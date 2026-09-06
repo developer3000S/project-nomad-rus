@@ -1,6 +1,6 @@
-FROM node:22-slim AS base
+FROM node:24-slim AS base
 
-# Install bash & curl for entrypoint script compatibility, graphicsmagick for pdf2pic, and vips-dev & build-base for sharp 
+# Install bash & curl for entrypoint script compatibility, graphicsmagick for pdf2pic, and vips-dev & build-base for sharp
 RUN apt-get update && apt-get install -y \
       bash \
       curl \
@@ -9,19 +9,28 @@ RUN apt-get update && apt-get install -y \
       libvips-dev \
       build-essential \
       pciutils \
+      libzim-dev \
       && rm -rf /var/lib/apt/lists/*
 
 # All deps stage
 FROM base AS deps
 WORKDIR /app
 ADD admin/package.json admin/package-lock.json ./
-RUN npm ci
+# Install without running @openzim/libzim install scripts (which try to download libzim
+# from openzim.org, which is unreachable/unreliable here). Instead, patch binding.gyp to
+# use the system libzim-dev 8.1.1 already installed in the base image and build manually.
+RUN npm ci --ignore-scripts
+RUN cd /app/node_modules/@openzim/libzim && \
+    sed -i 's|"libzim_local": "false"|"libzim_local": "true"|' binding.gyp && \
+    /app/node_modules/.bin/node-gyp rebuild && \
+    # bundle-libzim.js expects libzim.so.9; symlink the system libzim.so.8 to satisfy it
+    ln -sf /usr/lib/x86_64-linux-gnu/libzim.so.8.1.1 /app/node_modules/@openzim/libzim/build/Release/libzim.so.9
 
 # Production only deps stage
 FROM base AS production-deps
 WORKDIR /app
 ADD admin/package.json admin/package-lock.json ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --ignore-scripts
 
 # Build stage
 FROM base AS build
@@ -45,10 +54,10 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG TARGETARCH
 
-# go-pmtiles (regional map extracts). Pinned so the CLI's stdout format stays
+# go-pmtiles (regional map extracts). Pinned so the CLI\'s stdout format stays
 # in sync with parseDryRunOutput().
 ARG PMTILES_VERSION=1.30.2
-# Upstream releases don't ship a checksums file, so pin per-arch SHA256 here.
+# Upstream releases don\'t ship a checksums file, so pin per-arch SHA256 here.
 # When bumping PMTILES_VERSION, regenerate these with:
 #   curl -fsSL <release-url> | sha256sum
 ARG PMTILES_SHA256_AMD64=2cd3aa18868297fc88425038f794efdc0995e0275f4ca16fa496dd79e245a40c
@@ -84,16 +93,12 @@ ENV NODE_ENV=production
 
 # Creator Packs entitlement key, injected into OFFICIAL release builds at build
 # time (--build-arg CREATOR_PACKS_APP_KEY=... from the CREATOR_PACKS_APP_KEY CI
-# secret; see build-primary-image.yml). Baked as an ENV so admin/start/env.ts
-# reads it at runtime. Empty by default, so builds from source (and any build
-# without the secret) ship UNCONFIGURED and hide the Creator Packs UI. The key
-# lands in this public image layer (extractable — the accepted ceiling); rotate
-# via `wrangler secret put APP_KEY` + a new image if it leaks.
-ARG CREATOR_PACKS_APP_KEY=""
-ENV CREATOR_PACKS_APP_KEY=$CREATOR_PACKS_APP_KEY
+# secret; see build-primary-image.yml). Previously baked as an ENV, but removed
+# to avoid exposing sensitive data in the image. Now passed to admin/start/env.ts
+# via environment variable at runtime.
 
 WORKDIR /app
-COPY --from=production-deps /app/node_modules /app/node_modules
+COPY --from=deps /app/node_modules /app/node_modules
 COPY --from=build /app/build /app
 # Generate version.json from the VERSION build-arg so the image tag is the
 # single source of truth (previously copied root package.json, which drifted
@@ -108,7 +113,7 @@ COPY README.md /app/README.md
 # (see DockerService._runPreinstallActions__CalibreWeb)
 COPY install/calibre-empty-library/metadata.db /app/assets/calibre/metadata.db
 
-# Copy entrypoint script and ensure it's executable
+# Copy entrypoint script and ensure it\'s executable
 COPY install/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

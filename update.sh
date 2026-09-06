@@ -1,37 +1,37 @@
 #!/bin/bash
 
-# Script for automatic GitHub repository update
-# Usage: ./update.sh "Your commit message"
+# Скрипт для автоматического обновления GitHub-репозитория
+# Использование: ./update.sh "Ваше сообщение коммита"
 
-# Check for presence of commit message
+# Проверка наличия сообщения коммита
 if [ -z "$1" ]; then
-    echo "Error: Please provide a commit message."
-    echo "Example: ./update.sh \"Fixed log processing error\""
+    echo "Ошибка: Укажите сообщение коммита."
+    echo "Пример: ./update.sh \"Исправлена ошибка обработки логов\""
     exit 1
 fi
 
 COMMIT_MSG="$1"
 
-echo "--- Starting GitHub update ---"
+echo "--- Начало обновления GitHub ---"
 
-# 1. Adding all changes
-echo "[1/3] Adding files..."
+# 1. Добавление всех изменений
+echo "[1/3] Добавление файлов..."
 git add .
 
-# 2. Creating commit
-echo "[2/3] Creating commit: '$COMMIT_MSG'..."
-git commit -m "$COMMIT_MSG" || echo "No changes to commit."
+# 2. Создание коммита
+echo "[2/3] Создание коммита: '$COMMIT_MSG'..."
+git commit -m "$COMMIT_MSG" || echo "Нет изменений для коммита."
 
-# 3. Pushing to current branch
+# 3. Отправка в текущую ветку
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-echo "[3/3] Pushing data to GitHub (branch $CURRENT_BRANCH)..."
+echo "[3/3] Отправка данных в GitHub (ветка $CURRENT_BRANCH)..."
 # Добавляем флаг --no-thin и предварительную очистку для стабильности на внешних дисках
 git gc --auto > /dev/null 2>&1
 git push origin "$CURRENT_BRANCH" --no-thin
 
 if [ $? -eq 0 ]; then
-    echo "--- Success: Repository updated! ---"
+    echo "--- Успех: Репозиторий обновлён! ---"
 else
-    echo "--- Error: Failed to update repository. ---"
+    echo "--- Ошибка: Не удалось обновить репозиторий. ---"
     exit 1
 fi
