@@ -87,7 +87,7 @@ export class KiwixCatalogService {
         if (latest) result.set(`zim:${r.resource_id}`, latest)
       } catch (error) {
         logger.warn(
-          `[KiwixCatalogService] ZIM check failed for ${r.resource_id}: ${error instanceof Error ? error.message : error}`
+          `[KiwixCatalogService] Проверка ZIM не удалась для ${r.resource_id}: ${error instanceof Error ? error.message : error}`
         )
       }
     })
@@ -101,7 +101,7 @@ export class KiwixCatalogService {
         }
       } catch (error) {
         logger.warn(
-          `[KiwixCatalogService] Map listing fetch failed: ${error instanceof Error ? error.message : error}`
+          `[KiwixCatalogService] Получение списка карт не удалось: ${error instanceof Error ? error.message : error}`
         )
       }
     }

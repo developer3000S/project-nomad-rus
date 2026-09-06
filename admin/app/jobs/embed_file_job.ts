@@ -70,7 +70,7 @@ export class EmbedFileJob {
 
     const isZimBatch = batchOffset !== undefined
     const batchInfo = isZimBatch ? ` (batch offset: ${batchOffset})` : ''
-    logger.info(`[EmbedFileJob] Starting embedding process for: ${fileName}${batchInfo}`)
+    logger.info(`[EmbedFileJob] Запуск процесса эмбеддинга для: ${fileName}${batchInfo}`)
 
     const dockerService = new DockerService()
     const ollamaService = new OllamaService()
@@ -82,23 +82,23 @@ export class EmbedFileJob {
       // retrying 30x when the service doesn't exist just wastes Redis connections
       const ollamaUrl = await dockerService.getServiceURL('nomad_ollama')
       if (!ollamaUrl) {
-        logger.warn('[EmbedFileJob] Ollama is not installed. Skipping embedding for: %s', fileName)
-        throw new UnrecoverableError('Ollama service is not installed. Install AI Assistant to enable file embeddings.')
+        logger.warn('[EmbedFileJob] Ollama не установлен. Эмбеддинг пропускается для: %s', fileName)
+        throw new UnrecoverableError('Сервис Ollama не установлен. Установите AI-ассистента, чтобы включить эмбеддинг файлов.')
       }
 
       const existingModels = await ollamaService.getModels()
       if (!existingModels) {
-        logger.warn('[EmbedFileJob] Ollama service not ready yet. Will retry...')
-        throw new Error('Ollama service not ready yet')
+        logger.warn('[EmbedFileJob] Сервис Ollama ещё не готов. Повторная попытка...')
+        throw new Error('Сервис Ollama ещё не готов')
       }
 
       const qdrantUrl = await dockerService.getServiceURL('nomad_qdrant')
       if (!qdrantUrl) {
-        logger.warn('[EmbedFileJob] Qdrant is not installed. Skipping embedding for: %s', fileName)
-        throw new UnrecoverableError('Qdrant service is not installed. Install AI Assistant to enable file embeddings.')
+        logger.warn('[EmbedFileJob] Qdrant не установлен. Эмбеддинг пропускается для: %s', fileName)
+        throw new UnrecoverableError('Сервис Qdrant не установлен. Установите AI-ассистента, чтобы включить эмбеддинг файлов.')
       }
 
-      logger.info(`[EmbedFileJob] Services ready. Processing file: ${fileName}`)
+      logger.info(`[EmbedFileJob] Сервисы готовы. Обработка файла: ${fileName}`)
 
       // Anchor initial progress to where we are in the overall file. For a
       // continuation batch midway through a multi-batch ZIM (e.g. offset 100k of
@@ -116,7 +116,7 @@ export class EmbedFileJob {
         startedAt: job.data.startedAt || Date.now(),
       })
 
-      logger.info(`[EmbedFileJob] Processing file: ${filePath}`)
+      logger.info(`[EmbedFileJob] Обработка файла: ${filePath}`)
 
       // Progress callback. For multi-batch ZIM ingestions, scale the service-reported
       // 0-100% (which is % through the current batch's chunks) into the overall-file
@@ -151,7 +151,7 @@ export class EmbedFileJob {
       )
 
       if (!result.success) {
-        logger.error(`[EmbedFileJob] Failed to process file ${fileName}: ${result.message}`)
+        logger.error(`[EmbedFileJob] Не удалось обработать файл ${fileName}: ${result.message}`)
         throw new Error(result.message)
       }
 
@@ -159,7 +159,7 @@ export class EmbedFileJob {
       if (result.hasMoreBatches) {
         const nextOffset = (batchOffset || 0) + (result.articlesProcessed || 0)
         logger.info(
-          `[EmbedFileJob] Batch complete. Dispatching next batch at offset ${nextOffset}`
+          `[EmbedFileJob] Батч завершён. Запуск следующего батча со смещением ${nextOffset}`
         )
 
         // Pace continuation batches when embedding is CPU-bound. Sustained 100% CPU
@@ -170,7 +170,7 @@ export class EmbedFileJob {
         const isGpuAccelerated = await ollamaService.isEmbeddingGpuAccelerated()
         if (!isGpuAccelerated) {
           logger.info(
-            `[EmbedFileJob] Embedding is CPU-only — pacing ${EmbedFileJob.CPU_BATCH_DELAY_MS}ms before dispatching next batch`
+            `[EmbedFileJob] Эмбеддинг только на CPU — пауза ${EmbedFileJob.CPU_BATCH_DELAY_MS}мс перед запуском следующего батча`
           )
           await new Promise((resolve) => setTimeout(resolve, EmbedFileJob.CPU_BATCH_DELAY_MS))
         }
@@ -186,7 +186,7 @@ export class EmbedFileJob {
           .getJob(job.id!)
         if (!stillQueued) {
           logger.info(
-            `[EmbedFileJob] Job ${fileName} was cancelled; skipping continuation dispatch`
+            `[EmbedFileJob] Задача ${fileName} была отменена; пропуск запуска продолжения`
           )
           return { success: false, cancelled: true, fileName, filePath }
         }
@@ -235,7 +235,7 @@ export class EmbedFileJob {
           chunks: result.chunks,
           hasMoreBatches: true,
           nextOffset,
-          message: `Batch embedded ${result.chunks} chunks, next batch queued`,
+          message: `Батч: встроено ${result.chunks} фрагментов, следующий батч поставлен в очередь`,
         }
       }
 
@@ -259,14 +259,14 @@ export class EmbedFileJob {
         await KbIngestState.markIndexed(filePath, totalChunks, effectiveCollection)
       } catch (stateErr) {
         logger.warn(
-          `[EmbedFileJob] Failed to persist ingest state for ${fileName}: %s`,
+          `[EmbedFileJob] Не удалось сохранить состояние индексирования для ${fileName}: %s`,
           stateErr instanceof Error ? stateErr.message : String(stateErr)
         )
       }
 
-      const batchMsg = isZimBatch ? ` (final batch, total chunks: ${totalChunks})` : ''
+      const batchMsg = isZimBatch ? ` (финальный батч, всего фрагментов: ${totalChunks})` : ''
       logger.info(
-        `[EmbedFileJob] Successfully embedded ${result.chunks} chunks from file: ${fileName}${batchMsg}`
+        `[EmbedFileJob] Успешно встроено ${result.chunks} фрагментов из файла: ${fileName}${batchMsg}`
       )
 
       return {
@@ -274,7 +274,7 @@ export class EmbedFileJob {
         fileName,
         filePath,
         chunks: result.chunks,
-        message: `Successfully embedded ${result.chunks} chunks`,
+        message: `Успешно встроено ${result.chunks} фрагментов`,
       }
     } catch (error) {
       // A chunk that still exceeds the model's context after OllamaService's truncate-and-retry is
@@ -285,20 +285,20 @@ export class EmbedFileJob {
       let normalizedError = error
       if (!(error instanceof UnrecoverableError) && OllamaService.isContextLengthError(error)) {
         logger.warn(
-          `[EmbedFileJob] Context-length overflow persisted for ${fileName} after truncation; not retrying.`
+          `[EmbedFileJob] Переполнение длины контекста для ${fileName} сохраняется после усечения; повтор не выполняется.`
         )
         normalizedError = new UnrecoverableError(
-          error instanceof Error ? error.message : 'Embedding input exceeds the model context length'
+          error instanceof Error ? error.message : 'Входные данные эмбеддинга превышают длину контекста модели'
         )
       }
 
-      logger.error(`[EmbedFileJob] Error embedding file ${fileName}:`, normalizedError)
+      logger.error(`[EmbedFileJob] Ошибка эмбеддинга файла ${fileName}:`, normalizedError)
 
       await job.updateData({
         ...job.data,
         status: 'failed',
         failedAt: Date.now(),
-        error: normalizedError instanceof Error ? normalizedError.message : 'Unknown error',
+        error: normalizedError instanceof Error ? normalizedError.message : 'Неизвестная ошибка',
       })
 
       // Only persist `failed` for unrecoverable errors. Retryable errors get
@@ -308,11 +308,11 @@ export class EmbedFileJob {
         try {
           await KbIngestState.markFailed(
             filePath,
-            normalizedError instanceof Error ? normalizedError.message : 'Unknown error'
+            normalizedError instanceof Error ? normalizedError.message : 'Неизвестная ошибка'
           )
         } catch (stateErr) {
           logger.warn(
-            `[EmbedFileJob] Failed to persist failed state for ${fileName}: %s`,
+            `[EmbedFileJob] Не удалось сохранить состояние ошибки для ${fileName}: %s`,
             stateErr instanceof Error ? stateErr.message : String(stateErr)
           )
         }
@@ -393,19 +393,19 @@ export class EmbedFileJob {
       const job = await queue.add(this.key, params, jobOptions)
 
       const label = isContinuation
-        ? ` (continuation @ offset ${params.batchOffset})`
+        ? ` (продолжение @ offset ${params.batchOffset})`
         : force
-          ? ' (forced re-dispatch)'
+          ? ' (принудительный перезапуск)'
           : ''
       logger.info(
-        `[EmbedFileJob] Dispatched embedding job for file: ${params.fileName}${label}`
+        `[EmbedFileJob] Задача эмбеддинга запущена для файла: ${params.fileName}${label}`
       )
 
       return {
         job,
         created: true,
         jobId: job.id ?? initialJobId,
-        message: `File queued for embedding: ${params.fileName}`,
+        message: `Файл поставлен в очередь на эмбеддинг: ${params.fileName}`,
       }
     } catch (error) {
       if (
@@ -415,12 +415,12 @@ export class EmbedFileJob {
         error.message.includes('job already exists')
       ) {
         const existing = await queue.getJob(initialJobId)
-        logger.info(`[EmbedFileJob] Job already exists for file: ${params.fileName}`)
+        logger.info(`[EmbedFileJob] Задача уже существует для файла: ${params.fileName}`)
         return {
           job: existing,
           created: false,
           jobId: initialJobId,
-          message: `Embedding job already exists for: ${params.fileName}`,
+          message: `Задача эмбеддинга уже существует для: ${params.fileName}`,
         }
       }
       throw error
@@ -469,7 +469,7 @@ export class EmbedFileJob {
       cleaned++
     }
 
-    logger.info(`[EmbedFileJob] Cleaned up ${cleaned} failed jobs, deleted ${filesDeleted} files`)
+    logger.info(`[EmbedFileJob] Очищено ${cleaned} неудачных задач, удалено ${filesDeleted} файлов`)
     return { cleaned, filesDeleted }
   }
 
@@ -509,7 +509,7 @@ export class EmbedFileJob {
     // prevents it from dispatching a continuation back into the cleared queue.
     await queue.obliterate({ force: true })
 
-    logger.info(`[EmbedFileJob] Cancelled ${cancelled} jobs, deleted ${filesDeleted} files`)
+    logger.info(`[EmbedFileJob] Отменено ${cancelled} задач, удалено ${filesDeleted} файлов`)
     return { cancelled, filesDeleted }
   }
 

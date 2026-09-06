@@ -24,7 +24,7 @@ export default class BenchmarkController {
     if (status.status !== 'idle') {
       return response.status(409).send({
         success: false,
-        error: 'A benchmark is already running',
+        error: 'Бенчмарк уже запущен',
         current_benchmark_id: status.benchmarkId,
       })
     }
@@ -53,10 +53,10 @@ export default class BenchmarkController {
           result,
         })
       } catch (error) {
-        logger.error({ err: error }, '[BenchmarkController] Benchmark run failed')
+        logger.error({ err: error }, '[BenchmarkController] Ошибка запуска бенчмарка')
         return response.status(500).send({
           success: false,
-          error: 'An internal error occurred while running the benchmark.',
+          error: 'Внутренняя ошибка при запуске бенчмарка.',
         })
       }
     }
@@ -74,8 +74,8 @@ export default class BenchmarkController {
       job_id: job?.id || benchmarkId,
       benchmark_id: benchmarkId,
       message: created
-        ? `${benchmarkType} benchmark started`
-        : 'Benchmark job already exists',
+        ? `Бенчмарк ${benchmarkType} запущен`
+        : 'Задача бенчмарка уже существует',
     })
   }
 
@@ -87,7 +87,7 @@ export default class BenchmarkController {
     if (status.status !== 'idle') {
       return response.status(409).send({
         success: false,
-        error: 'A benchmark is already running',
+        error: 'Бенчмарк уже запущен',
       })
     }
 
@@ -101,7 +101,7 @@ export default class BenchmarkController {
     return response.status(201).send({
       success: true,
       benchmark_id: benchmarkId,
-      message: 'System benchmark started',
+      message: 'Системный бенчмарк запущен',
     })
   }
 
@@ -113,7 +113,7 @@ export default class BenchmarkController {
     if (status.status !== 'idle') {
       return response.status(409).send({
         success: false,
-        error: 'A benchmark is already running',
+        error: 'Бенчмарк уже запущен',
       })
     }
 
@@ -127,7 +127,7 @@ export default class BenchmarkController {
     return response.status(201).send({
       success: true,
       benchmark_id: benchmarkId,
-      message: 'AI benchmark started',
+      message: 'AI-бенчмарк запущен',
     })
   }
 
@@ -160,7 +160,7 @@ export default class BenchmarkController {
     const result = await this.benchmarkService.getResultById(params.id)
     if (!result) {
       return response.status(404).send({
-        error: 'Benchmark result not found',
+        error: 'Результат бенчмарка не найден',
       })
     }
     return { result }
@@ -183,7 +183,7 @@ export default class BenchmarkController {
     } catch (error) {
       // Pass through the status code from the service if available, otherwise default to 400
       const statusCode = (error as any).statusCode || 400
-      logger.error({ err: error }, '[BenchmarkController] Benchmark submit failed')
+      logger.error({ err: error }, '[BenchmarkController] Ошибка отправки бенчмарка')
 
       // Surface a clear, actionable reason to the UI instead of a generic failure.
       // The rate limiter (429) is the most common cause, so name it explicitly;
@@ -191,10 +191,10 @@ export default class BenchmarkController {
       // validation message) and fall back to a safe generic only when we have none.
       let errorMessage: string
       if (statusCode === 429) {
-        errorMessage = 'You can only submit one benchmark per hour. Please wait a bit and try again.'
+        errorMessage = 'Можно отправить только один бенчмарк в час. Подождите немного и попробуйте снова.'
       } else {
         errorMessage =
-          (error as any).detail || (error as any).message || 'Failed to submit benchmark results.'
+          (error as any).detail || (error as any).message || 'Не удалось отправить результаты бенчмарка.'
       }
 
       return response.status(statusCode).send({
@@ -214,7 +214,7 @@ export default class BenchmarkController {
     if (!benchmarkId) {
       return response.status(400).send({
         success: false,
-        error: 'benchmark_id is required',
+        error: 'Требуется benchmark_id',
       })
     }
 
@@ -222,7 +222,7 @@ export default class BenchmarkController {
     if (!result) {
       return response.status(404).send({
         success: false,
-        error: 'Benchmark result not found',
+        error: 'Результат бенчмарка не найден',
       })
     }
 

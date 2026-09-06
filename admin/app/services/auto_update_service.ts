@@ -209,7 +209,7 @@ export class AutoUpdateService {
       return cached.releases
     }
     if (now - AutoUpdateService.releasesFailureAt < RELEASES_FAILURE_TTL_MS) {
-      throw new Error('GitHub releases fetch recently failed; backing off')
+      throw new Error('Недавняя попытка получить релизы с GitHub не удалась; ожидание')
     }
 
     try {
@@ -218,7 +218,7 @@ export class AutoUpdateService {
         timeout: 5000,
       })
       if (!Array.isArray(response.data)) {
-        throw new Error('Unexpected response from GitHub releases API')
+        throw new Error('Неожиданный ответ от API релизов GitHub')
       }
       AutoUpdateService.releasesCache = { releases: response.data, at: now }
       return response.data
@@ -279,14 +279,14 @@ export class AutoUpdateService {
 
     // 1. Sidecar must be present to perform the update.
     if (!this.systemUpdateService.isSidecarAvailable()) {
-      blockers.push({ reason: 'Update sidecar is not available', severity: 'failure' })
+      blockers.push({ reason: 'Сторожевой процесс обновления недоступен', severity: 'failure' })
     }
 
     // 2. No system update already running.
     const updateStatus = this.systemUpdateService.getUpdateStatus()
     if (updateStatus && !['idle', 'complete', 'error'].includes(updateStatus.stage)) {
       blockers.push({
-        reason: `A system update is already in progress (stage: ${updateStatus.stage})`,
+        reason: `Системное обновление уже выполняется (этап: ${updateStatus.stage})`,
         severity: 'skip',
       })
     }
@@ -299,12 +299,12 @@ export class AutoUpdateService {
       )
       if (active.length > 0) {
         blockers.push({
-          reason: `${active.length} download(s) in progress`,
+          reason: `${active.length} загрузка(и) выполняется`,
           severity: 'skip',
         })
       }
     } catch (error) {
-      logger.warn(`[AutoUpdateService] Could not check active downloads: ${error.message}`)
+      logger.warn(`[AutoUpdateService] Не удалось проверить активные загрузки: ${error.message}`)
     }
 
     // 4. No app (container) install/update in progress.
@@ -312,12 +312,12 @@ export class AutoUpdateService {
       const installing = await Service.query().whereNot('installation_status', 'idle')
       if (installing.length > 0) {
         blockers.push({
-          reason: `${installing.length} app install/update(s) in progress`,
+          reason: `${installing.length} установка/обновление приложения(й) выполняется`,
           severity: 'skip',
         })
       }
     } catch (error) {
-      logger.warn(`[AutoUpdateService] Could not check app installations: ${error.message}`)
+      logger.warn(`[AutoUpdateService] Не удалось проверить установки приложений: ${error.message}`)
     }
 
     // 5. Sufficient host storage for the new image.
@@ -384,7 +384,7 @@ export class AutoUpdateService {
     }
 
     if (!config.enabled) {
-      return { ...base, outcome: 'disabled', reason: 'Auto-update is disabled' }
+      return { ...base, outcome: 'disabled', reason: 'Автообновление отключено' }
     }
 
     const withinWindow = this.isWithinWindow(config, now)
@@ -392,7 +392,7 @@ export class AutoUpdateService {
       return {
         ...base,
         outcome: 'outside-window',
-        reason: `Outside update window (${config.windowStart}-${config.windowEnd})`,
+        reason: `Вне окна обновления (${config.windowStart}-${config.windowEnd})`,
       }
     }
 
@@ -405,7 +405,7 @@ export class AutoUpdateService {
         ...base,
         withinWindow,
         outcome: 'eligibility-error',
-        reason: `Failed to determine eligible version: ${error.message}`,
+        reason: `Не удалось определить подходящую версию: ${error.message}`,
       }
     }
 
@@ -414,7 +414,7 @@ export class AutoUpdateService {
         ...base,
         withinWindow,
         outcome: 'no-eligible',
-        reason: 'No eligible minor/patch update available (or still in cool-off)',
+        reason: 'Нет доступных минорных/патч-обновлений (или всё ещё в периоде охлаждения)',
       }
     }
 
@@ -432,7 +432,7 @@ export class AutoUpdateService {
         eligibleTarget,
         preflight,
         outcome: 'blocked',
-        reason: `Pre-flight blocked: ${summary}`,
+        reason: `Заблокировано предварительной проверкой: ${summary}`,
       }
     }
 
@@ -442,7 +442,7 @@ export class AutoUpdateService {
       eligibleTarget,
       preflight,
       outcome: 'ready',
-      reason: `Ready to update to ${eligibleTarget.tag}`,
+      reason: `Готов к обновлению до ${eligibleTarget.tag}`,
     }
   }
 
@@ -497,11 +497,11 @@ export class AutoUpdateService {
 
         if (result.success) {
           await this.recordSuccess(target)
-          logger.info(`[AutoUpdateService] Auto-update requested: ${target.tag}`)
-          return { updated: true, reason: `Update requested: ${target.tag}` }
+          logger.info(`[AutoUpdateService] Запрошено автообновление: ${target.tag}`)
+          return { updated: true, reason: `Запрошено обновление: ${target.tag}` }
         }
 
-        await this.recordFailure(`Update request failed: ${result.message}`)
+        await this.recordFailure(`Запрос обновления не удался: ${result.message}`)
         return { updated: false, reason: result.message }
       }
     }
@@ -511,7 +511,7 @@ export class AutoUpdateService {
 
   private async recordSuccess(target: EligibleTarget): Promise<void> {
     await KVStore.setValue('autoUpdate.lastAttemptAt', DateTime.now().toISO()!)
-    await KVStore.setValue('autoUpdate.lastResult', `Update requested: ${target.tag}`)
+    await KVStore.setValue('autoUpdate.lastResult', `Запрошено обновление: ${target.tag}`)
     await KVStore.clearValue('autoUpdate.lastError')
     await KVStore.setValue('autoUpdate.consecutiveFailures', '0')
   }
@@ -519,7 +519,7 @@ export class AutoUpdateService {
   private async recordSkip(reason: string): Promise<void> {
     await KVStore.setValue('autoUpdate.lastAttemptAt', DateTime.now().toISO()!)
     await KVStore.setValue('autoUpdate.lastResult', reason)
-    logger.info(`[AutoUpdateService] Skipped: ${reason}`)
+    logger.info(`[AutoUpdateService] Пропущено: ${reason}`)
   }
 
   private async recordFailure(reason: string): Promise<void> {
@@ -530,16 +530,16 @@ export class AutoUpdateService {
     const prior = Number(await KVStore.getValue('autoUpdate.consecutiveFailures')) || 0
     const failures = prior + 1
     await KVStore.setValue('autoUpdate.consecutiveFailures', String(failures))
-    logger.error(`[AutoUpdateService] Failure ${failures}/${MAX_CONSECUTIVE_FAILURES}: ${reason}`)
+    logger.error(`[AutoUpdateService] Сбой ${failures}/${MAX_CONSECUTIVE_FAILURES}: ${reason}`)
 
     if (failures >= MAX_CONSECUTIVE_FAILURES) {
       await KVStore.setValue('autoUpdate.enabled', false)
       await KVStore.setValue(
         'autoUpdate.autoDisabledReason',
-        `Auto-update disabled after ${failures} consecutive failures. Last error: ${reason}`
+        `Автообновление отключено после ${failures} последовательных сбоев. Последняя ошибка: ${reason}`
       )
       logger.error(
-        `[AutoUpdateService] Auto-update auto-disabled after ${failures} consecutive failures`
+        `[AutoUpdateService] Автообновление автоматически отключено после ${failures} последовательных сбоев`
       )
     }
   }
@@ -553,7 +553,7 @@ export class AutoUpdateService {
     try {
       eligibleTarget = await this.getEligibleTarget(config)
     } catch (error) {
-      logger.warn(`[AutoUpdateService] getStatus eligibility lookup failed: ${error.message}`)
+      logger.warn(`[AutoUpdateService] Ошибка проверки доступных обновлений: ${error.message}`)
     }
 
     const [lastAttemptAt, lastResult, lastError, consecutiveFailures, autoDisabledReason] =

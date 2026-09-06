@@ -77,7 +77,7 @@ export class CollectionManifestService {
 
       return true
     } catch (error) {
-      logger.error(`[CollectionManifestService] Failed to fetch spec for ${type}:`, error?.message || error)
+      logger.error(`[CollectionManifestService] Не удалось получить спецификацию для ${type}:`, error?.message || error)
       return false
     }
   }
@@ -167,7 +167,7 @@ export class CollectionManifestService {
       return downloadJobs.length === 0
     } catch (error: any) {
       logger.warn(
-        '[CollectionManifestService] Could not determine drug indexing state:',
+        '[CollectionManifestService] Не удалось определить состояние индексации лекарств:',
         error?.message || error
       )
       return false
@@ -187,7 +187,7 @@ export class CollectionManifestService {
     } catch (error) {
       // Don't fail the whole categories endpoint if the queue is briefly
       // unreachable — just report no in-flight downloads.
-      logger.warn('[CollectionManifestService] Could not read download queue:', error?.message || error)
+      logger.warn('[CollectionManifestService] Не удалось прочитать очередь загрузок:', error?.message || error)
     }
 
     // Also surface an in-flight curated-tier drug-dataset install. The drug
@@ -224,7 +224,7 @@ export class CollectionManifestService {
       }
     } catch (error: any) {
       logger.warn(
-        '[CollectionManifestService] Could not read drug dataset queue:',
+        '[CollectionManifestService] Не удалось прочитать очередь набора данных лекарств:',
         error?.message || error
       )
     }
@@ -418,7 +418,7 @@ export class CollectionManifestService {
     let zimCount = 0
     let mapCount = 0
 
-    console.log("RECONCILING FILESYSTEM MANIFESTS...")
+    console.log("СВЕРКА МАНИФЕСТОВ С ФАЙЛОВОЙ СИСТЕМОЙ...")
 
     // Reconcile ZIM files
     try {
@@ -427,7 +427,7 @@ export class CollectionManifestService {
       const zimItems = await listDirectoryContents(zimDir)
       const zimFiles = zimItems.filter((f) => f.name.endsWith('.zim'))
 
-      console.log(`Found ${zimFiles.length} ZIM files on disk. Reconciling with database...`)
+      console.log(`Найдено ${zimFiles.length} ZIM файлов на диске. Сверка с базой данных...`)
 
       // Get spec for URL lookup
       const zimSpec = await this.getCachedSpec<ZimCategoriesSpec>('zim_categories')
@@ -453,11 +453,11 @@ export class CollectionManifestService {
       const managedWikipediaFilename = wikipediaSelection?.filename ?? null
 
       for (const file of zimFiles) {
-        console.log(`Processing ZIM file: ${file.name}`)
+        console.log(`Обработка ZIM файла: ${file.name}`)
         if (managedWikipediaFilename && file.name === managedWikipediaFilename) continue
 
         const parsed = CollectionManifestService.parseZimFilename(file.name)
-        console.log(`Parsed ZIM filename:`, parsed)
+        console.log(`Разобрано имя ZIM файла:`, parsed)
         if (!parsed) continue
 
         seenZimIds.add(parsed.resource_id)
@@ -487,7 +487,7 @@ export class CollectionManifestService {
         }
       }
     } catch (error) {
-      logger.error('[CollectionManifestService] Error reconciling ZIM files:', error)
+      logger.error('[CollectionManifestService] Ошибка сверки ZIM файлов:', error)
     }
 
     // Reconcile map files
@@ -541,10 +541,10 @@ export class CollectionManifestService {
         }
       }
     } catch (error) {
-      logger.error('[CollectionManifestService] Error reconciling map files:', error)
+      logger.error('[CollectionManifestService] Ошибка сверки файлов карт:', error)
     }
 
-    logger.info(`[CollectionManifestService] Reconciled ${zimCount} ZIM files, ${mapCount} map files`)
+    logger.info(`[CollectionManifestService] Сверка завершена: ${zimCount} ZIM файлов, ${mapCount} файлов карт`)
     return { zim: zimCount, map: mapCount }
   }
 }

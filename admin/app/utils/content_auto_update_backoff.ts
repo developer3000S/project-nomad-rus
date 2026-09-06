@@ -39,13 +39,13 @@ export async function recordResourceUpdateFailure(
   const failures = (resource.auto_update_consecutive_failures || 0) + 1
   resource.auto_update_consecutive_failures = failures
   if (failures >= MAX_CONSECUTIVE_FAILURES) {
-    resource.auto_update_disabled_reason = `Auto-update disabled after ${failures} consecutive failures. Last error: ${reason}`
+    resource.auto_update_disabled_reason = `Автообновление отключено после ${failures} последовательных сбоев. Последняя ошибка: ${reason}`
     logger.error(
-      `[ContentAutoUpdate] ${resource.resource_id} auto-disabled after ${failures} failures`
+      `[ContentAutoUpdate] ${resource.resource_id} автоматически отключён после ${failures} сбоев`
     )
   }
   await resource.save()
   logger.error(
-    `[ContentAutoUpdate] ${resource.resource_id} failure ${failures}/${MAX_CONSECUTIVE_FAILURES}: ${reason}`
+    `[ContentAutoUpdate] ${resource.resource_id} сбой ${failures}/${MAX_CONSECUTIVE_FAILURES}: ${reason}`
   )
 }

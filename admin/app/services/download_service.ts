@@ -400,7 +400,7 @@ export class DownloadService {
     }
 
     console.warn(
-      `[DownloadService] cancelJob: job ${jobId} did not reach terminal state within timeout, removing anyway`
+      `[DownloadService] cancelJob: задание ${jobId} не достигло терминального состояния за время ожидания, удаляем всё равно`
     )
   }
 

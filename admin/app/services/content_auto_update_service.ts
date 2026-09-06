@@ -145,20 +145,20 @@ export class ContentAutoUpdateService {
     now: DateTime
   ): ContentEligibility {
     if (!resource.available_update_version) {
-      return { eligible: false, reason: 'Up to date', cooloffRemainingHours: null }
+      return { eligible: false, reason: 'Актуальная версия', cooloffRemainingHours: null }
     }
     if (resource.auto_update_disabled_reason) {
       return {
         eligible: false,
-        reason: 'Auto-update disabled after repeated failures',
+        reason: 'Автообновление отключено после повторных сбоев',
         cooloffRemainingHours: null,
       }
     }
     if (!(resource.available_update_version > resource.version)) {
-      return { eligible: false, reason: 'Up to date', cooloffRemainingHours: null }
+      return { eligible: false, reason: 'Актуальная версия', cooloffRemainingHours: null }
     }
     if (!resource.available_update_first_seen_at) {
-      return { eligible: false, reason: 'Cool-off pending', cooloffRemainingHours: cooloffHours }
+      return { eligible: false, reason: 'Ожидание периода охлаждения', cooloffRemainingHours: cooloffHours }
     }
 
     const ageHours = now.diff(resource.available_update_first_seen_at, 'hours').hours
@@ -167,14 +167,14 @@ export class ContentAutoUpdateService {
       const rounded = Math.ceil(remaining)
       return {
         eligible: false,
-        reason: `In cool-off (${rounded}h remaining)`,
+        reason: `В периоде охлаждения (осталось ${rounded} ч)`,
         cooloffRemainingHours: rounded,
       }
     }
 
     return {
       eligible: true,
-      reason: `Eligible → ${resource.available_update_version}`,
+      reason: `Подходит → ${resource.available_update_version}`,
       cooloffRemainingHours: 0,
     }
   }
@@ -237,11 +237,11 @@ export class ContentAutoUpdateService {
         (d) => !!d.status && ['waiting', 'active', 'delayed'].includes(d.status)
       )
       if (active.length > 0) {
-        blockers.push({ reason: `${active.length} download(s) in progress`, severity: 'skip' })
+        blockers.push({ reason: `${active.length} загрузка(и) выполняется`, severity: 'skip' })
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      logger.warn(`[ContentAutoUpdateService] Could not check active downloads: ${message}`)
+      logger.warn(`[ContentAutoUpdateService] Не удалось проверить активные загрузки: ${message}`)
     }
     return { ok: blockers.length === 0, blockers }
   }
@@ -256,10 +256,10 @@ export class ContentAutoUpdateService {
     const now = DateTime.now()
 
     if (!config.enabled) {
-      return { started: 0, reason: 'Content auto-update is disabled' }
+      return { started: 0, reason: 'Автообновление контента отключено' }
     }
     if (!isWithinWindow(config.windowStart, config.windowEnd, now)) {
-      const reason = `Outside update window (${config.windowStart}-${config.windowEnd})`
+      const reason = `Вне окна обновления (${config.windowStart}-${config.windowEnd})`
       await this.recordRun(reason)
       return { started: 0, reason }
     }
@@ -293,7 +293,7 @@ export class ContentAutoUpdateService {
       )
       if (eligible.length === 0) {
         await this.recordFeatureSuccess()
-        const reason = 'No eligible content updates'
+        const reason = 'Нет подходящих обновлений контента'
         await this.recordRun(reason)
         return { started: 0, reason }
       }
@@ -301,7 +301,7 @@ export class ContentAutoUpdateService {
       const global = await this.runGlobalPreflight()
       if (!global.ok) {
         await this.recordFeatureSuccess()
-        const reason = `Pre-flight blocked: ${global.blockers.map((b) => b.reason).join('; ')}`
+        const reason = `Заблокировано предварительной проверкой: ${global.blockers.map((b) => b.reason).join('; ')}`
         await this.recordRun(reason)
         return { started: 0, reason }
       }
@@ -350,12 +350,12 @@ export class ContentAutoUpdateService {
           initiatedBytes += candidate.size_bytes
           started++
           logger.info(
-            `[ContentAutoUpdateService] Started ${candidate.resource.resource_id} → ${candidate.version}`
+            `[ContentAutoUpdateService] Запущено ${candidate.resource.resource_id} → ${candidate.version}`
           )
         } else {
           // A failure to even enqueue is a genuine auto-update failure; no job runs,
           // so no terminal `failed` event will follow — count it here.
-          await recordResourceUpdateFailure(candidate.resource, result.error ?? 'dispatch failed')
+          await recordResourceUpdateFailure(candidate.resource, result.error ?? 'не удалось запустить')
           failed++
         }
       }
@@ -364,22 +364,22 @@ export class ContentAutoUpdateService {
         await this.addWindowBytesUsed(initiatedBytes)
       }
 
-      const parts = [`${started} started`]
-      if (failed) parts.push(`${failed} failed`)
-      if (skippedOversize.length) parts.push(`${skippedOversize.length} skipped (exceeds cap)`)
-      if (deferred.length) parts.push(`${deferred.length} deferred (over budget)`)
+      const parts = [`${started} запущено`]
+      if (failed) parts.push(`${failed} с ошибкой`)
+      if (skippedOversize.length) parts.push(`${skippedOversize.length} пропущено (превышает лимит)`)
+      if (deferred.length) parts.push(`${deferred.length} отложено (превышен бюджет)`)
       const reason = parts.join(', ')
 
       await this.recordFeatureSuccess()
       await this.recordRun(reason)
-      logger.info(`[ContentAutoUpdateService] Run complete: ${reason}`)
+      logger.info(`[ContentAutoUpdateService] Запуск завершён: ${reason}`)
       return { started, reason }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       await this.recordFeatureFailure(message)
-      await this.recordRun(`Failed: ${message}`)
-      logger.error(`[ContentAutoUpdateService] Run failed: ${message}`)
-      return { started: 0, reason: `Failed: ${message}` }
+      await this.recordRun(`Сбой: ${message}`)
+      logger.error(`[ContentAutoUpdateService] Сбой запуска: ${message}`)
+      return { started: 0, reason: `Сбой: ${message}` }
     }
   }
 
@@ -397,22 +397,22 @@ export class ContentAutoUpdateService {
   async attemptDrugDataset(): Promise<{ started: number; reason: string }> {
     const config = await this.getConfig()
     if (!config.enabled) {
-      return { started: 0, reason: 'Content auto-update is disabled' }
+      return { started: 0, reason: 'Автообновление контента отключено' }
     }
     if (!isWithinWindow(config.windowStart, config.windowEnd, DateTime.now())) {
       return {
         started: 0,
-        reason: `Outside update window (${config.windowStart}-${config.windowEnd})`,
+        reason: `Вне окна обновления (${config.windowStart}-${config.windowEnd})`,
       }
     }
 
     try {
       const result = await new DrugReferenceService().attemptAutoUpdate()
-      return { started: result.started ? 1 : 0, reason: `drug dataset: ${result.reason}` }
+      return { started: result.started ? 1 : 0, reason: `набор данных лекарств: ${result.reason}` }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      logger.warn(`[ContentAutoUpdateService] Drug dataset freshness check failed: ${message}`)
-      return { started: 0, reason: `drug dataset check failed: ${message}` }
+      logger.warn(`[ContentAutoUpdateService] Проверка актуальности набора данных лекарств не удалась: ${message}`)
+      return { started: 0, reason: `проверка набора данных лекарств не удалась: ${message}` }
     }
   }
 
@@ -532,10 +532,10 @@ export class ContentAutoUpdateService {
       await KVStore.setValue('contentAutoUpdate.enabled', false)
       await KVStore.setValue(
         'contentAutoUpdate.autoDisabledReason',
-        `Content auto-update disabled after ${failures} consecutive failures. Last error: ${reason}`
+        `Автообновление контента отключено после ${failures} последовательных сбоев. Последняя ошибка: ${reason}`
       )
       logger.error(
-        `[ContentAutoUpdateService] Feature auto-disabled after ${failures} consecutive failures`
+        `[ContentAutoUpdateService] Функция автоотключена после ${failures} последовательных сбоев`
       )
     }
   }
@@ -568,7 +568,7 @@ export class ContentAutoUpdateService {
         available_update_version: resource.available_update_version,
         size_bytes: size,
         eligible: verdict.eligible && !exceedsCap,
-        reason: exceedsCap ? 'Exceeds data cap — update manually' : verdict.reason,
+        reason: exceedsCap ? 'Превышает лимит данных — обновите вручную' : verdict.reason,
         cooloff_remaining_hours: verdict.cooloffRemainingHours,
         exceeds_cap: exceedsCap,
         consecutive_failures: resource.auto_update_consecutive_failures || 0,

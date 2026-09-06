@@ -125,12 +125,12 @@ export class AppAutoUpdateService {
    */
   appEligibility(service: Service, cooloffHours: number, now: DateTime): AppEligibility {
     if (!service.available_update_version) {
-      return { eligible: false, reason: 'Up to date', cooloffRemainingHours: null }
+      return { eligible: false, reason: 'Актуальная версия', cooloffRemainingHours: null }
     }
     if (service.auto_update_disabled_reason) {
       return {
         eligible: false,
-        reason: 'Auto-update disabled after repeated failures',
+        reason: 'Автообновление отключено после повторных сбоев',
         cooloffRemainingHours: null,
       }
     }
@@ -141,22 +141,22 @@ export class AppAutoUpdateService {
     if (currentTag === 'latest') {
       return {
         eligible: false,
-        reason: 'Pinned to :latest — cannot version-check',
+        reason: 'Закреплено за :latest — проверка версии невозможна',
         cooloffRemainingHours: null,
       }
     }
     if (parseMajorVersion(service.available_update_version) !== parseMajorVersion(currentTag)) {
       return {
         eligible: false,
-        reason: 'Major version — manual update required',
+        reason: 'Мажорная версия — требуется ручное обновление',
         cooloffRemainingHours: null,
       }
     }
     if (!isNewerVersion(service.available_update_version, currentTag)) {
-      return { eligible: false, reason: 'Up to date', cooloffRemainingHours: null }
+      return { eligible: false, reason: 'Актуальная версия', cooloffRemainingHours: null }
     }
     if (!service.available_update_first_seen_at) {
-      return { eligible: false, reason: 'Cool-off pending', cooloffRemainingHours: cooloffHours }
+      return { eligible: false, reason: 'Ожидание периода охлаждения', cooloffRemainingHours: cooloffHours }
     }
 
     const ageHours = now.diff(service.available_update_first_seen_at, 'hours').hours
@@ -165,14 +165,14 @@ export class AppAutoUpdateService {
       const rounded = Math.ceil(remaining)
       return {
         eligible: false,
-        reason: `In cool-off (${rounded}h remaining)`,
+        reason: `Период охлаждения (осталось ${rounded} ч)`,
         cooloffRemainingHours: rounded,
       }
     }
 
     return {
       eligible: true,
-      reason: `Eligible → ${service.available_update_version}`,
+      reason: `Доступно обновление → ${service.available_update_version}`,
       cooloffRemainingHours: 0,
     }
   }
@@ -202,10 +202,10 @@ export class AppAutoUpdateService {
         (d) => !!d.status && ['waiting', 'active', 'delayed'].includes(d.status)
       )
       if (active.length > 0) {
-        blockers.push({ reason: `${active.length} download(s) in progress`, severity: 'skip' })
+        blockers.push({ reason: `${active.length} загрузка(и) выполняется`, severity: 'skip' })
       }
     } catch (error) {
-      logger.warn(`[AppAutoUpdateService] Could not check active downloads: ${error.message}`)
+      logger.warn(`[AppAutoUpdateService] Не удалось проверить активные загрузки: ${error.message}`)
     }
     return { ok: blockers.length === 0, blockers }
   }
@@ -217,7 +217,7 @@ export class AppAutoUpdateService {
 
     if (service.installation_status !== 'idle') {
       blockers.push({
-        reason: `App has an operation in progress (status: ${service.installation_status})`,
+        reason: `Приложение выполняет операцию (статус: ${service.installation_status})`,
         severity: 'skip',
       })
     }
@@ -245,24 +245,24 @@ export class AppAutoUpdateService {
     const now = DateTime.now()
 
     if (!config.enabled) {
-      return { updated: 0, reason: 'App auto-update is disabled' }
+      return { updated: 0, reason: 'Автообновление приложений отключено' }
     }
     if (!isWithinWindow(config.windowStart, config.windowEnd, now)) {
-      const reason = `Outside update window (${config.windowStart}-${config.windowEnd})`
+      const reason = `Вне окна обновления (${config.windowStart}-${config.windowEnd})`
       await this.recordRun(reason)
       return { updated: 0, reason }
     }
 
     const eligible = await this.getEligibleApps(config, now)
     if (eligible.length === 0) {
-      const reason = 'No eligible app updates (all current, in cool-off, or major-only)'
+      const reason = 'Нет доступных обновлений приложений (все актуальны, в периоде охлаждения или только мажорные)'
       await this.recordRun(reason)
       return { updated: 0, reason }
     }
 
     const global = await this.runGlobalPreflight()
     if (!global.ok) {
-      const reason = `Pre-flight blocked: ${global.blockers.map((b) => b.reason).join('; ')}`
+      const reason = `Заблокировано предварительной проверкой: ${global.blockers.map((b) => b.reason).join('; ')}`
       await this.recordRun(reason)
       return { updated: 0, reason }
     }
@@ -280,13 +280,13 @@ export class AppAutoUpdateService {
           await this.recordAppFailure(target.service, summary)
           failed++
         } else {
-          logger.info(`[AppAutoUpdateService] Skipped ${name}: ${summary}`)
+          logger.info(`[AppAutoUpdateService] Пропущено ${name}: ${summary}`)
           skipped++
         }
         continue
       }
 
-      logger.info(`[AppAutoUpdateService] Updating ${name} → ${target.targetVersion}`)
+      logger.info(`[AppAutoUpdateService] Обновление ${name} → ${target.targetVersion}`)
       const result = await this.dockerService.updateContainer(name, target.targetVersion)
       if (result.success) {
         await this.recordAppSuccess(target.service)
@@ -297,9 +297,9 @@ export class AppAutoUpdateService {
       }
     }
 
-    const reason = `${updated} updated, ${failed} failed, ${skipped} skipped`
+    const reason = `${updated} обновлено, ${failed} с ошибкой, ${skipped} пропущено`
     await this.recordRun(reason)
-    logger.info(`[AppAutoUpdateService] Run complete: ${reason}`)
+    logger.info(`[AppAutoUpdateService] Запуск завершён: ${reason}`)
     return { updated, reason }
   }
 
@@ -318,14 +318,14 @@ export class AppAutoUpdateService {
     const failures = (service.auto_update_consecutive_failures || 0) + 1
     service.auto_update_consecutive_failures = failures
     if (failures >= MAX_CONSECUTIVE_FAILURES) {
-      service.auto_update_disabled_reason = `Auto-update disabled after ${failures} consecutive failures. Last error: ${reason}`
+      service.auto_update_disabled_reason = `Автообновление отключено после ${failures} последовательных сбоев. Последняя ошибка: ${reason}`
       logger.error(
-        `[AppAutoUpdateService] ${service.service_name} auto-disabled after ${failures} failures`
+        `[AppAutoUpdateService] ${service.service_name} автообновление отключено после ${failures} сбоев`
       )
     }
     await service.save()
     logger.error(
-      `[AppAutoUpdateService] ${service.service_name} failure ${failures}/${MAX_CONSECUTIVE_FAILURES}: ${reason}`
+      `[AppAutoUpdateService] ${service.service_name} сбой ${failures}/${MAX_CONSECUTIVE_FAILURES}: ${reason}`
     )
   }
 

@@ -62,7 +62,7 @@ export class DownloadDrugDataJob {
     if (existing) {
       const state = await existing.getState()
       if (state === 'active' || state === 'waiting' || state === 'delayed') {
-        return { job: existing, created: false, message: 'Drug data download already running' }
+        return { job: existing, created: false, message: 'Загрузка данных о лекарствах уже выполняется' }
       }
       try {
         await existing.remove()
@@ -83,12 +83,12 @@ export class DownloadDrugDataJob {
           removeOnFail: { count: 5 },
         }
       )
-      return { job, created: true, message: 'Drug data download dispatched' }
+      return { job, created: true, message: 'Загрузка данных о лекарствах запущена' }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error)
       if (msg.includes('job already exists')) {
         const stillThere = await queue.getJob(this.jobId)
-        return { job: stillThere, created: false, message: 'Drug data download already running' }
+        return { job: stillThere, created: false, message: 'Загрузка данных о лекарствах уже выполняется' }
       }
       throw error
     }
@@ -109,7 +109,7 @@ export class DownloadDrugDataJob {
     const startedAt = params.startedAt ?? Date.now()
     const resourceMeta = params.resourceMeta
 
-    logger.info(`[DownloadDrugDataJob] Starting pass partIndex=${partIndex}`)
+    logger.info(`[DownloadDrugDataJob] Запуск прохода partIndex=${partIndex}`)
 
     // Pre-flight: storage drive writable.
     await this.verifyStorageAvailable(job)
@@ -128,10 +128,10 @@ export class DownloadDrugDataJob {
       })
       await job.updateProgress(0)
 
-      logger.info('[DownloadDrugDataJob] Fetching manifest from api.fda.gov/download.json')
+      logger.info('[DownloadDrugDataJob] Получение манифеста с api.fda.gov/download.json')
       manifest = await this.fetchManifest()
       logger.info(
-        `[DownloadDrugDataJob] Manifest: export_date=${manifest.export_date} ` +
+        `[DownloadDrugDataJob] Манифест: export_date=${manifest.export_date} ` +
           `total_records=${manifest.total_records} parts=${manifest.partitions.length}`
       )
     } else {
@@ -142,7 +142,7 @@ export class DownloadDrugDataJob {
 
     if (partIndex >= totalParts) {
       logger.warn(
-        `[DownloadDrugDataJob] partIndex ${partIndex} >= totalParts ${totalParts}, nothing to do`
+        `[DownloadDrugDataJob] partIndex ${partIndex} >= totalParts ${totalParts}, делать нечего`
       )
       return
     }
@@ -152,7 +152,7 @@ export class DownloadDrugDataJob {
     const partName = partition.display_name || partition.file
 
     logger.info(
-      `[DownloadDrugDataJob] Downloading part ${partIndex + 1}/${totalParts}: ${partName}`
+      `[DownloadDrugDataJob] Загрузка части ${partIndex + 1}/${totalParts}: ${partName}`
     )
 
     await job.updateData({
@@ -210,7 +210,7 @@ export class DownloadDrugDataJob {
         void job.updateData({ ...job.data, bytesDownloaded: progress.downloadedBytes }).catch(() => {})
       },
     })
-    logger.info(`[DownloadDrugDataJob] Download complete: ${zipPath} (${partBytes} bytes)`)
+    logger.info(`[DownloadDrugDataJob] Загрузка завершена: ${zipPath} (${partBytes} байт)`)
 
     // Record this part for the download-state marker (written after the last one).
     const recordedParts =
@@ -243,7 +243,7 @@ export class DownloadDrugDataJob {
         removeOnFail: { count: 5 },
       })
       logger.info(
-        `[DownloadDrugDataJob] Dispatched continuation for part ${nextIndex + 1}/${totalParts}`
+        `[DownloadDrugDataJob] Запущено продолжение для части ${nextIndex + 1}/${totalParts}`
       )
     } else {
       // Last part — write the download-state marker. Parts stay on disk until a
@@ -258,7 +258,7 @@ export class DownloadDrugDataJob {
       })
       await job.updateProgress(100)
       logger.info(
-        `[DownloadDrugDataJob] All ${totalParts} parts downloaded. ` +
+        `[DownloadDrugDataJob] Все ${totalParts} части загружены. ` +
           `export_date=${manifest.export_date}`
       )
 
@@ -267,7 +267,7 @@ export class DownloadDrugDataJob {
         // Forward the install-state identity so the ingest job writes the
         // `installed_resources` row on `ready`. undefined for a manual download.
         await IngestDrugDataJob.dispatch(resourceMeta)
-        logger.info('[DownloadDrugDataJob] Auto-chained ingest phase')
+        logger.info('[DownloadDrugDataJob] Автозапуск фазы индексирования')
       }
     }
 
@@ -285,7 +285,7 @@ export class DownloadDrugDataJob {
       } catch (mkdirErr) {
         await job.updateData({ ...job.data, phase: 'failed' })
         throw new Error(
-          `Storage drive not available: cannot write to ${STORAGE_BASE} (${
+          `Диск хранилища недоступен: невозможно записать в ${STORAGE_BASE} (${
             mkdirErr instanceof Error ? mkdirErr.message : String(mkdirErr)
           })`
         )
@@ -320,7 +320,7 @@ export class DownloadDrugDataJob {
         msg.includes('ECONNRESET') ||
         msg.includes('fetch failed')
       ) {
-        throw new Error(`No internet — connect to download FDA drug data. (${msg})`)
+        throw new Error(`Нет интернета — подключитесь для загрузки данных о лекарствах FDA. (${msg})`)
       }
       throw err
     }

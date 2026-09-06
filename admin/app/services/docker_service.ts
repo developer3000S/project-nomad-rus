@@ -91,7 +91,7 @@ export class DockerService {
       if (!service || !service.installed) {
         return {
           success: false,
-          message: `Service ${serviceName} not found or not installed`,
+          message: `Сервис ${serviceName} не найден или не установлен`,
         }
       }
 
@@ -100,7 +100,7 @@ export class DockerService {
       if (!container) {
         return {
           success: false,
-          message: `Container for service ${serviceName} not found`,
+          message: `Контейнер сервиса ${serviceName} не найден`,
         }
       }
 
@@ -110,7 +110,7 @@ export class DockerService {
         this.invalidateServicesStatusCache()
         return {
           success: true,
-          message: `Service ${serviceName} stopped successfully`,
+          message: `Сервис ${serviceName} успешно остановлен`,
         }
       }
 
@@ -118,10 +118,10 @@ export class DockerService {
         if (serviceName === SERVICE_NAMES.KIWIX) {
           const isLegacy = await this.isKiwixOnLegacyConfig()
           if (isLegacy) {
-            logger.info('[DockerService] Kiwix on legacy glob config — running migration instead of restart.')
+            logger.info('[DockerService] Kiwix на устаревшей конфигурации glob — запуск миграции вместо перезапуска.')
             await this.migrateKiwixToLibraryMode()
             this.invalidateServicesStatusCache()
-            return { success: true, message: 'Kiwix migrated to library mode successfully.' }
+            return { success: true, message: 'Kiwix успешно мигрирован в режим библиотеки.' }
           }
         }
 
@@ -130,7 +130,7 @@ export class DockerService {
 
         return {
           success: true,
-          message: `Service ${serviceName} restarted successfully`,
+          message: `Сервис ${serviceName} успешно перезапущен`,
         }
       }
 
@@ -138,7 +138,7 @@ export class DockerService {
         if (container.State === 'running') {
           return {
             success: true,
-            message: `Service ${serviceName} is already running`,
+            message: `Сервис ${serviceName} уже запущен`,
           }
         }
 
@@ -147,19 +147,19 @@ export class DockerService {
 
         return {
           success: true,
-          message: `Service ${serviceName} started successfully`,
+          message: `Сервис ${serviceName} успешно запущен`,
         }
       }
 
       return {
         success: false,
-        message: `Invalid action: ${action}. Use 'start', 'stop', or 'restart'.`,
+        message: `Недопустимое действие: ${action}. Используйте 'start', 'stop' или 'restart'.`,
       }
     } catch (error: any) {
-      logger.error({ err: error }, `[DockerService] Error controlling service ${serviceName}`)
+      logger.error({ err: error }, `[DockerService] Ошибка управления сервисом ${serviceName}`)
       return {
         success: false,
-        message: `Failed to ${action} service ${serviceName}. Check server logs for details.`,
+        message: `Не удалось ${action === 'start' ? 'запустить' : action === 'stop' ? 'остановить' : 'перезапустить'} сервис ${serviceName}. Проверьте серверные логи для подробностей.`,
       }
     }
   }
@@ -212,7 +212,7 @@ export class DockerService {
         status: container.State,
       }))
     } catch (error: any) {
-      logger.error(`Error fetching services status: ${error.message}`)
+      logger.error(`Ошибка получения статуса сервисов: ${error.message}`)
       return []
     }
   }
@@ -282,14 +282,14 @@ export class DockerService {
     if (!service) {
       return {
         success: false,
-        message: `Service ${serviceName} not found`,
+        message: `Сервис ${serviceName} не найден`,
       }
     }
 
     if (service.installed) {
       return {
         success: false,
-        message: `Service ${serviceName} is already installed`,
+        message: `Сервис ${serviceName} уже установлен`,
       }
     }
 
@@ -297,7 +297,7 @@ export class DockerService {
     if (service.installation_status === 'installing') {
       return {
         success: false,
-        message: `Service ${serviceName} installation is already in progress`,
+        message: `Установка сервиса ${serviceName} уже выполняется`,
       }
     }
 
@@ -305,7 +305,7 @@ export class DockerService {
     if (this.activeInstallations.has(serviceName)) {
       return {
         success: false,
-        message: `Service ${serviceName} installation is already in progress`,
+        message: `Установка сервиса ${serviceName} уже выполняется`,
       }
     }
 
@@ -331,13 +331,13 @@ export class DockerService {
 
     // Execute installation asynchronously and handle cleanup
     this._createContainer(service, containerConfig).catch(async (error) => {
-      logger.error(`Installation failed for ${serviceName}: ${error.message}`)
+      logger.error(`Установка ${serviceName} не удалась: ${error.message}`)
       await this._cleanupFailedInstallation(serviceName)
     })
 
     return {
       success: true,
-      message: `Service ${serviceName} installation initiated successfully. You can receive updates via server-sent events.`,
+      message: `Установка сервиса ${serviceName} успешно начата. Вы можете получать обновления через server-sent events.`,
     }
   }
 
@@ -356,7 +356,7 @@ export class DockerService {
       if (!service) {
         return {
           success: false,
-          message: `Service ${serviceName} not found`,
+          message: `Сервис ${serviceName} не найден`,
         }
       }
 
@@ -364,7 +364,7 @@ export class DockerService {
       if (this.activeInstallations.has(serviceName)) {
         return {
           success: false,
-          message: `Service ${serviceName} installation is already in progress`,
+          message: `Установка сервиса ${serviceName} уже выполняется`,
         }
       }
 
@@ -376,7 +376,7 @@ export class DockerService {
       this._broadcast(
         serviceName,
         'reinstall-starting',
-        `Starting force reinstall for ${serviceName}...`
+        `Начало принудительной переустановки ${serviceName}...`
       )
 
       // Step 1: Try to stop and remove the container if it exists
@@ -389,35 +389,35 @@ export class DockerService {
 
           // Only try to stop if it's running
           if (container.State === 'running') {
-            this._broadcast(serviceName, 'stopping', `Stopping container...`)
+            this._broadcast(serviceName, 'stopping', `Остановка контейнера...`)
             await dockerContainer.stop({ t: 10 }).catch((error) => {
               // If already stopped, continue
               if (!error.message.includes('already stopped')) {
-                logger.warn(`Error stopping container: ${error.message}`)
+                logger.warn(`Ошибка остановки контейнера: ${error.message}`)
               }
             })
           }
 
           // Step 2: Remove the container
-          this._broadcast(serviceName, 'removing', `Removing container...`)
+          this._broadcast(serviceName, 'removing', `Удаление контейнера...`)
           await dockerContainer.remove({ force: true }).catch((error) => {
-            logger.warn(`Error removing container: ${error.message}`)
+            logger.warn(`Ошибка удаления контейнера: ${error.message}`)
           })
         } else {
           this._broadcast(
             serviceName,
             'no-container',
-            `No existing container found, proceeding with installation...`
+            `Существующий контейнер не найден, продолжаем установку...`
           )
         }
       } catch (error: any) {
-        logger.warn({ err: error }, `[DockerService] Error during container cleanup for ${serviceName}`)
-        this._broadcast(serviceName, 'cleanup-warning', 'Warning during container cleanup. Check server logs for details.')
+        logger.warn({ err: error }, `[DockerService] Ошибка при очистке контейнера для ${serviceName}`)
+        this._broadcast(serviceName, 'cleanup-warning', 'Предупреждение при очистке контейнера. Проверьте серверные логи для подробностей.')
       }
 
       // Step 3: Clear volumes/data if needed
       try {
-        this._broadcast(serviceName, 'clearing-volumes', `Checking for volumes to clear...`)
+        this._broadcast(serviceName, 'clearing-volumes', `Проверка томов для очистки...`)
         const volumes = await this.docker.listVolumes()
         const serviceVolumes =
           volumes.Volumes?.filter(
@@ -431,21 +431,21 @@ export class DockerService {
           try {
             const volume = this.docker.getVolume(vol.Name)
             await volume.remove({ force: true })
-            this._broadcast(serviceName, 'volume-removed', `Removed volume: ${vol.Name}`)
+            this._broadcast(serviceName, 'volume-removed', `Удалён том: ${vol.Name}`)
           } catch (error: any) {
-            logger.warn(`Failed to remove volume ${vol.Name}: ${error.message}`)
+            logger.warn(`Не удалось удалить том ${vol.Name}: ${error.message}`)
           }
         }
 
         if (serviceVolumes.length === 0) {
-          this._broadcast(serviceName, 'no-volumes', `No volumes found to clear`)
+          this._broadcast(serviceName, 'no-volumes', `Томы для очистки не найдены`)
         }
       } catch (error: any) {
-        logger.warn({ err: error }, `[DockerService] Error during volume cleanup for ${serviceName}`)
+        logger.warn({ err: error }, `[DockerService] Ошибка при очистке томов для ${serviceName}`)
         this._broadcast(
           serviceName,
           'volume-cleanup-warning',
-          'Warning during volume cleanup. Check server logs for details.'
+          'Предупреждение при очистке томов. Проверьте серверные логи для подробностей.'
         )
       }
 
@@ -456,25 +456,25 @@ export class DockerService {
       this.invalidateServicesStatusCache()
 
       // Step 5: Recreate the container
-      this._broadcast(serviceName, 'recreating', `Recreating container...`)
+      this._broadcast(serviceName, 'recreating', `Пересоздание контейнера...`)
       const containerConfig = this._parseContainerConfig(service.container_config)
 
       // Execute installation asynchronously and handle cleanup
       this._createContainer(service, containerConfig).catch(async (error) => {
-        logger.error(`Reinstallation failed for ${serviceName}: ${error.message}`)
+        logger.error(`Принудительная переустановка ${serviceName} не удалась: ${error.message}`)
         await this._cleanupFailedInstallation(serviceName)
       })
 
       return {
         success: true,
-        message: `Service ${serviceName} force reinstall initiated successfully. You can receive updates via server-sent events.`,
+        message: `Принудительная переустановка сервиса ${serviceName} успешно начата. Вы можете получать обновления через server-sent events.`,
       }
     } catch (error: any) {
-      logger.error({ err: error }, `[DockerService] Force reinstall failed for ${serviceName}`)
+      logger.error({ err: error }, `[DockerService] Принудительная переустановка ${serviceName} не удалась`)
       await this._cleanupFailedInstallation(serviceName)
       return {
         success: false,
-        message: `Failed to force reinstall service ${serviceName}. Check server logs for details.`,
+        message: `Не удалось принудительно переустановить сервис ${serviceName}. Проверьте серверные логи для подробностей.`,
       }
     }
   }
@@ -494,11 +494,11 @@ export class DockerService {
     const portMatch = raw.match(/(?:Bind for [^:]+:(\d+) failed: port is already allocated|:(\d+): bind: address already in use)/i)
     if (portMatch) {
       const port = portMatch[1] || portMatch[2]
-      const portText = port ? `port ${port}` : 'a required port'
+      const portText = port ? `порт ${port}` : 'необходимый порт'
       if (port === '11434' || serviceName === SERVICE_NAMES.OLLAMA) {
-        return `Couldn't start because ${portText} is already in use on this machine. This usually means Ollama is already installed and running directly on the host (outside NOMAD). Stop and disable the host Ollama service (e.g. "sudo systemctl stop ollama" then "sudo systemctl disable ollama"), then try again.`
+        return `Не удалось запустить, потому что ${portText} уже используется на этой машине. Обычно это означает, что Ollama уже установлен и запущен непосредственно на хосте (вне NOMAD). Остановите и отключите сервис Ollama на хосте (например, "sudo systemctl stop ollama" затем "sudo systemctl disable ollama"), затем попробуйте снова.`
       }
-      return `Couldn't start because ${portText} is already in use on this machine. Stop whatever is using ${portText} on the host, then try again.`
+      return `Не удалось запустить, потому что ${portText} уже используется на этой машине. Остановите процесс, использующий ${portText} на хосте, затем попробуйте снова.`
     }
     return raw
   }
@@ -545,13 +545,13 @@ export class DockerService {
         (m: any) => m.Type === 'bind' && m.Destination === adminStorageDest
       )
       if (mount?.Source) {
-        logger.info(`[DockerService] Resolved host storage root from admin mount: ${mount.Source}`)
+        logger.info(`[DockerService] Определён корневой путь хранилища хоста из монтирования админки: ${mount.Source}`)
         return (this._hostStorageRoot = mount.Source)
       }
       return (this._hostStorageRoot = fallback)
     } catch (err: any) {
       logger.warn(
-        `[DockerService] Could not resolve host storage root, using fallback ${fallback}: ${err.message}`
+        `[DockerService] Не удалось определить корневой путь хранилища хоста, используется запасной вариант ${fallback}: ${err.message}`
       )
       // Deliberately NOT cached: a transient Docker error (e.g. socket not ready at
       // early boot) shouldn't lock this process into the fallback for its lifetime —

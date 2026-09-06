@@ -89,8 +89,8 @@ export async function doResumableDownload({
     const status = error?.response?.status
     if (status === 401 || status === 403) {
       throw new GatedContentAuthError(
-        'This content is hosted by Project NOMAD and requires an official release build. ' +
-          `The download server rejected this install's credentials (HTTP ${status}).`
+        'Этот контент размещён проектом Project NOMAD и требует официальной релизной сборки. ' +
+          `Сервер загрузок отклонил учётные данные этой установки (HTTP ${status}).`
       )
     }
     throw error
@@ -111,7 +111,7 @@ export async function doResumableDownload({
   if (allowedMimeTypes && allowedMimeTypes.length > 0) {
     const isMimeTypeAllowed = allowedMimeTypes.some((mimeType) => contentType.includes(mimeType))
     if (!isMimeTypeAllowed) {
-      throw new Error(`MIME type ${contentType} is not allowed`)
+      throw new Error(`MIME-тип ${contentType} не разрешён`)
     }
   }
 
@@ -144,7 +144,7 @@ export async function doResumableDownload({
   // recover on its own. Discard and start clean.
   if (startByte > totalBytes && totalBytes > 0) {
     logger.warn(
-      `[Download] Discarding stale partial for ${filepath}: .tmp is ${startByte}B but the server reports ${totalBytes}B`
+      `[Загрузка] Отбрасываем устаревший частичный файл для ${filepath}: .tmp занимает ${startByte}B, но сервер сообщает о ${totalBytes}B`
     )
     await deleteFileIfExists(tempPath)
     startByte = 0
@@ -167,7 +167,7 @@ export async function doResumableDownload({
   let response = await fetchStream(headers)
 
   if (response.status !== 200 && response.status !== 206) {
-    throw new Error(`Failed to download: HTTP ${response.status}`)
+    throw new Error(`Не удалось загрузить: HTTP ${response.status}`)
   }
 
   // If we requested a range but the server returned 200 (ignored the Range header),
@@ -180,7 +180,7 @@ export async function doResumableDownload({
     delete headers.Range
     response = await fetchStream(headers)
     if (response.status !== 200 && response.status !== 206) {
-      throw new Error(`Failed to download: HTTP ${response.status}`)
+      throw new Error(`Не удалось загрузить: HTTP ${response.status}`)
     }
   }
 
@@ -203,7 +203,7 @@ export async function doResumableDownload({
     const resetStallTimer = () => {
       clearStallTimer()
       stallTimer = setTimeout(() => {
-        cleanup(new Error('Download stalled - no data received for 5 minutes'))
+        cleanup(new Error('Загрузка зависла — данные не поступали 5 минут'))
       }, STALL_TIMEOUT_MS)
     }
 
@@ -251,7 +251,7 @@ export async function doResumableDownload({
     writeStream.on('error', cleanup)
 
     signal?.addEventListener('abort', () => {
-      cleanup(new Error('Download aborted'))
+      cleanup(new Error('Загрузка прервана'))
     })
 
     writeStream.on('finish', async () => {
@@ -330,7 +330,7 @@ export async function doResumableDownloadWithRetry({
 
       onAttemptError?.(error, attempt)
       if (isAborted) {
-        throw new Error(`Download aborted for URL: ${url}`)
+        throw new Error(`Загрузка прервана для URL: ${url}`)
       }
 
       if (attempt < max_retries && isNetworkError) {
@@ -346,7 +346,7 @@ export async function doResumableDownloadWithRetry({
   }
 
   // should not reach here, but TypeScript needs a return
-  throw lastError || new Error('Unknown error during download')
+  throw lastError || new Error('Неизвестная ошибка при загрузке')
 }
 
 async function delay(ms: number): Promise<void> {

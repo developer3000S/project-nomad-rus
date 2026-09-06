@@ -25,14 +25,14 @@ export function validateSettingValue(key: KVStoreKey, value: unknown): string | 
         case 'contentAutoUpdate.windowStart':
         case 'contentAutoUpdate.windowEnd':
             if (typeof value !== 'string' || !HHMM_PATTERN.test(value)) {
-                return 'Time window values must be in 24-hour HH:MM format (e.g. "20:00").'
+                return 'Значения временного окна должны быть в 24-часовом формате ЧЧ:ММ (например, "20:00").'
             }
             return null
         case 'autoUpdate.cooloffHours':
         case 'contentAutoUpdate.cooloffHours': {
             const num = Number(value)
             if (!Number.isInteger(num) || num < 0 || num > 8760) {
-                return 'Cool-off must be a whole number of hours between 0 and 8760.'
+                return 'Период охлаждения должен быть целым числом часов от 0 до 8760.'
             }
             return null
         }
@@ -42,15 +42,15 @@ export function validateSettingValue(key: KVStoreKey, value: unknown): string | 
                 return null
             }
             if (typeof value !== 'string') {
-                return 'Test URL must be a string.'
+                return 'Тестовый URL должен быть строкой.'
             }
             try {
                 const url = new URL(value)
                 if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-                    return 'Test URL must use http or https.'
+                    return 'Тестовый URL должен использовать схему http или https.'
                 }
             } catch {
-                return 'Test URL must be a valid URL (e.g. "https://example.com").'
+                return 'Тестовый URL должен быть корректным URL (например, "https://example.com").'
             }
             return null
         }
@@ -58,7 +58,7 @@ export function validateSettingValue(key: KVStoreKey, value: unknown): string | 
             // Per-window download budget in bytes. 0 = unlimited.
             const num = Number(value)
             if (!Number.isInteger(num) || num < 0) {
-                return 'The per-window data cap must be a whole number of bytes (0 = unlimited).'
+                return 'Лимит данных за окно должен быть целым числом байт (0 = без ограничений).'
             }
             return null
         }

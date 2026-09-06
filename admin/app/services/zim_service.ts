@@ -119,7 +119,7 @@ export class ZimService {
 
       const parsed = parser.parse(res.data)
       if (!isRawListRemoteZimFilesResponse(parsed)) {
-        throw new Error('Invalid response format from remote library')
+        throw new Error('Недопустимый формат ответа от удалённой библиотеки')
       }
       totalResults = parsed.feed.totalResults
 
@@ -194,18 +194,18 @@ export class ZimService {
   async downloadRemote(url: string, metadata?: { title?: string; summary?: string; author?: string; size_bytes?: number }): Promise<{ filename: string; jobId?: string }> {
     const parsed = new URL(url)
     if (!parsed.pathname.endsWith('.zim')) {
-      throw new Error(`Invalid ZIM file URL: ${url}. URL must end with .zim`)
+      throw new Error(`Недопустимый URL ZIM файла: ${url}. URL должен оканчиваться на .zim`)
     }
 
     const existing = await RunDownloadJob.getActiveByUrl(url)
     if (existing) {
-      throw new Error('A download for this URL is already in progress')
+      throw new Error('Загрузка по этому URL уже выполняется')
     }
 
     // Extract the filename from the URL
     const filename = url.split('/').pop()
     if (!filename) {
-      throw new Error('Could not determine filename from URL')
+      throw new Error('Не удалось определить имя файла из URL')
     }
 
     const filepath = join(process.cwd(), ZIM_STORAGE_PATH, filename)
@@ -229,7 +229,7 @@ export class ZimService {
     })
 
     if (!result || !result.job) {
-      throw new Error('Failed to dispatch download job')
+      throw new Error('Не удалось запустить задачу загрузки')
     }
 
     logger.info(`[ZimService] Dispatched background download job for ZIM file: ${filename}`)
@@ -249,17 +249,17 @@ export class ZimService {
     const manifestService = new CollectionManifestService()
     const spec = await manifestService.getSpecWithFallback<import('../../types/collections.js').ZimCategoriesSpec>('zim_categories')
     if (!spec) {
-      throw new Error('Could not load ZIM categories spec')
+      throw new Error('Не удалось загрузить спецификацию категорий ZIM')
     }
 
     const category = spec.categories.find((c) => c.slug === categorySlug)
     if (!category) {
-      throw new Error(`Category not found: ${categorySlug}`)
+      throw new Error(`Категория не найдена: ${categorySlug}`)
     }
 
     const tier = category.tiers.find((t) => t.slug === tierSlug)
     if (!tier) {
-      throw new Error(`Tier not found: ${tierSlug}`)
+      throw new Error(`Уровень не найден: ${tierSlug}`)
     }
 
     const allResources = CollectionManifestService.resolveTierResources(tier, category.tiers)
@@ -649,12 +649,12 @@ export class ZimService {
 
     // Prevent path traversal — resolved path must stay within the storage directory
     if (!fullPath.startsWith(basePath + sep)) {
-      throw new Error('Invalid filename')
+      throw new Error('Недопустимое имя файла')
     }
 
     const exists = await getFileStatsIfExists(fullPath)
     if (!exists) {
-      throw new Error('not_found')
+      throw new Error('Файл не найден')
     }
 
     await deleteFileIfExists(fullPath)
@@ -705,8 +705,8 @@ export class ZimService {
 
       return validated.options
     } catch (error) {
-      logger.error(`[ZimService] Failed to fetch Wikipedia options:`, error)
-      throw new Error('Failed to fetch Wikipedia options')
+      logger.error(`[ZimService] Не удалось получить опции Wikipedia:`, error)
+      throw new Error('Не удалось получить опции Wikipedia')
     }
   }
 
@@ -737,14 +737,14 @@ export class ZimService {
     const selectedOption = options.find((opt) => opt.id === optionId)
 
     if (!selectedOption) {
-      throw new Error(`Invalid Wikipedia option: ${optionId}`)
+      throw new Error(`Недопустимая опция Wikipedia: ${optionId}`)
     }
 
     const currentSelection = await this.getWikipediaSelection()
 
     // If same as currently installed, no action needed
     if (currentSelection?.option_id === optionId && currentSelection.status === 'installed') {
-      return { success: true, message: 'Already installed' }
+      return { success: true, message: 'Уже установлено' }
     }
 
     // Handle "none" option - delete current Wikipedia file and update DB
@@ -782,24 +782,24 @@ export class ZimService {
           logger.error(`[ZimService] Failed to restart Kiwix after Wikipedia removal:`, error)
         })
 
-      return { success: true, message: 'Wikipedia removed' }
+      return { success: true, message: 'Wikipedia удалён' }
     }
 
     // Start download for the new Wikipedia option
     if (!selectedOption.url) {
-      throw new Error('Selected Wikipedia option has no download URL')
+      throw new Error('У выбранной опции Wikipedia нет URL для скачивания')
     }
 
     // Check if already downloading
     const existingJob = await RunDownloadJob.getActiveByUrl(selectedOption.url)
     if (existingJob) {
-      return { success: false, message: 'Download already in progress' }
+      return { success: false, message: 'Загрузка уже выполняется' }
     }
 
     // Extract filename from URL
     const filename = selectedOption.url.split('/').pop()
     if (!filename) {
-      throw new Error('Could not determine filename from URL')
+      throw new Error('Не удалось определить имя файла из URL')
     }
 
     const filepath = join(process.cwd(), ZIM_STORAGE_PATH, filename)
@@ -840,7 +840,7 @@ export class ZimService {
       selection.filename = currentSelection?.filename || null
       selection.status = currentSelection?.status || 'none'
       await selection.save()
-      throw new Error('Failed to dispatch download job')
+      throw new Error('Не удалось запустить задачу загрузки')
     }
 
     logger.info(`[ZimService] Started Wikipedia download for ${optionId}: ${filename}`)
@@ -848,7 +848,7 @@ export class ZimService {
     return {
       success: true,
       jobId: result.job.id,
-      message: 'Download started',
+      message: 'Загрузка начата',
     }
   }
 
@@ -929,7 +929,7 @@ export class ZimService {
     const count = await CustomLibrarySource.query().count('* as total')
     const total = Number(count[0].$extras.total)
     if (total >= 10) {
-      throw new Error('Maximum of 10 custom libraries allowed')
+      throw new Error('Максимум 10 пользовательских библиотек')
     }
 
     // Ensure URL ends with /
@@ -944,10 +944,10 @@ export class ZimService {
   async removeCustomLibrary(id: number): Promise<void> {
     const source = await CustomLibrarySource.find(id)
     if (!source) {
-      throw new Error('Custom library not found')
+      throw new Error('Пользовательская библиотека не найдена')
     }
     if (source.is_default) {
-      throw new Error('Cannot remove a built-in mirror')
+      throw new Error('Невозможно удалить встроенное зеркало')
     }
     await source.delete()
   }

@@ -66,7 +66,7 @@ export class SystemService {
         testUrls = [customTestUrl]
       } catch (error) {
         logger.warn(
-          `Invalid internet status test URL: ${customTestUrl}. Falling back to default URLs.`
+          `Недопустимый URL для проверки интернет-статуса: ${customTestUrl}. Возврат к URL по умолчанию.`
         )
       }
     }
@@ -78,7 +78,7 @@ export class SystemService {
         // internet, so accept all status codes rather than requiring a strict 200.
         await Promise.any(
           testUrls.map((testUrl) => {
-            logger.debug(`[SystemService] Checking internet connectivity via: ${testUrl}`)
+            logger.debug(`[SystemService] Проверка интернет-подключения через: ${testUrl}`)
             return axios.get(testUrl, { timeout: 5000, validateStatus: () => true })
           })
         )
@@ -86,7 +86,7 @@ export class SystemService {
       } catch (error) {
         // Promise.any only rejects (with an AggregateError) when every endpoint failed.
         logger.warn(
-          `Internet status check attempt ${attempt}/${MAX_ATTEMPTS} failed: ${error instanceof Error ? error.message : error}`
+          `Попытка проверки интернет-статуса ${attempt}/${MAX_ATTEMPTS} не удалась: ${error instanceof Error ? error.message : error}`
         )
 
         if (attempt < MAX_ATTEMPTS) {
@@ -96,7 +96,7 @@ export class SystemService {
       }
     }
 
-    logger.warn('All internet status check attempts failed.')
+    logger.warn('Все попытки проверки интернет-статуса не удались.')
     return false
   }
 
@@ -151,7 +151,7 @@ export class SystemService {
         logsOpts.until = startedAtSec + 300 // 5-minute window
       } else {
         logger.warn(
-          `[SystemService] nomad_ollama State.StartedAt missing or invalid (${startedAtRaw ?? 'undefined'}); falling back to tail:500 for inference-compute probe`
+          `[SystemService] nomad_ollama State.StartedAt отсутствует или недопустим (${startedAtRaw ?? 'undefined'}); возврат к tail:500 для проверки вывода`
         )
         logsOpts.tail = 500
       }
@@ -177,7 +177,7 @@ export class SystemService {
       }
     } catch (error) {
       logger.warn(
-        `[SystemService] Failed to probe Ollama logs for inference compute line: ${error instanceof Error ? error.message : error}`
+        `[SystemService] Не удалось прочитать логи Ollama для строки вывода: ${error instanceof Error ? error.message : error}`
       )
       return null
     }
@@ -195,7 +195,7 @@ export class SystemService {
       const ollamaContainer = containers.find((c) => c.Names.includes(`/${SERVICE_NAMES.OLLAMA}`))
       if (!ollamaContainer) {
         logger.info(
-          'Ollama container not found for nvidia-smi info retrieval. This is expected if Ollama is not installed.'
+          'Контейнер Ollama не найден для получения информации nvidia-smi. Это нормально, если Ollama не установлен.'
         )
         return 'OLLAMA_NOT_FOUND'
       }
@@ -252,7 +252,7 @@ export class SystemService {
       // If we got output but looks like an error, consider it a bad response from nvidia-smi
       return 'BAD_RESPONSE'
     } catch (error) {
-      logger.error('Error getting nvidia-smi info:', error)
+      logger.error('Ошибка получения информации nvidia-smi:', error)
       if (error instanceof Error && error.message) {
         return { error: error.message }
       }
@@ -311,7 +311,7 @@ export class SystemService {
       ]
     } catch (error) {
       logger.info(
-        `[SystemService] External Ollama GPU probe failed: ${error instanceof Error ? error.message : error}`
+        `[SystemService] Внешняя проверка GPU Ollama не удалась: ${error instanceof Error ? error.message : error}`
       )
       return null
     }
@@ -408,7 +408,7 @@ export class SystemService {
       this.appVersion = version
       return version
     } catch (error) {
-      logger.error('Error getting app version:', error)
+      logger.error('Ошибка получения версии приложения:', error)
       return '0.0.0'
     }
   }
@@ -442,7 +442,7 @@ export class SystemService {
 
         disk = this.calculateDiskUsage(diskInfo)
       } catch (error) {
-        logger.error('Error reading disk info file:', error)
+        logger.error('Ошибка чтения файла информации о диске:', error)
       }
 
       // GPU health tracking — detect when host has a GPU runtime but Ollama can't access it.
@@ -588,7 +588,7 @@ export class SystemService {
                 } else {
                   gpuHealth.status = 'passthrough_failed'
                   logger.warn(
-                    `NVIDIA runtime detected but GPU passthrough failed: ${typeof nvidiaInfo === 'string' ? nvidiaInfo : JSON.stringify(nvidiaInfo)}`
+                    `Обнаружена среда выполнения NVIDIA, но проброс GPU не удался: ${typeof nvidiaInfo === 'string' ? nvidiaInfo : JSON.stringify(nvidiaInfo)}`
                   )
                 }
               }
@@ -617,7 +617,7 @@ export class SystemService {
               } else {
                 gpuHealth.status = 'passthrough_failed'
                 logger.warn(
-                  'AMD GPU detected but Ollama logs show no ROCm initialization — passthrough or HSA override may have failed'
+                  'Обнаружен GPU AMD, но в логах Ollama нет инициализации ROCm — проброс или переопределение HSA могли не удаться'
                 )
               }
             }
@@ -643,7 +643,7 @@ export class SystemService {
         gpuHealth,
       }
     } catch (error) {
-      logger.error('Error getting system info:', error)
+      logger.error('Ошибка получения системной информации:', error)
       return undefined
     }
   }
@@ -679,18 +679,18 @@ export class SystemService {
           'https://api.github.com/repos/Crosstalk-Solutions/project-nomad/releases',
           { headers: { Accept: 'application/vnd.github+json' }, timeout: 5000 }
         )
-        if (!response?.data?.length) throw new Error('No releases found')
+        if (!response?.data?.length) throw new Error('Релизы не найдены')
         latestVersion = response.data[0].tag_name.replace(/^v/, '').trim()
       } else {
         const response = await axios.get(
           'https://api.github.com/repos/Crosstalk-Solutions/project-nomad/releases/latest',
           { headers: { Accept: 'application/vnd.github+json' }, timeout: 5000 }
         )
-        if (!response?.data?.tag_name) throw new Error('Invalid response from GitHub API')
+        if (!response?.data?.tag_name) throw new Error('Недопустимый ответ от GitHub API')
         latestVersion = response.data.tag_name.replace(/^v/, '').trim()
       }
 
-      logger.info(`Current version: ${currentVersion}, Latest version: ${latestVersion}`)
+      logger.info(`Текущая версия: ${currentVersion}, Последняя версия: ${latestVersion}`)
 
       const updateAvailable =
         process.env.NODE_ENV === 'development'
@@ -708,13 +708,13 @@ export class SystemService {
         latestVersion,
       }
     } catch (error) {
-      logger.error('Error checking latest version:', error)
+      logger.error('Ошибка проверки последней версии:', error)
       return {
         success: false,
         updateAvailable: false,
         currentVersion: '',
         latestVersion: '',
-        message: `Failed to check latest version: ${error instanceof Error ? error.message : error}`,
+        message: `Не удалось проверить последнюю версию: ${error instanceof Error ? error.message : error}`,
       }
     }
   }
@@ -730,19 +730,19 @@ export class SystemService {
       if (response.status === 200) {
         return {
           success: true,
-          message: 'Successfully subscribed to release notes',
+          message: 'Подписка на заметки о выпуске оформлена',
         }
       }
 
       return {
         success: false,
-        message: `Failed to subscribe: ${response.statusText}`,
+        message: `Не удалось подписаться: ${response.statusText}`,
       }
     } catch (error) {
-      logger.error('Error subscribing to release notes:', error)
+      logger.error('Ошибка подписки на заметки о выпуске:', error)
       return {
         success: false,
-        message: `Failed to subscribe: ${error instanceof Error ? error.message : error}`,
+        message: `Не удалось подписаться: ${error instanceof Error ? error.message : error}`,
       }
     }
   }
@@ -781,46 +781,46 @@ export class SystemService {
     const isEnabled = (v: any) => v === true || v === 'true'
 
     const lines: string[] = [
-      'Project NOMAD Debug Info',
+      'Отладочная информация Project NOMAD',
       '========================',
-      `App Version: ${appVersion}`,
-      `Environment: ${environment}`,
+      `Версия приложения: ${appVersion}`,
+      `Окружение: ${environment}`,
     ]
 
     if (systemInfo) {
       const { cpu, mem, os, disk, fsSize, uptime, graphics, gpuHealth } = systemInfo
 
       lines.push('')
-      lines.push('System:')
-      if (os.distro) lines.push(`  OS: ${os.distro}`)
-      if (os.hostname) lines.push(`  Hostname: ${os.hostname}`)
-      if (os.kernel) lines.push(`  Kernel: ${os.kernel}`)
-      if (os.arch) lines.push(`  Architecture: ${os.arch}`)
+      lines.push('Система:')
+      if (os.distro) lines.push(`  ОС: ${os.distro}`)
+      if (os.hostname) lines.push(`  Имя хоста: ${os.hostname}`)
+      if (os.kernel) lines.push(`  Ядро: ${os.kernel}`)
+      if (os.arch) lines.push(`  Архитектура: ${os.arch}`)
       if (dockerVersion) lines.push(`  Docker Engine: ${dockerVersion}`)
-      if (uptime?.uptime) lines.push(`  Uptime: ${this._formatUptime(uptime.uptime)}`)
+      if (uptime?.uptime) lines.push(`  Время работы: ${this._formatUptime(uptime.uptime)}`)
 
       lines.push('')
-      lines.push('Hardware:')
+      lines.push('Оборудование:')
       if (cpu.brand) {
-        lines.push(`  CPU: ${cpu.brand} (${cpu.cores} cores)`)
+        lines.push(`  Процессор: ${cpu.brand} (${cpu.cores} ядер)`)
       }
       if (mem.total) {
         const total = this._formatBytes(mem.total)
         const used = this._formatBytes(mem.total - (mem.available || 0))
         const available = this._formatBytes(mem.available || 0)
-        lines.push(`  RAM: ${total} total, ${used} used, ${available} available`)
+        lines.push(`  ОЗУ: ${total} всего, ${used} использовано, ${available} доступно`)
       }
       if (graphics.controllers && graphics.controllers.length > 0) {
         for (const gpu of graphics.controllers) {
-          const vram = gpu.vram ? ` (${gpu.vram} MB VRAM)` : ''
+          const vram = gpu.vram ? ` (${gpu.vram} МБ VRAM)` : ''
           lines.push(`  GPU: ${gpu.model}${vram}`)
         }
       } else {
-        lines.push('  GPU: None detected')
+        lines.push('  GPU: Не обнаружен')
       }
       if (gpuHealth?.status) {
         const vendor = gpuType || gpuHealth.gpuVendor
-        lines.push(`  GPU Passthrough: ${gpuHealth.status}${vendor ? ` (${vendor})` : ''}`)
+        lines.push(`  Проброс GPU: ${gpuHealth.status}${vendor ? ` (${vendor})` : ''}`)
       }
 
       // Disk info — try disk array first, fall back to fsSize
@@ -829,7 +829,7 @@ export class SystemService {
         for (const d of diskEntries) {
           const size = this._formatBytes(d.totalSize)
           const type = d.tran?.toUpperCase() || (d.rota ? 'HDD' : 'SSD')
-          lines.push(`  Disk: ${size}, ${Math.round(d.percentUsed)}% used, ${type}`)
+          lines.push(`  Диск: ${size}, ${Math.round(d.percentUsed)}% использовано, ${type}`)
         }
       } else if (fsSize.length > 0) {
         const realFs = fsSize.filter((f) => f.fs.startsWith('/dev/'))
@@ -837,55 +837,55 @@ export class SystemService {
         for (const f of realFs) {
           if (seen.has(f.size)) continue
           seen.add(f.size)
-          lines.push(`  Disk: ${this._formatBytes(f.size)}, ${Math.round(f.use)}% used`)
+          lines.push(`  Диск: ${this._formatBytes(f.size)}, ${Math.round(f.use)}% использовано`)
         }
       }
     }
 
     lines.push('')
-    lines.push('Storage:')
-    lines.push(`  Host storage root: ${hostStorageRoot ?? 'unknown'}`)
-    lines.push(`  Container path: ${DockerService.ADMIN_STORAGE_DEST}`)
+    lines.push('Хранилище:')
+    lines.push(`  Корневой каталог хранилища хоста: ${hostStorageRoot ?? 'неизвестно'}`)
+    lines.push(`  Путь контейнера: ${DockerService.ADMIN_STORAGE_DEST}`)
     const storageEnv = process.env.NOMAD_STORAGE_PATH
     lines.push(
-      `  NOMAD_STORAGE_PATH: ${storageEnv ? storageEnv : 'not set (auto-detected from admin mount)'}`
+      `  NOMAD_STORAGE_PATH: ${storageEnv ? storageEnv : 'не установлен (автоопределение из монтирования admin)'}`
     )
     if (kiwixBookCount !== null) {
       lines.push(
-        `  Kiwix library: ${kiwixBookCount === 0 ? 'empty (0 books)' : `${kiwixBookCount} book(s)`}`
+        `  Библиотека Kiwix: ${kiwixBookCount === 0 ? 'пусто (0 книг)' : `${kiwixBookCount} книг(и)`}`
       )
     }
 
     const installed = services.filter((s) => s.installed)
     lines.push('')
     if (installed.length > 0) {
-      lines.push('Installed Services:')
+      lines.push('Установленные сервисы:')
       for (const svc of installed) {
         lines.push(`  ${svc.friendly_name} (${svc.service_name}): ${svc.status}`)
       }
     } else {
-      lines.push('Installed Services: None')
+      lines.push('Установленные сервисы: Нет')
     }
 
     if (internetStatus !== null) {
       lines.push('')
-      lines.push(`Internet Status: ${internetStatus ? 'Online' : 'Offline'}`)
+      lines.push(`Статус интернета: ${internetStatus ? 'В сети' : 'Не в сети'}`)
     }
 
     if (versionCheck?.success) {
       const updateMsg = versionCheck.updateAvailable
-        ? `Yes (${versionCheck.latestVersion} available)`
-        : `No (${versionCheck.currentVersion} is latest)`
-      lines.push(`Update Available: ${updateMsg}`)
+        ? `Да (доступна версия ${versionCheck.latestVersion})`
+        : `Нет (версия ${versionCheck.currentVersion} актуальна)`
+      lines.push(`Доступно обновление: ${updateMsg}`)
     }
 
     lines.push('')
-    lines.push('Auto-Update:')
-    lines.push(`  Core: ${isEnabled(autoUpdateCore) ? 'Enabled' : 'Disabled'}`)
-    lines.push(`  Apps: ${isEnabled(autoUpdateApps) ? 'Enabled' : 'Disabled'}`)
-    lines.push(`  Content: ${isEnabled(autoUpdateContent) ? 'Enabled' : 'Disabled'}`)
+    lines.push('Автообновление:')
+    lines.push(`  Ядро: ${isEnabled(autoUpdateCore) ? 'Включено' : 'Отключено'}`)
+    lines.push(`  Приложения: ${isEnabled(autoUpdateApps) ? 'Включено' : 'Отключено'}`)
+    lines.push(`  Контент: ${isEnabled(autoUpdateContent) ? 'Включено' : 'Отключено'}`)
     if (autoDisabledReason) {
-      lines.push(`  Auto-disabled reason: ${autoDisabledReason}`)
+      lines.push(`  Причина автоотключения: ${autoDisabledReason}`)
     }
 
     return lines.join('\n')
@@ -895,15 +895,15 @@ export class SystemService {
     const days = Math.floor(seconds / 86400)
     const hours = Math.floor((seconds % 86400) / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
-    if (days > 0) return `${days}d ${hours}h ${minutes}m`
-    if (hours > 0) return `${hours}h ${minutes}m`
-    return `${minutes}m`
+    if (days > 0) return `${days}д ${hours}ч ${minutes}м`
+    if (hours > 0) return `${hours}ч ${minutes}м`
+    return `${minutes}м`
   }
 
   private _formatBytes(bytes: number, decimals = 1): string {
-    if (bytes === 0) return '0 Bytes'
+    if (bytes === 0) return '0 Байт'
     const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+    const sizes = ['Байт', 'КБ', 'МБ', 'ГБ', 'ТБ']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(decimals)) + ' ' + sizes[i]
   }
@@ -973,7 +973,7 @@ export class SystemService {
               if (remoteUrl) continue
             }
             logger.warn(
-              `Service ${service.service_name} is marked as installed but container does not exist. Marking as not installed.`
+              `Сервис ${service.service_name} отмечен как установленный, но контейнер не существует. Снимаем отметку об установке.`
             )
             service.installed = false
             service.installation_status = 'idle'
@@ -983,7 +983,7 @@ export class SystemService {
           // If marked as not installed but container exists (any state), mark as installed
           if (containerExists) {
             logger.warn(
-              `Service ${service.service_name} is marked as not installed but container exists. Marking as installed.`
+              `Сервис ${service.service_name} отмечен как не установленный, но контейнер существует. Отмечаем как установленный.`
             )
             service.installed = true
             service.installation_status = 'idle'
@@ -994,7 +994,7 @@ export class SystemService {
 
       return serviceStatusList
     } catch (error) {
-      logger.error('Error syncing containers with database:', error)
+      logger.error('Ошибка синхронизации контейнеров с базой данных:', error)
       return []
     }
   }
@@ -1061,11 +1061,11 @@ export class SystemService {
       const availableMB = Math.floor(mem.available / 1024 / 1024)
       if (availableMB < minMemoryMB) {
         warnings.push(
-          `Low memory: ${availableMB} MB available, this app recommends at least ${minMemoryMB} MB free.`
+          `Мало памяти: доступно ${availableMB} МБ, приложению рекомендуется минимум ${minMemoryMB} МБ свободной памяти.`
         )
       }
     } catch (err: any) {
-      logger.warn(`[SystemService] checkResourceWarnings mem check failed: ${err.message}`)
+      logger.warn(`[SystemService] Ошибка проверки памяти: ${err.message}`)
     }
 
     try {
@@ -1080,12 +1080,12 @@ export class SystemService {
         const availableDiskMB = Math.floor((fs.size - fs.used) / 1024 / 1024)
         if (availableDiskMB < minDiskMB) {
           warnings.push(
-            `Low disk space: ${availableDiskMB} MB available on ${fs.mount}, this app recommends at least ${minDiskMB} MB free.`
+            `Мало места на диске: доступно ${availableDiskMB} МБ на ${fs.mount}, приложению рекомендуется минимум ${minDiskMB} МБ свободного места.`
           )
         }
       }
     } catch (err: any) {
-      logger.warn(`[SystemService] checkResourceWarnings disk check failed: ${err.message}`)
+      logger.warn(`[SystemService] Ошибка проверки диска: ${err.message}`)
     }
 
     return warnings
@@ -1119,7 +1119,7 @@ export class SystemService {
         }
       }
     } catch (err: any) {
-      logger.warn(`[SystemService] getNextSuggestedCustomPort probe failed: ${err.message}`)
+      logger.warn(`[SystemService] Ошибка поиска следующего порта: ${err.message}`)
     }
 
     let candidate = CUSTOM_PORT_START

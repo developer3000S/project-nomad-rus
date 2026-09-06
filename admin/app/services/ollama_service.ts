@@ -78,7 +78,7 @@ export class OllamaService {
           const dockerService = new (await import('./docker_service.js')).DockerService()
           const ollamaUrl = await dockerService.getServiceURL(SERVICE_NAMES.OLLAMA)
           if (!ollamaUrl) {
-            throw new Error('Ollama service is not installed or running.')
+            throw new Error('Сервис Ollama не установлен или не запущен.')
           }
           this.baseUrl = ollamaUrl.trim().replace(/\/$/, '')
         }
@@ -120,7 +120,7 @@ export class OllamaService {
     // Deduplicate concurrent downloads of the same model
     const existing = this.activeDownloads.get(model)
     if (existing) {
-      logger.info(`[OllamaService] Download already in progress for "${model}", waiting on existing download.`)
+      logger.info(`[OllamaService] Загрузка модели "${model}" уже выполняется, ожидаем существующую загрузку.`)
       return existing
     }
 
@@ -144,26 +144,26 @@ export class OllamaService {
   ): Promise<{ success: boolean; message: string; retryable?: boolean }> {
     await this._ensureDependencies()
     if (!this.baseUrl) {
-      return { success: false, message: 'AI service is not initialized.' }
+      return { success: false, message: 'AI-сервис не инициализирован.' }
     }
 
     try {
       // See if model is already installed
       const installedModels = await this.getModels()
       if (installedModels && installedModels.some((m) => m.name === model)) {
-        logger.info(`[OllamaService] Model "${model}" is already installed.`)
-        return { success: true, message: 'Model is already installed.' }
+        logger.info(`[OllamaService] Модель "${model}" уже установлена.`)
+        return { success: true, message: 'Модель уже установлена.' }
       }
 
       // Model pulling is an Ollama-only operation. Non-Ollama backends (LM Studio, llama.cpp, etc.)
       // return HTTP 200 for unknown endpoints, so the pull would appear to succeed but do nothing.
       if (this.isOllamaNative === false) {
         logger.warn(
-          `[OllamaService] Non-Ollama backend detected — skipping model pull for "${model}". Load the model manually in your AI host.`
+          `[OllamaService] Обнаружен не-Ollama бэкенд — пропускаем загрузку модели "${model}". Загрузите модель вручную в вашем AI-хосте.`
         )
         return {
           success: false,
-          message: `Model "${model}" is not available in your AI host. Please load it manually (model pulling is only supported for Ollama backends).`,
+          message: `Модель "${model}" недоступна в вашем AI-хосте. Пожалуйста, загрузите её вручную (загрузка моделей поддерживается только для бэкендов Ollama).`,
         }
       }
 
@@ -194,7 +194,7 @@ export class OllamaService {
         // destroys the stream which surfaces as an 'error' event — wire the signal listener so
         // the promise rejects promptly with a recognizable cancel reason.
         const onAbort = () => {
-          const err: any = new Error('Download cancelled')
+          const err: any = new Error('Загрузка отменена')
           err.code = 'ERR_CANCELED'
           pullResponse.data.destroy(err)
         }
@@ -267,8 +267,8 @@ export class OllamaService {
         })
       })
 
-      logger.info(`[OllamaService] Model "${model}" downloaded successfully.`)
-      return { success: true, message: 'Model downloaded successfully.' }
+      logger.info(`[OllamaService] Модель "${model}" успешно загружена.`)
+      return { success: true, message: 'Модель успешно загружена.' }
     } catch (error) {
       // Detect axios cancel (signal-triggered abort). Don't broadcast an error event for
       // user-initiated cancels — the cancel handler in DownloadService already broadcasts
@@ -278,8 +278,8 @@ export class OllamaService {
         (error as any)?.code === 'ERR_CANCELED' ||
         (error as any)?.name === 'CanceledError'
       if (isCancelled) {
-        logger.info(`[OllamaService] Model "${model}" download cancelled by user.`)
-        return { success: false, message: 'Download cancelled', retryable: false }
+        logger.info(`[OllamaService] Загрузка модели "${model}" отменена пользователем.`)
+        return { success: false, message: 'Загрузка отменена', retryable: false }
       }
 
       const errorMessage = error instanceof Error ? error.message : String(error)
@@ -290,8 +290,8 @@ export class OllamaService {
       // Check for version mismatch (Ollama 412 response)
       const isVersionMismatch = errorMessage.includes('newer version of Ollama')
       const userMessage = isVersionMismatch
-        ? 'This model requires a newer version of Ollama. Please update AI Assistant from the Apps page.'
-        : `Failed to download model: ${errorMessage}`
+        ? 'Эта модель требует более новую версию Ollama. Пожалуйста, обновите AI Assistant на странице Приложения.'
+        : `Не удалось загрузить модель: ${errorMessage}`
 
       // Broadcast failure to connected clients so UI can show the error
       this.broadcastDownloadError(model, userMessage)
@@ -302,7 +302,7 @@ export class OllamaService {
 
   async dispatchModelDownload(modelName: string): Promise<{ success: boolean; message: string }> {
     try {
-      logger.info(`[OllamaService] Dispatching model download for ${modelName} via job queue`)
+      logger.info(`[OllamaService] Диспетчеризация загрузки модели ${modelName} через очередь заданий`)
 
       await DownloadModelJob.dispatch({
         modelName,
@@ -311,15 +311,15 @@ export class OllamaService {
       return {
         success: true,
         message:
-          'Model download has been queued successfully. It will start shortly after Ollama and Open WebUI are ready (if not already).',
+          'Загрузка модели успешно поставлена в очередь. Она начнётся в ближайшее время после готовности Ollama и Open WebUI (если они ещё не готовы).',
       }
     } catch (error) {
       logger.error(
-        `[OllamaService] Failed to dispatch model download for ${modelName}: ${error instanceof Error ? error.message : error}`
+        `[OllamaService] Не удалось диспетчеризировать загрузку модели ${modelName}: ${error instanceof Error ? error.message : error}`
       )
       return {
         success: false,
-        message: 'Failed to queue model download. Please try again.',
+        message: 'Не удалось поставить загрузку модели в очередь. Пожалуйста, попробуйте ещё раз.',
       }
     }
   }
@@ -327,7 +327,7 @@ export class OllamaService {
   public async chat(chatRequest: ChatInput): Promise<NomadChatResponse> {
     await this._ensureDependencies()
     if (!this.openai) {
-      throw new Error('AI client is not initialized.')
+      throw new Error('AI-клиент не инициализирован.')
     }
 
     const params: any = {
@@ -369,7 +369,7 @@ export class OllamaService {
   public async chatStream(chatRequest: ChatInput): Promise<AsyncIterable<NomadChatStreamChunk>> {
     await this._ensureDependencies()
     if (!this.openai) {
-      throw new Error('AI client is not initialized.')
+      throw new Error('AI-клиент не инициализирован.')
     }
 
     const params: any = {
@@ -493,7 +493,7 @@ export class OllamaService {
   public async deleteModel(modelName: string): Promise<{ success: boolean; message: string }> {
     await this._ensureDependencies()
     if (!this.baseUrl) {
-      return { success: false, message: 'AI service is not initialized.' }
+      return { success: false, message: 'AI-сервис не инициализирован.' }
     }
 
     try {
@@ -501,12 +501,12 @@ export class OllamaService {
         data: { model: modelName },
         timeout: 10000,
       })
-      return { success: true, message: `Model "${modelName}" deleted.` }
+      return { success: true, message: `Модель "${modelName}" удалена.` }
     } catch (error) {
       logger.error(
-        `[OllamaService] Failed to delete model "${modelName}": ${error instanceof Error ? error.message : error}`
+        `[OllamaService] Не удалось удалить модель "${modelName}": ${error instanceof Error ? error.message : error}`
       )
-      return { success: false, message: 'Failed to delete model. This may not be an Ollama backend.' }
+      return { success: false, message: 'Не удалось удалить модель. Возможно, это не Ollama-бэкенд.' }
     }
   }
 
@@ -563,7 +563,7 @@ export class OllamaService {
   public async embed(model: string, input: string[]): Promise<{ embeddings: number[][] }> {
     await this._ensureDependencies()
     if (!this.baseUrl || !this.openai) {
-      throw new Error('AI service is not initialized.')
+      throw new Error('AI-сервис не инициализирован.')
     }
 
     const cap = (arr: string[], max: number) => arr.map((s) => (s.length > max ? s.slice(0, max) : s))
@@ -583,7 +583,7 @@ export class OllamaService {
       const hardCapped = cap(input, OllamaService.EMBED_CONTEXT_SAFE_CHARS)
       const reduced = hardCapped.reduce((n, s, i) => (s.length < safeInput[i].length ? n + 1 : n), 0)
       logger.warn(
-        '[OllamaService] embed: context-length overflow; retrying %d/%d inputs hard-capped at %d chars',
+        '[OllamaService] embed: переполнение контекста; повторная попытка для %d/%d входных данных с жёстким ограничением %d символов',
         reduced,
         input.length,
         OllamaService.EMBED_CONTEXT_SAFE_CHARS
@@ -617,7 +617,7 @@ export class OllamaService {
       // Some backends (e.g. LM Studio) return HTTP 200 for unknown endpoints with an incompatible
       // body — validate explicitly before accepting the result.
       if (!Array.isArray(response.data?.embeddings)) {
-        throw new Error('Invalid /api/embed response — missing embeddings array')
+        throw new Error('Некорректный ответ /api/embed — отсутствует массив embeddings')
       }
       return { embeddings: response.data.embeddings }
     } catch (err) {
@@ -627,7 +627,7 @@ export class OllamaService {
       // Log the original error so we know *why* we fell back. Earlier bare catches here masked
       // recurring failures for months (#369, #670, #881).
       logger.warn(
-        '[OllamaService] /api/embed failed, falling back to /v1/embeddings: %s',
+        '[OllamaService] /api/embed не удалось, переходим на /v1/embeddings: %s',
         err instanceof Error ? err.message : String(err)
       )
       // Fall back to OpenAI-compatible /v1/embeddings. Explicitly request float format — some
@@ -675,7 +675,7 @@ export class OllamaService {
       // /api/ps unreachable (Ollama down, non-native backend, etc.) — fail closed: assume CPU,
       // which means we'll pace. Better to over-pace than risk box-killing CPU saturation.
       logger.warn(
-        `[OllamaService] Could not check embedding placement via /api/ps: ${err?.message ?? err}`
+        `[OllamaService] Не удалось проверить размещение эмбеддинга через /api/ps: ${err?.message ?? err}`
       )
       return false
     }
@@ -715,7 +715,7 @@ export class OllamaService {
         .filter((name: unknown): name is string => typeof name === 'string')
     } catch (err: any) {
       logger.warn(
-        `[OllamaService] unloadAllChatModelsExcept: /api/ps unreachable, skipping unload sweep: ${err?.message ?? err}`
+        `[OllamaService] unloadAllChatModelsExcept: /api/ps недоступен, пропускаем выгрузку: ${err?.message ?? err}`
       )
       return []
     }
@@ -734,7 +734,7 @@ export class OllamaService {
           )
         } catch (err: any) {
           logger.warn(
-            `[OllamaService] Failed to send unload hint for ${modelName}: ${err?.message ?? err}`
+            `[OllamaService] Не удалось отправить запрос на выгрузку для ${modelName}: ${err?.message ?? err}`
           )
         }
       })
@@ -742,7 +742,7 @@ export class OllamaService {
 
     if (toUnload.length > 0) {
       logger.info(
-        `[OllamaService] Sent unload hint for ${toUnload.length} chat model(s): ${toUnload.join(', ')}`
+        `[OllamaService] Отправлен запрос на выгрузку для ${toUnload.length} чар-моделей: ${toUnload.join(', ')}`
       )
     }
     return toUnload
@@ -751,7 +751,7 @@ export class OllamaService {
   public async getModels(includeEmbeddings = false): Promise<NomadInstalledModel[]> {
     await this._ensureDependencies()
     if (!this.baseUrl) {
-      throw new Error('AI service is not initialized.')
+      throw new Error('AI-сервис не инициализирован.')
     }
 
     try {
@@ -759,7 +759,7 @@ export class OllamaService {
       const response = await axios.get(`${this.baseUrl}/api/tags`, { timeout: 5000 })
       // LM Studio returns HTTP 200 for unknown endpoints with an incompatible body — validate explicitly
       if (!Array.isArray(response.data?.models)) {
-        throw new Error('Not an Ollama-compatible /api/tags response')
+        throw new Error('Ответ несовместим с /api/tags Ollama')
       }
       this.isOllamaNative = true
       const models: NomadInstalledModel[] = response.data.models
@@ -768,7 +768,7 @@ export class OllamaService {
     } catch {
       // Fall back to the OpenAI-compatible /v1/models endpoint (LM Studio, llama.cpp, etc.)
       this.isOllamaNative = false
-      logger.info('[OllamaService] /api/tags unavailable, falling back to /v1/models')
+      logger.info('[OllamaService] /api/tags недоступен, переходим на /v1/models')
       try {
         const modelList = await this.openai!.models.list()
         const models: NomadInstalledModel[] = modelList.data.map((m) => ({ name: m.id, size: 0 }))
@@ -776,7 +776,7 @@ export class OllamaService {
         return models.filter((m) => !m.name.includes('embed'))
       } catch (err) {
         logger.error(
-          `[OllamaService] Failed to list models: ${err instanceof Error ? err.message : err}`
+          `[OllamaService] Не удалось получить список моделей: ${err instanceof Error ? err.message : err}`
         )
         return []
       }
@@ -807,7 +807,7 @@ export class OllamaService {
       const models = await this.retrieveAndRefreshModels(sort, force)
       if (!models || models.length === 0) {
         logger.warn(
-          '[OllamaService] Returning fallback recommended models due to failure in fetching available models'
+          '[OllamaService] Возвращаем резервный список рекомендуемых моделей из-за ошибки получения доступных моделей'
         )
         return {
           models: FALLBACK_RECOMMENDED_OLLAMA_MODELS,
@@ -847,7 +847,7 @@ export class OllamaService {
       }
     } catch (error) {
       logger.error(
-        `[OllamaService] Failed to get available models: ${error instanceof Error ? error.message : error}`
+        `[OllamaService] Не удалось получить доступные модели: ${error instanceof Error ? error.message : error}`
       )
       return null
     }
@@ -864,14 +864,14 @@ export class OllamaService {
         // response) must not be treated as valid data — fall through to a
         // fresh fetch and, failing that, the fallback list.
         if (cachedModels && cachedModels.length > 0) {
-          logger.info('[OllamaService] Using cached available models data')
+          logger.info('[OllamaService] Используем кешированные данные доступных моделей')
           return this.sortModels(cachedModels, sort)
         }
       } else {
-        logger.info('[OllamaService] Force refresh requested, bypassing cache')
+        logger.info('[OllamaService] Запрошено принудительное обновление, обходим кеш')
       }
 
-      logger.info('[OllamaService] Fetching fresh available models from API')
+      logger.info('[OllamaService] Получаем свежие данные доступных моделей с API')
 
       const baseUrl = env.get('NOMAD_API_URL') || NOMAD_API_DEFAULT_BASE_URL
       const fullUrl = new URL(NOMAD_MODELS_API_PATH, baseUrl).toString()
@@ -879,7 +879,7 @@ export class OllamaService {
       const response = await axios.get(fullUrl, { timeout: 10000 })
       if (!response.data || !Array.isArray(response.data.models)) {
         logger.warn(
-          `[OllamaService] Invalid response format when fetching available models: ${JSON.stringify(response.data)}`
+          `[OllamaService] Некорректный формат ответа при получении доступных моделей: ${JSON.stringify(response.data)}`
         )
         return null
       }
@@ -898,7 +898,7 @@ export class OllamaService {
       // fallback list, and don't poison the 24h cache with an empty array.
       if (noCloud.length === 0) {
         logger.warn(
-          '[OllamaService] Nomad API returned no usable (non-cloud) models; using fallback'
+          '[OllamaService] API Nomad не вернул пригодных (не-облачных) моделей; используем резервный список'
         )
         return null
       }
@@ -907,7 +907,7 @@ export class OllamaService {
       return this.sortModels(noCloud, sort)
     } catch (error) {
       logger.error(
-        `[OllamaService] Failed to retrieve models from Nomad API: ${error instanceof Error ? error.message : error}`
+        `[OllamaService] Не удалось получить модели из API Nomad: ${error instanceof Error ? error.message : error}`
       )
       return null
     }
@@ -919,7 +919,7 @@ export class OllamaService {
       const cacheAge = Date.now() - stats.mtimeMs
 
       if (cacheAge > CACHE_MAX_AGE_MS) {
-        logger.info('[OllamaService] Cache is stale, will fetch fresh data')
+        logger.info('[OllamaService] Кеш устарел, получаем свежие данные')
         return null
       }
 
@@ -927,7 +927,7 @@ export class OllamaService {
       const models = JSON.parse(cacheData) as NomadOllamaModel[]
 
       if (!Array.isArray(models)) {
-        logger.warn('[OllamaService] Invalid cache format, will fetch fresh data')
+        logger.warn('[OllamaService] Некорректный формат кеша, получаем свежие данные')
         return null
       }
 
@@ -935,7 +935,7 @@ export class OllamaService {
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
         logger.warn(
-          `[OllamaService] Error reading cache: ${error instanceof Error ? error.message : error}`
+          `[OllamaService] Ошибка чтения кеша: ${error instanceof Error ? error.message : error}`
         )
       }
       return null
@@ -946,10 +946,10 @@ export class OllamaService {
     try {
       await fs.mkdir(path.dirname(MODELS_CACHE_FILE), { recursive: true })
       await fs.writeFile(MODELS_CACHE_FILE, JSON.stringify(models, null, 2), 'utf-8')
-      logger.info('[OllamaService] Successfully cached available models')
+      logger.info('[OllamaService] Доступные модели успешно закэшированы')
     } catch (error) {
       logger.warn(
-        `[OllamaService] Failed to write models cache: ${error instanceof Error ? error.message : error}`
+        `[OllamaService] Не удалось записать кеш моделей: ${error instanceof Error ? error.message : error}`
       )
     }
   }
@@ -1020,7 +1020,7 @@ export class OllamaService {
       ...(bytes ? { downloadedBytes: bytes.downloadedBytes, totalBytes: bytes.totalBytes } : {}),
       timestamp: new Date().toISOString(),
     })
-    logger.info(`[OllamaService] Download progress for model "${model}": ${percent}%`)
+    logger.info(`[OllamaService] Прогресс загрузки модели "${model}": ${percent}%`)
   }
 
   private fuseSearchModels(models: NomadOllamaModel[], query: string): NomadOllamaModel[] {

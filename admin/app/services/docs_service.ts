@@ -51,21 +51,21 @@ export class DocsService {
       // Filter out attribute-undefined errors which may be caused by emojis and special characters
       const criticalErrors = errors.filter((e) => e.error.id !== 'attribute-undefined')
       if (criticalErrors.length > 0) {
-        logger.error('Markdoc validation errors:', errors.map((e) => JSON.stringify(e.error)).join(', '))
-        throw new Error('Markdoc validation failed')
+        logger.error('Ошибки валидации Markdoc:', errors.map((e) => JSON.stringify(e.error)).join(', '))
+        throw new Error('Валидация Markdoc не удалась')
       }
 
       return Markdoc.transform(ast, config)
     } catch (error) {
-      logger.error('Error parsing Markdoc content:', error)
-      throw new InternalServerErrorException(`Error parsing content: ${(error as Error).message}`)
+      logger.error('Ошибка парсинга контента Markdoc:', error)
+      throw new InternalServerErrorException(`Ошибка парсинга контента: ${(error as Error).message}`)
     }
   }
 
   async parseFile(_filename: string) {
     try {
       if (!_filename) {
-        throw new Error('Filename is required')
+        throw new Error('Имя файла обязательно')
       }
 
       const filename = _filename.endsWith('.md') ? _filename : `${_filename}.md`
@@ -74,17 +74,17 @@ export class DocsService {
       const basePath = path.resolve(this.docsPath)
       const fullPath = path.resolve(path.join(this.docsPath, filename))
       if (!fullPath.startsWith(basePath + path.sep)) {
-        throw new Error('Invalid document slug')
+        throw new Error('Неверный slug документа')
       }
 
       const fileExists = await getFileStatsIfExists(fullPath)
       if (!fileExists) {
-        throw new Error(`File not found: ${filename}`)
+        throw new Error(`Файл не найден: ${filename}`)
       }
 
       const fileStream = await getFile(fullPath, 'stream')
       if (!fileStream) {
-        throw new Error(`Failed to read file stream: ${filename}`)
+        throw new Error(`Не удалось прочитать поток файла: ${filename}`)
       }
       const content = await streamToString(fileStream)
       return this.parse(content)

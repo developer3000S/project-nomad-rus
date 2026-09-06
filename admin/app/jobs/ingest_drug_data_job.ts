@@ -92,8 +92,8 @@ async function withUpsertTimeout<T>(
       () =>
         reject(
           new Error(
-            `updateOrCreateMany timed out after ${timeoutMs}ms (batch of ${rowCount} rows) — ` +
-              'the database may be locked or overloaded'
+            `updateOrCreateMany превысил тайм-аут через ${timeoutMs}мс (батч из ${rowCount} строк) — ` +
+              'база данных может быть заблокирована или перегружена'
           )
         ),
       timeoutMs
@@ -171,7 +171,7 @@ export class IngestDrugDataJob {
     if (existing) {
       const state = await existing.getState()
       if (state === 'active' || state === 'waiting' || state === 'delayed') {
-        return { job: existing, created: false, message: 'Drug label ingest already running' }
+        return { job: existing, created: false, message: 'Индексирование меток лекарств уже выполняется' }
       }
       try {
         await existing.remove()
@@ -192,12 +192,12 @@ export class IngestDrugDataJob {
           removeOnFail: { count: 5 },
         }
       )
-      return { job, created: true, message: 'Drug label ingest dispatched' }
+      return { job, created: true, message: 'Индексирование меток лекарств запущено' }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : String(error)
       if (msg.includes('job already exists')) {
         const stillThere = await queue.getJob(this.jobId)
-        return { job: stillThere, created: false, message: 'Drug label ingest already running' }
+        return { job: stillThere, created: false, message: 'Индексирование меток лекарств уже выполняется' }
       }
       throw error
     }
@@ -234,7 +234,7 @@ export class IngestDrugDataJob {
       }
     }
 
-    logger.info(`[IngestDrugDataJob] Starting pass partIndex=${partIndex}`)
+    logger.info(`[IngestDrugDataJob] Запуск прохода partIndex=${partIndex}`)
 
     // Resolve the part list: manifest in job data, else the KV download marker.
     const { manifest, exportDate } = await this.resolvePartSource(params)
@@ -242,7 +242,7 @@ export class IngestDrugDataJob {
 
     if (partIndex >= totalParts) {
       logger.warn(
-        `[IngestDrugDataJob] partIndex ${partIndex} >= totalParts ${totalParts}, nothing to do`
+        `[IngestDrugDataJob] partIndex ${partIndex} >= totalParts ${totalParts}, делать нечего`
       )
       return
     }
@@ -258,13 +258,13 @@ export class IngestDrugDataJob {
     } catch {
       await job.updateData({ ...job.data, phase: 'failed' })
       throw new Error(
-        `Part ${partIndex + 1}/${totalParts} not downloaded (${zipPath}). ` +
-          'Run Download FDA data first.'
+        `Часть ${partIndex + 1}/${totalParts} не загружена (${zipPath}). ` +
+          'Сначала запустите загрузку данных FDA.'
       )
     }
 
     logger.info(
-      `[IngestDrugDataJob] Ingesting part ${partIndex + 1}/${totalParts}: ${partName}`
+      `[IngestDrugDataJob] Индексирование части ${partIndex + 1}/${totalParts}: ${partName}`
     )
 
     await job.updateData({
@@ -295,8 +295,8 @@ export class IngestDrugDataJob {
     const totalSkipped = runningSkipped + partSkipped
 
     logger.info(
-      `[IngestDrugDataJob] Part ${partIndex + 1} done: ` +
-        `ingested=${partIngested} skipped=${partSkipped} running_total=${totalIngested}`
+      `[IngestDrugDataJob] Часть ${partIndex + 1} завершена: ` +
+        `индексировано=${partIngested} пропущено=${partSkipped} итого=${totalIngested}`
     )
 
     const nextIndex = partIndex + 1
@@ -323,7 +323,7 @@ export class IngestDrugDataJob {
         removeOnComplete: { count: 5 },
         removeOnFail: { count: 5 },
       })
-      logger.info(`[IngestDrugDataJob] Dispatched continuation for part ${nextIndex + 1}/${totalParts}`)
+      logger.info(`[IngestDrugDataJob] Запущено продолжение для части ${nextIndex + 1}/${totalParts}`)
 
       await job.updateData({
         ...job.data,
@@ -349,8 +349,8 @@ export class IngestDrugDataJob {
       await job.updateProgress(100)
 
       logger.info(
-        `[IngestDrugDataJob] Ingest complete. ` +
-          `total_ingested=${totalIngested} total_skipped=${totalSkipped} ` +
+        `[IngestDrugDataJob] Индексирование завершено. ` +
+          `всего_индексировано=${totalIngested} всего_пропущено=${totalSkipped} ` +
           `export_date=${exportDate}`
       )
 
@@ -383,7 +383,7 @@ export class IngestDrugDataJob {
     const KVStore = (await import('#models/kv_store')).default
     const marker = parseDownloadState(await KVStore.getValue('drugReference.downloadState'))
     if (!marker) {
-      throw new Error('Nothing downloaded — run Download FDA data first.')
+      throw new Error('Ничего не загружено — сначала запустите загрузку данных FDA.')
     }
 
     // Rebuild a manifest-shaped partition list from the marker. partZipPath uses
@@ -461,7 +461,7 @@ export class IngestDrugDataJob {
       typeof createStreamArray !== 'function'
     ) {
       throw new Error(
-        'stream-json factory imports did not resolve to functions ' +
+        'Фабрики stream-json не распознаны как функции ' +
           `(parser=${typeof createParser}, pick=${typeof createPick}, streamArray=${typeof createStreamArray})`
       )
     }
@@ -517,9 +517,9 @@ export class IngestDrugDataJob {
         if (!settled && !firstRecordSeen && Date.now() - watchStart > STALL_MS) {
           reject(
             new Error(
-              `Ingest stalled: no records parsed from part ${partIndex + 1}/${totalParts} ` +
-                `within ${Math.round(STALL_MS / 1000)}s. The downloaded part is likely corrupt ` +
-                'or truncated — re-download FDA data, then ingest again.'
+              `Индексирование зависло: записей из части ${partIndex + 1}/${totalParts} не получено ` +
+                `за ${Math.round(STALL_MS / 1000)}с. Загруженная часть, вероятно, повреждена ` +
+                'или обрезана — перезагрузите данные FDA, затем проведите индексирование повторно.'
             )
           )
         }
@@ -527,7 +527,7 @@ export class IngestDrugDataJob {
 
       yauzlOpen(zipPath, { lazyEntries: true, autoClose: true }, (err, zipFile) => {
         if (err || !zipFile) {
-          reject(err ?? new Error(`Failed to open zip: ${zipPath}`))
+          reject(err ?? new Error(`Не удалось открыть zip: ${zipPath}`))
           return
         }
 
@@ -544,12 +544,12 @@ export class IngestDrugDataJob {
           // Open the single JSON entry as a read stream — never buffer it
           zipFile.openReadStream(entry, (streamErr, readStream) => {
             if (streamErr || !readStream) {
-              reject(streamErr ?? new Error(`Could not open zip entry ${entry.fileName}`))
+              reject(streamErr ?? new Error(`Не удалось открыть zip-запись ${entry.fileName}`))
               return
             }
 
             logger.info(
-              `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: reading zip entry ${entry.fileName}`
+              `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: чтение zip-записи ${entry.fileName}`
             )
             activeReadStream = readStream
 
@@ -569,7 +569,7 @@ export class IngestDrugDataJob {
                 if (!firstRecordSeen) {
                   firstRecordSeen = true
                   logger.info(
-                    `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: first record received from parser`
+                    `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: первая запись получена от парсера`
                   )
                 }
 
@@ -579,7 +579,7 @@ export class IngestDrugDataJob {
                   row = mapDrugLabelRecord(record as Parameters<typeof mapDrugLabelRecord>[0])
                 } catch (mapErr) {
                   logger.warn(
-                    `[IngestDrugDataJob] mapDrugLabelRecord threw: ${mapErr instanceof Error ? mapErr.message : String(mapErr)}`
+                    `[IngestDrugDataJob] mapDrugLabelRecord выбросил ошибку: ${mapErr instanceof Error ? mapErr.message : String(mapErr)}`
                   )
                   recordsSkipped++
                   callback()
@@ -607,7 +607,7 @@ export class IngestDrugDataJob {
                 const myBatch = ++batchNum
                 const t0 = Date.now()
                 logger.info(
-                  `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: upserting batch ${myBatch} (${currentBatch.length} rows)…`
+                  `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: upsert батча ${myBatch} (${currentBatch.length} строк)…`
                 )
 
                 withUpsertTimeout(
@@ -618,8 +618,8 @@ export class IngestDrugDataJob {
                   .then((rowCount) => {
                     recordsIngested += rowCount
                     logger.info(
-                      `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: batch ${myBatch} ok in ${Date.now() - t0}ms ` +
-                        `(${rowCount} rows; part running ${recordsIngested})`
+                      `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: батч ${myBatch} ok за ${Date.now() - t0}мс ` +
+                        `(${rowCount} строк; часть: ${recordsIngested})`
                     )
 
                     // Update progress: parts-done fraction + within-part fraction
@@ -651,7 +651,7 @@ export class IngestDrugDataJob {
                     if (/timed out/i.test(msg)) {
                       // Systemic DB hang — fail the part loudly so BullMQ retries.
                       logger.error(
-                        `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: batch ${myBatch} TIMED OUT after ${Date.now() - t0}ms: ${msg}`
+                        `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: батч ${myBatch} ПРЕВЫСИЛ ТАЙМ-АУТ через ${Date.now() - t0}мс: ${msg}`
                       )
                       callback(upsertErr instanceof Error ? upsertErr : new Error(msg))
                       return
@@ -661,7 +661,7 @@ export class IngestDrugDataJob {
                     // the whole ~259k ingest (over-correcting to fail-loud here is
                     // what let a single duplicate set_id kill the run at part 5).
                     logger.error(
-                      `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: batch ${myBatch} skipped after error (${Date.now() - t0}ms): ${msg}`
+                      `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: батч ${myBatch} пропущен из-за ошибки (${Date.now() - t0}мс): ${msg}`
                     )
                     recordsSkipped += currentBatch.length
                     callback()
@@ -678,7 +678,7 @@ export class IngestDrugDataJob {
                 batch = []
                 const t0 = Date.now()
                 logger.info(
-                  `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: upserting final batch (${remainingBatch.length} rows)…`
+                  `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: upsert финального батча (${remainingBatch.length} строк)…`
                 )
 
                 withUpsertTimeout(
@@ -689,7 +689,7 @@ export class IngestDrugDataJob {
                   .then((rowCount) => {
                     recordsIngested += rowCount
                     logger.info(
-                      `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: final batch ok in ${Date.now() - t0}ms (${rowCount} rows)`
+                      `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: финальный батч ok за ${Date.now() - t0}мс (${rowCount} строк)`
                     )
                     callback()
                   })
@@ -697,13 +697,13 @@ export class IngestDrugDataJob {
                     const msg = upsertErr instanceof Error ? upsertErr.message : String(upsertErr)
                     if (/timed out/i.test(msg)) {
                       logger.error(
-                        `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: final batch TIMED OUT after ${Date.now() - t0}ms: ${msg}`
+                        `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: финальный батч ПРЕВЫСИЛ ТАЙМ-АУТ через ${Date.now() - t0}мс: ${msg}`
                       )
                       callback(upsertErr instanceof Error ? upsertErr : new Error(msg))
                       return
                     }
                     logger.error(
-                      `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: final batch skipped after error (${Date.now() - t0}ms): ${msg}`
+                      `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: финальный батч пропущен из-за ошибки (${Date.now() - t0}мс): ${msg}`
                     )
                     recordsSkipped += remainingBatch.length
                     callback()
@@ -713,8 +713,8 @@ export class IngestDrugDataJob {
 
             batchWriter.on('finish', () => {
               logger.info(
-                `[IngestDrugDataJob] part ${partIndex + 1}/${totalParts}: stream finished — ` +
-                  `ingested=${recordsIngested} skipped=${recordsSkipped} batches=${batchNum}`
+                `[IngestDrugDataJob] часть ${partIndex + 1}/${totalParts}: поток завершён — ` +
+                  `индексировано=${recordsIngested} пропущено=${recordsSkipped} батчей=${batchNum}`
               )
               resolve({ recordsIngested, recordsSkipped })
             })
@@ -774,14 +774,14 @@ export class IngestDrugDataJob {
         }
       )
       logger.info(
-        `[IngestDrugDataJob] Wrote installed_resources row for ${resourceMeta.resourceId} (export_date=${exportDate})`
+        `[IngestDrugDataJob] Записана строка installed_resources для ${resourceMeta.resourceId} (export_date=${exportDate})`
       )
     } catch (err) {
       // A failed row write must NOT abort a completed ingest — the data is
       // already searchable. Log loud; the tier badge will simply read
       // not-installed until the next install reconcile.
       logger.error(
-        `[IngestDrugDataJob] Failed to write installed_resources row for ${resourceMeta.resourceId}: ${
+        `[IngestDrugDataJob] Не удалось записать строку installed_resources для ${resourceMeta.resourceId}: ${
           err instanceof Error ? err.message : String(err)
         }`
       )
@@ -823,10 +823,10 @@ export class IngestDrugDataJob {
       const zipPath = partZipPath(STORAGE_BASE, partition)
       try {
         await fsPromises.unlink(zipPath)
-        logger.info(`[IngestDrugDataJob] Deleted zip: ${zipPath}`)
+        logger.info(`[IngestDrugDataJob] Удалён zip: ${zipPath}`)
       } catch (err) {
         logger.warn(
-          `[IngestDrugDataJob] Could not delete zip ${zipPath}: ${err instanceof Error ? err.message : String(err)}`
+          `[IngestDrugDataJob] Не удалось удалить zip ${zipPath}: ${err instanceof Error ? err.message : String(err)}`
         )
       }
     }

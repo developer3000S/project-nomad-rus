@@ -21,7 +21,7 @@ export class ZIMExtractionService {
                 description: archive.getMetadata('Description') || '',
             }
         } catch (error) {
-            logger.warn('[ZIMExtractionService]: Could not extract all metadata, using defaults', error)
+            logger.warn('[ZIMExtractionService]: Невозможно извлечь все метаданные, используем значения по умолчанию', error)
             return {
                 title: 'Unknown',
                 creator: 'Unknown',
@@ -46,28 +46,28 @@ export class ZIMExtractionService {
         opts: ExtractZIMContentOptions = {}
     ): Promise<{ chunks: ZIMContentChunk[]; totalArticles: number }> {
         try {
-            logger.info(`[ZIMExtractionService]: Processing ZIM file at path: ${filePath}`)
+            logger.info(`[ZIMExtractionService]: Обработка ZIM файла по пути: ${filePath}`)
             
             // defensive - check if file still exists before opening
             // could have been deleted by another process or batch
             try {
                 await access(filePath)
             } catch (error) {
-                logger.error(`[ZIMExtractionService]: ZIM file not accessible: ${filePath}`)
-                throw new Error(`ZIM file not found or not accessible: ${filePath}`)
+                logger.error(`[ZIMExtractionService]: ZIM файл недоступен: ${filePath}`)
+                throw new Error(`ZIM файл не найден или недоступен: ${filePath}`)
             }
 
             // Validate ZIM magic number before opening with native library.
             // A corrupted file causes a native C++ abort that cannot be caught by JS.
             if (!(await isValidZimFile(filePath))) {
-                throw new Error(`ZIM file is invalid or corrupted: ${filePath}`)
+                throw new Error(`ZIM файл недействителен или повреждён: ${filePath}`)
             }
 
             const archive = new Archive(filePath)
 
             // Extract archive-level metadata once
             const archiveMetadata = this.extractArchiveMetadata(archive)
-            logger.info(`[ZIMExtractionService]: Archive metadata - Title: ${archiveMetadata.title}, Language: ${archiveMetadata.language}`)
+            logger.info(`[ZIMExtractionService]: Метаданные архива - Заголовок: ${archiveMetadata.title}, Язык: ${archiveMetadata.language}`)
 
             let articlesProcessed = 0
             let articlesSkipped = 0
@@ -92,12 +92,12 @@ export class ZIMExtractionService {
                 }
 
                 if (!this.isArticleEntry(entry)) {
-                    logger.debug(`[ZIMExtractionService]: Skipping non-article entry at path: ${entry.path}`)
+                    logger.debug(`[ZIMExtractionService]: Пропуск записи, не являющейся статьёй, по пути: ${entry.path}`)
                     continue
                 }
 
                 if (processedPaths.has(entry.path)) {
-                    logger.debug(`[ZIMExtractionService]: Skipping duplicate entry at path: ${entry.path}`)
+                    logger.debug(`[ZIMExtractionService]: Пропуск дублирующейся записи по пути: ${entry.path}`)
                     continue
                 }
                 processedPaths.add(entry.path)
@@ -107,7 +107,7 @@ export class ZIMExtractionService {
                 const html = this.getCleanedHTMLString(blob.data)
 
                 const strategy = opts.strategy || this.chooseChunkingStrategy(html);
-                logger.debug(`[ZIMExtractionService]: Chosen chunking strategy for path ${entry.path}: ${strategy}`)
+                logger.debug(`[ZIMExtractionService]: Выбрана стратегия разбиения для пути ${entry.path}: ${strategy}`)
 
                 // Generate a unique document ID. All chunks from same article will share it
                 const documentId = randomUUID()
@@ -145,10 +145,10 @@ export class ZIMExtractionService {
                     }]
                 }
 
-                logger.debug(`Extracted ${chunks.length} chunks from article at path: ${entry.path} using strategy: ${strategy}`)
+                logger.debug(`Извлечено ${chunks.length} фрагментов из статьи по пути: ${entry.path} с использованием стратегии: ${strategy}`)
 
                 const nonEmptyChunks = chunks.filter(c => c.text.trim().length > 0)
-                logger.debug(`After filtering empty chunks, ${nonEmptyChunks.length} chunks remain for article at path: ${entry.path}`)
+                logger.debug(`После фильтрации пустых фрагментов, для статьи по пути ${entry.path} остаётся ${nonEmptyChunks.length} фрагментов`)
                 toReturn.push(...nonEmptyChunks)
                 articlesProcessed++
 
@@ -157,17 +157,17 @@ export class ZIMExtractionService {
                 }
             }
 
-            logger.info(`[ZIMExtractionService]: Completed processing ZIM file. Total articles processed: ${articlesProcessed}`)
-            logger.debug("Final structured content sample:", toReturn.slice(0, 3).map(c => ({
+            logger.info(`[ZIMExtractionService]: Обработка ZIM файла завершена. Всего обработано статей: ${articlesProcessed}`)
+            logger.debug("Пример итоговой структурированной выборки:", toReturn.slice(0, 3).map(c => ({
                 articleTitle: c.articleTitle,
                 sectionTitle: c.sectionTitle,
                 hierarchy: c.hierarchy,
                 textPreview: c.text.substring(0, 100)
             })))
-            logger.debug("Total structured sections extracted:", toReturn.length)
+            logger.debug("Всего извлечено структурированных секций:", toReturn.length)
             return { chunks: toReturn, totalArticles: archive.articleCount }
         } catch (error) {
-            logger.error('Error processing ZIM file:', error)
+            logger.error('Ошибка при обработке ZIM файла:', error)
             throw error
         }
     }
@@ -206,7 +206,7 @@ export class ZIMExtractionService {
 
             return text.replace(/\s+/g, ' ').replace(/\n\s*\n/g, '\n').trim()
         } catch (error) {
-            logger.error('Error extracting text from HTML:', error)
+            logger.error('Ошибка при извлечении текста из HTML:', error)
             return null
         }
     }

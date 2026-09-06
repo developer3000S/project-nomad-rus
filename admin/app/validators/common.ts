@@ -28,7 +28,7 @@ export function assertNotPrivateUrl(urlString: string): void {
     .replace(/\.+$/, '')
 
   if (hostname === 'localhost') {
-    throw new Error(`Download URL must not point to a loopback or link-local address: ${hostname}`)
+    throw new Error(`URL загрузки не должен указывать на loopback- или link-local-адрес: ${hostname}`)
   }
 
   // Anything that isn't a literal IP (DNS names, bare LAN hostnames like
@@ -48,7 +48,7 @@ export function assertNotPrivateUrl(urlString: string): void {
   const range = addr.range()
   if (range === 'loopback' || range === 'linkLocal' || range === 'unspecified') {
     throw new Error(
-      `Download URL must not point to a loopback or link-local address: ${addr.toNormalizedString()}`
+      `URL загрузки не должен указывать на loopback- или link-local-адрес: ${addr.toNormalizedString()}`
     )
   }
 }
@@ -80,7 +80,7 @@ export function assertNotCloudMetadataUrl(urlString: string): void {
   const parsed = new URL(urlString)
 
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new Error(`URL must use http or https scheme: ${parsed.protocol}`)
+    throw new Error(`URL должен использовать схему http или https: ${parsed.protocol}`)
   }
 
   // Node's WHATWG URL parser keeps the brackets on IPv6 literals
@@ -106,7 +106,7 @@ export function assertNotCloudMetadataUrl(urlString: string): void {
   const blocked =
     addr.kind() === 'ipv4' ? BLOCKED_METADATA_IPV4 : BLOCKED_METADATA_IPV6
   if (blocked.has(canonical)) {
-    throw new Error(`URL must not point to the cloud instance metadata endpoint: ${canonical}`)
+    throw new Error(`URL не должен указывать на эндпоинт метаданных облачного инстанса: ${canonical}`)
   }
 }
 

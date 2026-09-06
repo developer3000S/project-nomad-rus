@@ -50,7 +50,7 @@ export default class DrugReferenceController {
       })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] index failed: ${msg}`)
+      logger.error(`[DrugReferenceController] ошибка индекса: ${msg}`)
       return inertia.render('drug-reference/index', {
         ingestStatus: null,
         rowCount: 0,
@@ -67,13 +67,13 @@ export default class DrugReferenceController {
   async show({ inertia, params, response }: HttpContext) {
     const id = Number(params.id)
     if (!Number.isInteger(id) || id <= 0) {
-      return response.notFound({ error: 'invalid id' })
+      return response.notFound({ error: 'Недействительный id' })
     }
 
     try {
       const label = await this.service.find(id)
       if (!label) {
-        return response.notFound({ error: 'Drug label not found' })
+        return response.notFound({ error: 'Метка лекарства не найдена' })
       }
 
       // Reverse link — the other direction of the symbiotic relationship: which
@@ -87,8 +87,8 @@ export default class DrugReferenceController {
       return inertia.render('drug-reference/show', { label, situations })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] show(${id}) failed: ${msg}`)
-      return response.internalServerError({ error: 'Could not load drug label' })
+      logger.error(`[DrugReferenceController] show(${id}) ошибка: ${msg}`)
+      return response.internalServerError({ error: 'Не удалось загрузить метку лекарства' })
     }
   }
 
@@ -110,7 +110,7 @@ export default class DrugReferenceController {
       return { results }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.warn(`[DrugReferenceController] search failed: ${msg}`)
+      logger.warn(`[DrugReferenceController] ошибка поиска: ${msg}`)
       return response.badRequest({ error: msg })
     }
   }
@@ -125,8 +125,8 @@ export default class DrugReferenceController {
       return status
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] status failed: ${msg}`)
-      return response.internalServerError({ error: 'Could not read ingest status' })
+      logger.error(`[DrugReferenceController] ошибка статуса: ${msg}`)
+      return response.internalServerError({ error: 'Не удалось прочитать статус индексирования' })
     }
   }
 
@@ -149,7 +149,7 @@ export default class DrugReferenceController {
       })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] interactions page failed: ${msg}`)
+      logger.error(`[DrugReferenceController] ошибка страницы взаимодействий: ${msg}`)
       return inertia.render('drug-reference/interactions', {
         ingestStatus: null,
         rowCount: 0,
@@ -170,7 +170,7 @@ export default class DrugReferenceController {
       return { entries }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.warn(`[DrugReferenceController] interactionsApi failed: ${msg}`)
+      logger.warn(`[DrugReferenceController] ошибка interactionsApi: ${msg}`)
       return response.badRequest({ error: msg })
     }
   }
@@ -186,8 +186,8 @@ export default class DrugReferenceController {
       return { success: true, created: result.created, message: result.message }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] download trigger failed: ${msg}`)
-      return response.internalServerError({ error: 'Could not trigger download' })
+      logger.error(`[DrugReferenceController] ошибка запуска загрузки: ${msg}`)
+      return response.internalServerError({ error: 'Не удалось запустить загрузку' })
     }
   }
 
@@ -206,8 +206,8 @@ export default class DrugReferenceController {
       return { success: true, created: result.created, message: result.message }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] ingest trigger failed: ${msg}`)
-      return response.internalServerError({ error: 'Could not trigger ingest' })
+      logger.error(`[DrugReferenceController] ошибка запуска индексирования: ${msg}`)
+      return response.internalServerError({ error: 'Не удалось запустить индексирование' })
     }
   }
 
@@ -226,8 +226,8 @@ export default class DrugReferenceController {
       return { success: true, created: result.created, message: result.message }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] reset-ingest failed: ${msg}`)
-      return response.internalServerError({ error: 'Could not reset ingest' })
+      logger.error(`[DrugReferenceController] ошибка сброса индексирования: ${msg}`)
+      return response.internalServerError({ error: 'Не удалось сбросить индексирование' })
     }
   }
 
@@ -251,8 +251,8 @@ export default class DrugReferenceController {
       return { success: true, rowsDropped: result.rowsDropped, message: result.message }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceController] uninstall failed: ${msg}`)
-      return response.internalServerError({ error: 'Could not uninstall drug reference' })
+      logger.error(`[DrugReferenceController] ошибка удаления: ${msg}`)
+      return response.internalServerError({ error: 'Не удалось удалить справочник лекарств' })
     }
   }
 

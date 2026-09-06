@@ -73,7 +73,7 @@ export class RunExtractPmtilesJob {
     const { sourceUrl, outputFilepath, regionFilepath, maxzoom, estimatedBytes } = params
 
     logger.info(
-      `[RunExtractPmtilesJob] Starting extract: source=${sourceUrl} region=${regionFilepath} ` +
+      `[RunExtractPmtilesJob] Запуск извлечения: source=${sourceUrl} region=${regionFilepath} ` +
         `maxzoom=${maxzoom ?? 'source-max'} out=${outputFilepath}`
     )
 
@@ -147,9 +147,9 @@ export class RunExtractPmtilesJob {
       if (exitCode !== 0) {
         await deleteFileIfExists(outputFilepath)
         if (userCancelled) {
-          throw new UnrecoverableError(`Extract cancelled by user (exit ${exitCode})`)
+          throw new UnrecoverableError(`Извлечение отменено пользователем (exit ${exitCode})`)
         }
-        throw new Error(`pmtiles extract exited with code ${exitCode}`)
+        throw new Error(`pmtiles extract завершился с кодом ${exitCode}`)
       }
 
       // Final progress bump — tick caps at 99 so the UI doesn't flicker to 100 mid-extract
@@ -166,7 +166,7 @@ export class RunExtractPmtilesJob {
       await this.onComplete(params)
 
       logger.info(
-        `[RunExtractPmtilesJob] Completed extract: out=${outputFilepath} size=${finalStat.size} bytes`
+        `[RunExtractPmtilesJob] Извлечение завершено: out=${outputFilepath} size=${finalStat.size} bytes`
       )
 
       return { sourceUrl, outputFilepath }
@@ -217,7 +217,7 @@ export class RunExtractPmtilesJob {
       try {
         await fsUtils.deleteFileIfExists(oldFilePath)
       } catch (err) {
-        logger.warn(`[RunExtractPmtilesJob] Failed to delete old file ${oldFilePath}: ${err}`)
+        logger.warn(`[RunExtractPmtilesJob] Не удалось удалить старый файл ${oldFilePath}: ${err}`)
       }
     }
 
@@ -238,13 +238,13 @@ export class RunExtractPmtilesJob {
         if (orphanPath === oldFilePath) continue
         try {
           await fsUtils.deleteFileIfExists(orphanPath)
-          logger.info(`[RunExtractPmtilesJob] Pruned orphan pmtiles ${orphanPath}`)
+          logger.info(`[RunExtractPmtilesJob] Обрезан сиротский pmtiles ${orphanPath}`)
         } catch (err) {
-          logger.warn(`[RunExtractPmtilesJob] Failed to prune orphan ${orphanPath}: ${err}`)
+          logger.warn(`[RunExtractPmtilesJob] Не удалось обрезать сиротский ${orphanPath}: ${err}`)
         }
       }
     } catch (err) {
-      logger.warn(`[RunExtractPmtilesJob] Directory scan for orphans failed: ${err}`)
+      logger.warn(`[RunExtractPmtilesJob] Сканирование директории на сиротские файлы не удалось: ${err}`)
     }
   }
 
@@ -266,7 +266,7 @@ export class RunExtractPmtilesJob {
         return {
           job: existing,
           created: false,
-          message: `Extract job already exists for these params`,
+          message: `Задача извлечения для этих параметров уже существует`,
         }
       }
       // Stale (completed/failed) — remove so we can re-dispatch under the same deterministic id
@@ -288,7 +288,7 @@ export class RunExtractPmtilesJob {
     return {
       job,
       created: true,
-      message: `Dispatched pmtiles extract job`,
+      message: `Задача извлечения pmtiles запущена`,
     }
   }
 }

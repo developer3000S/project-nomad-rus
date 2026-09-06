@@ -65,19 +65,19 @@ export async function checkImageDiskSpace(params: {
 
     const free = await getFreeBytes(systemService)
     if (free === null) {
-      logger.warn('[ImageDiskPreflight] Could not determine free disk space; skipping disk check')
+      logger.warn('[ImageDiskPreflight] Не удалось определить свободное место на диске; проверка пропущена')
       return null
     }
 
     if (free < required) {
       return {
-        reason: `Insufficient disk space: ${gib(free)} free, ${gib(required)} required`,
+        reason: `Недостаточно места на диске: свободно ${gib(free)}, требуется ${gib(required)}`,
         severity: 'failure',
       }
     }
     return null
   } catch (error) {
-    logger.warn(`[ImageDiskPreflight] Disk space check failed: ${error.message}`)
+    logger.warn(`[ImageDiskPreflight] Проверка места на диске не удалась: ${error.message}`)
     return null
   }
 }

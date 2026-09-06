@@ -115,7 +115,7 @@ export class MapService implements IMapService {
     })
     const tarFileBuffer = await getFileStatsIfExists(tempTarPath)
     if (!tarFileBuffer) {
-      throw new Error(`Failed to download tar file`)
+      throw new Error(`Не удалось загрузить tar-файл`)
     }
 
     await extract({
@@ -153,19 +153,19 @@ export class MapService implements IMapService {
       try {
         assertNotPrivateUrl(resource.url)
       } catch {
-        logger.warn(`[MapService] Blocked download from private/loopback URL: ${resource.url}`)
+        logger.warn(`[MapService] Загрузка заблокирована: частный/loopback URL: ${resource.url}`)
         continue
       }
 
       const existing = await RunDownloadJob.getActiveByUrl(resource.url)
       if (existing) {
-        logger.warn(`[MapService] Download already in progress for URL ${resource.url}, skipping.`)
+        logger.warn(`[MapService] Загрузка для URL ${resource.url} уже выполняется, пропуск.`)
         continue
       }
 
       const filename = resource.url.split('/').pop()
       if (!filename) {
-        logger.warn(`[MapService] Could not determine filename from URL ${resource.url}, skipping.`)
+        logger.warn(`[MapService] Не удалось определить имя файла из URL ${resource.url}, пропуск.`)
         continue
       }
 
@@ -223,7 +223,7 @@ export class MapService implements IMapService {
             installed_at: DateTime.now(),
           }
         )
-        logger.info(`[MapService] Created InstalledResource entry for: ${parsed.resource_id}`)
+        logger.info(`[MapService] Создана запись InstalledResource: ${parsed.resource_id}`)
 
         // Remove the superseded prior version's pmtiles file if every safety
         // rail passes (see decideSupersededDeletion). Maps have no library index,
@@ -239,18 +239,18 @@ export class MapService implements IMapService {
           try {
             await deleteFileIfExists(decision.path)
             logger.info(
-              `[MapService] Removed superseded ${parsed.resource_id} file: ${decision.path}`
+              `[MapService] Удалён заменённый файл ${parsed.resource_id}: ${decision.path}`
             )
           } catch (err) {
-            logger.warn(`[MapService] Failed to remove superseded file ${decision.path}:`, err)
+            logger.warn(`[MapService] Не удалось удалить заменённый файл ${decision.path}:`, err)
           }
         } else if (decision.reason !== 'first_install' && decision.reason !== 'same_file') {
           logger.info(
-            `[MapService] Kept prior ${parsed.resource_id} file (reason: ${decision.reason})`
+            `[MapService] Сохранён предыдущий файл ${parsed.resource_id} (причина: ${decision.reason})`
           )
         }
       } catch (error) {
-        logger.error(`[MapService] Failed to create InstalledResource for ${filename}:`, error)
+        logger.error(`[MapService] Не удалось создать InstalledResource для ${filename}:`, error)
       }
     }
   }
@@ -258,17 +258,17 @@ export class MapService implements IMapService {
   async downloadRemote(url: string): Promise<{ filename: string; jobId?: string }> {
     const parsed = new URL(url)
     if (!parsed.pathname.endsWith('.pmtiles')) {
-      throw new Error(`Invalid PMTiles file URL: ${url}. URL must end with .pmtiles`)
+      throw new Error(`Недопустимый URL PMTiles файла: ${url}. URL должен заканчиваться на .pmtiles`)
     }
 
     const existing = await RunDownloadJob.getActiveByUrl(url)
     if (existing) {
-      throw new Error(`Download already in progress for URL ${url}`)
+      throw new Error(`Загрузка для URL ${url} уже выполняется`)
     }
 
     const filename = url.split('/').pop()
     if (!filename) {
-      throw new Error('Could not determine filename from URL')
+      throw new Error('Не удалось определить имя файла из URL')
     }
 
     const filepath = join(process.cwd(), this.mapStoragePath, 'pmtiles', filename)
@@ -278,7 +278,7 @@ export class MapService implements IMapService {
     const baseAssetsExist = await this.ensureBaseAssets()
     if (!baseAssetsExist) {
       throw new Error(
-        'Base map assets are missing and could not be downloaded. Please check your connection and try again.'
+        'Базовые ресурсы карт отсутствуют и не удалось их загрузить. Проверьте подключение и попробуйте снова.'
       )
     }
 
@@ -300,10 +300,10 @@ export class MapService implements IMapService {
     })
 
     if (!result.job) {
-      throw new Error('Failed to dispatch download job')
+      throw new Error('Не удалось запустить задание загрузки')
     }
 
-    logger.info(`[MapService] Dispatched download job ${result.job.id} for URL ${url}`)
+    logger.info(`[MapService] Запущено задание загрузки ${result.job.id} для URL ${url}`)
 
     return {
       filename,
@@ -318,12 +318,12 @@ export class MapService implements IMapService {
       assertNotPrivateUrl(url)
       const parsed = new URL(url)
       if (!parsed.pathname.endsWith('.pmtiles')) {
-        throw new Error(`Invalid PMTiles file URL: ${url}. URL must end with .pmtiles`)
+        throw new Error(`Недопустимый URL PMTiles файла: ${url}. URL должен заканчиваться на .pmtiles`)
       }
 
       const filename = url.split('/').pop()
       if (!filename) {
-        throw new Error('Could not determine filename from URL')
+        throw new Error('Не удалось определить имя файла из URL')
       }
 
       // Perform a HEAD request to get the content length
@@ -331,7 +331,7 @@ export class MapService implements IMapService {
       const response = await axios.head(url)
 
       if (response.status !== 200) {
-        throw new Error(`Failed to fetch file info: ${response.status} ${response.statusText}`)
+        throw new Error(`Не удалось получить информацию о файле: ${response.status} ${response.statusText}`)
       }
 
       const contentLength = response.headers['content-length']
@@ -339,20 +339,20 @@ export class MapService implements IMapService {
 
       return { filename, size }
     } catch (error: any) {
-      logger.error({ err: error }, '[MapService] Preflight check failed for URL')
-      return { message: 'Preflight check failed. Please verify the URL is valid and accessible.' }
+      logger.error({ err: error }, '[MapService] Предварительная проверка не удалась для URL')
+      return { message: 'Предварительная проверка не удалась. Убедитесь, что URL корректен и доступен.' }
     }
   }
 
   async generateStylesJSON(host: string | null = null, protocol: string = 'http'): Promise<BaseStylesFile> {
     if (!(await this.checkBaseAssetsExist())) {
-      throw new Error('Base map assets are missing from storage/maps')
+      throw new Error('Базовые ресурсы карт отсутствуют в storage/maps')
     }
 
     const baseStylePath = join(this.baseDirPath, this.baseStylesFile)
     const baseStyle = await getFile(baseStylePath, 'string')
     if (!baseStyle) {
-      throw new Error('Base styles file not found in storage/maps')
+      throw new Error('Файл базовых стилей не найден в storage/maps')
     }
 
     const rawStyles = JSON.parse(baseStyle.toString()) as BaseStylesFile
@@ -398,7 +398,7 @@ export class MapService implements IMapService {
     try {
       await this.ensureWorldBasemap()
     } catch (err) {
-      logger.warn(`[MapService] World basemap setup failed, continuing without it: ${err}`)
+      logger.warn(`[MapService] Настройка базовой карты мира не удалась, продолжаем без неё: ${err}`)
     }
 
     return true
@@ -454,7 +454,7 @@ export class MapService implements IMapService {
     const basePath = resolve(join(this.baseDirPath, 'pmtiles'))
     const filepath = resolve(join(basePath, WORLD_BASEMAP_FILENAME))
     if (!filepath.startsWith(basePath + sep)) {
-      throw new Error('Invalid world basemap path')
+      throw new Error('Недопустимый путь базовой карты мира')
     }
 
     await ensureDirectoryExists(basePath)
@@ -474,7 +474,7 @@ export class MapService implements IMapService {
     })
 
     logger.info(
-      `[MapService] Extracting world basemap (z0-${WORLD_BASEMAP_MAX_ZOOM}) from ${info.url}`
+      `[MapService] Извлечение базовой карты мира (z0-${WORLD_BASEMAP_MAX_ZOOM}) из ${info.url}`
     )
     try {
       await execFileAsync(PMTILES_BINARY_PATH, args, {
@@ -485,7 +485,7 @@ export class MapService implements IMapService {
     } catch (err: any) {
       await deleteFileIfExists(filepath)
       throw new Error(
-        `pmtiles extract for world basemap failed: ${err.message}. stderr: ${err.stderr ?? ''}`
+        `pmtiles extract для базовой карты мира не удался: ${err.message}. stderr: ${err.stderr ?? ''}`
       )
     }
   }
@@ -630,7 +630,7 @@ export class MapService implements IMapService {
     const builds = response.data as Array<{ key: string; size: number }>
 
     if (!builds || builds.length === 0) {
-      throw new Error('No protomaps builds found')
+      throw new Error('Сборки protomaps не найдены')
     }
 
     // Latest build first
@@ -653,7 +653,7 @@ export class MapService implements IMapService {
 
     const existing = await RunDownloadJob.getByUrl(info.url)
     if (existing) {
-      throw new Error(`Download already in progress for URL ${info.url}`)
+      throw new Error(`Загрузка для URL ${info.url} уже выполняется`)
     }
 
     const basePath = resolve(join(this.baseDirPath, 'pmtiles'))
@@ -661,14 +661,14 @@ export class MapService implements IMapService {
 
     // Prevent path traversal — resolved path must stay within the storage directory
     if (!filepath.startsWith(basePath + sep)) {
-      throw new Error('Invalid filename')
+      throw new Error('Недопустимое имя файла')
     }
 
     // First, ensure base assets are present - the global map depends on them
     const baseAssetsExist = await this.ensureBaseAssets()
     if (!baseAssetsExist) {
       throw new Error(
-        'Base map assets are missing and could not be downloaded. Please check your connection and try again.'
+        'Базовые ресурсы карт отсутствуют и не удалось их загрузить. Проверьте подключение и попробуйте снова.'
       )
     }
 
@@ -683,10 +683,10 @@ export class MapService implements IMapService {
     })
 
     if (!result.job) {
-      throw new Error('Failed to dispatch download job')
+      throw new Error('Не удалось запустить задание загрузки')
     }
 
-    logger.info(`[MapService] Dispatched global map download job ${result.job.id}`)
+    logger.info(`[MapService] Запущено задание загрузки глобальной карты ${result.job.id}`)
 
     return {
       filename: info.key,
@@ -770,7 +770,7 @@ export class MapService implements IMapService {
     ])
     if (!baseAssetsExist) {
       throw new Error(
-        'Base map assets are missing and could not be downloaded. Please check your connection and try again.'
+        'Базовые ресурсы карт отсутствуют и не удалось их загрузить. Проверьте подключение и попробуйте снова.'
       )
     }
 
@@ -782,7 +782,7 @@ export class MapService implements IMapService {
     const filepath = resolve(join(basePath, filename))
 
     if (!filepath.startsWith(basePath + sep)) {
-      throw new Error('Invalid filename')
+      throw new Error('Недопустимое имя файла')
     }
 
     let estimatedBytes = params.estimatedBytes ?? 0
@@ -791,7 +791,7 @@ export class MapService implements IMapService {
         const preflight = await this.runDryRun(info, regionFilepath, maxzoom)
         estimatedBytes = preflight.bytes
       } catch (err) {
-        logger.warn(`[MapService] extractRegion preflight failed, proceeding without estimate: ${err}`)
+        logger.warn(`[MapService] Предварительная проверка extractRegion не удалась, продолжаем без оценки: ${err}`)
       }
     }
 
@@ -813,11 +813,11 @@ export class MapService implements IMapService {
     })
 
     if (!result.job) {
-      throw new Error('Failed to dispatch extract job')
+      throw new Error('Не удалось запустить задание извлечения')
     }
 
     logger.info(
-      `[MapService] Dispatched extract job ${result.job.id} for ${filename} ` +
+      `[MapService] Запущено задание извлечения ${result.job.id} для ${filename} ` +
         `(countries=[${countries.join(',')}] maxzoom=${maxzoom} est=${estimatedBytes} bytes)`
     )
 
@@ -891,7 +891,7 @@ export class MapService implements IMapService {
     }
 
     if (fileName === WORLD_BASEMAP_FILENAME) {
-      throw new Error('The world basemap cannot be deleted')
+      throw new Error('Базовая карта мира не может быть удалена')
     }
 
     const basePath = resolve(join(this.baseDirPath, 'pmtiles'))
@@ -899,12 +899,12 @@ export class MapService implements IMapService {
 
     // Prevent path traversal — resolved path must stay within the storage directory
     if (!fullPath.startsWith(basePath + sep)) {
-      throw new Error('Invalid filename')
+      throw new Error('Недопустимое имя файла')
     }
 
     const exists = await getFileStatsIfExists(fullPath)
     if (!exists) {
-      throw new Error('not_found')
+      throw new Error('не найдено')
     }
 
     await deleteFileIfExists(fullPath)
@@ -916,7 +916,7 @@ export class MapService implements IMapService {
         .where('resource_id', parsed.resource_id)
         .where('resource_type', 'map')
         .delete()
-      logger.info(`[MapService] Deleted InstalledResource entry for: ${parsed.resource_id}`)
+      logger.info(`[MapService] Удалена запись InstalledResource: ${parsed.resource_id}`)
     }
   }
 

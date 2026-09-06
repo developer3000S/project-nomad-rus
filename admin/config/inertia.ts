@@ -27,7 +27,7 @@ const inertiaConfig = defineConfig({
         return _assistantNameCache.value
       }
       const customName = await KVStore.getValue('ai.assistantCustomName')
-      const value = (customName && customName.trim()) ? customName : 'AI Assistant'
+      const value = (customName && customName.trim()) ? customName : 'ИИ Ассистент'
       _assistantNameCache = { value, expiresAt: now + 60_000 }
       return value
     },

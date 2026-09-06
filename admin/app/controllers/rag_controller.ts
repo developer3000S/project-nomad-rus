@@ -18,7 +18,7 @@ export default class RagController {
   public async upload({ request, response }: HttpContext) {
     const uploadedFile = request.file('file')
     if (!uploadedFile) {
-      return response.status(400).json({ error: 'No file uploaded' })
+      return response.status(400).json({ error: 'Файл не загружен' })
     }
 
     const collection = sanitizeCollectionName(request.input('collection', null))
@@ -61,7 +61,7 @@ export default class RagController {
     const status = await EmbedFileJob.getStatus(fullPath)
 
     if (!status.exists) {
-      return response.status(404).json({ error: 'Job not found for this file' })
+      return response.status(404).json({ error: 'Задача для этого файла не найдена' })
     }
 
     return response.status(200).json(status)
@@ -84,7 +84,7 @@ export default class RagController {
     const collection = sanitizeCollectionName(request.input('collection', null))
 
     if (!source) {
-      return response.status(400).json({ error: 'source is required.' })
+      return response.status(400).json({ error: 'Требуется source.' })
     }
 
     const result = await this.ragService.updateFileCollection(source, collection)
@@ -99,7 +99,7 @@ export default class RagController {
     const newName = sanitizeCollectionName(request.input('newName', null))
 
     if (!oldName || !newName) {
-      return response.status(400).json({ error: 'oldName and newName are required.' })
+      return response.status(400).json({ error: 'Требуются oldName и newName.' })
     }
 
     const result = await this.ragService.renameKnowledgeCollection(oldName, newName)
@@ -113,7 +113,7 @@ export default class RagController {
     const name = sanitizeCollectionName(request.input('name', null))
 
     if (!name) {
-      return response.status(400).json({ error: 'name is required.' })
+      return response.status(400).json({ error: 'Требуется name.' })
     }
 
     const result = await this.ragService.deleteKnowledgeCollection(name)
@@ -183,8 +183,8 @@ export default class RagController {
       const syncResult = await this.ragService.scanAndSyncStorage()
       return response.status(200).json(syncResult)
     } catch (error) {
-      logger.error({ err: error }, '[RagController] Error scanning and syncing storage')
-      return response.status(500).json({ error: 'Error scanning and syncing storage' })
+      logger.error({ err: error }, '[RagController] Ошибка сканирования и синхронизации хранилища')
+      return response.status(500).json({ error: 'Ошибка сканирования и синхронизации хранилища' })
     }
   }
 
@@ -193,8 +193,8 @@ export default class RagController {
       const result = await this.ragService.reembedAll()
       return response.status(200).json(result)
     } catch (error) {
-      logger.error({ err: error }, '[RagController] Error during re-embed all')
-      return response.status(500).json({ error: 'Error during re-embed all' })
+      logger.error({ err: error }, '[RagController] Ошибка при пересоздании эмбеддингов')
+      return response.status(500).json({ error: 'Ошибка при пересоздании эмбеддингов' })
     }
   }
 
@@ -203,8 +203,8 @@ export default class RagController {
       const result = await this.ragService.resetAndRebuild()
       return response.status(200).json(result)
     } catch (error) {
-      logger.error({ err: error }, '[RagController] Error during reset and rebuild')
-      return response.status(500).json({ error: 'Error during reset and rebuild' })
+      logger.error({ err: error }, '[RagController] Ошибка при сбросе и пересборке')
+      return response.status(500).json({ error: 'Ошибка при сбросе и пересборке' })
     }
   }
 
@@ -230,7 +230,7 @@ export default class RagController {
     const { source } = await request.validateUsing(fileSourceSchema)
     const result = await this.ragService.readFileContent(source)
     if (!result) {
-      return response.status(404).json({ error: 'File not found or not viewable' })
+      return response.status(404).json({ error: 'Файл не найден или недоступен для просмотра' })
     }
     return response.status(200).json(result)
   }
@@ -239,7 +239,7 @@ export default class RagController {
     const { source } = await request.validateUsing(fileSourceSchema)
     const filePath = await this.ragService.resolveDownloadPath(source)
     if (!filePath) {
-      return response.status(404).json({ error: 'File not found' })
+      return response.status(404).json({ error: 'Файл не найден' })
     }
     const fileName = filePath.split(/[/\\]/).at(-1) ?? 'download'
     return response.attachment(filePath, fileName)

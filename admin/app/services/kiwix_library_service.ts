@@ -57,7 +57,7 @@ export class KiwixLibraryService {
   private async _readZimMetadata(zimFilePath: string): Promise<Partial<KiwixBook> | null> {
     try {
       if (!(await isValidZimFile(zimFilePath))) {
-        logger.warn(`[KiwixLibraryService] Skipping invalid/corrupted ZIM file: ${zimFilePath}`)
+        logger.warn(`[KiwixLibraryService] Пропуск недопустимого/повреждённого ZIM файла: ${zimFilePath}`)
         return null
       }
       const archive = new Archive(zimFilePath)
@@ -237,7 +237,7 @@ export class KiwixLibraryService {
       content = await readFile(this.getLibraryFilePath(), 'utf-8')
     } catch (err: any) {
       if (err?.code === 'ENOENT') {
-        logger.warn('[KiwixLibraryService] Library XML missing on startup; rebuilding from disk.')
+        logger.warn('[KiwixLibraryService] XML библиотеки отсутствует при запуске; восстановление с диска.')
         await this.rebuildFromDisk()
         return true
       }
@@ -246,7 +246,7 @@ export class KiwixLibraryService {
 
     if (this._isValidLibraryXml(content)) return false
 
-    logger.warn('[KiwixLibraryService] Library XML present but invalid; rebuilding from disk.')
+    logger.warn('[KiwixLibraryService] XML библиотеки присутствует, но недопустим; восстановление с диска.')
     await this.rebuildFromDisk()
     return true
   }
@@ -269,7 +269,7 @@ export class KiwixLibraryService {
     for (const filename of zimFiles) {
       const meta = await this._readZimMetadata(join(dirPath, filename))
       if (meta === null) {
-        logger.warn(`[KiwixLibraryService] Skipping unreadable ZIM file: ${filename}`)
+        logger.warn(`[KiwixLibraryService] Пропуск нечитаемого ZIM файла: ${filename}`)
         continue
       }
       const containerPath = `${CONTAINER_DATA_PATH}/${filename}`
@@ -284,7 +284,7 @@ export class KiwixLibraryService {
 
     const xml = this._buildXml(books)
     await this._atomicWrite(xml)
-    logger.info(`[KiwixLibraryService] Rebuilt library XML with ${books.length} book(s).`)
+    logger.info(`[KiwixLibraryService] XML библиотеки перестроен: ${books.length} книг(а).`)
     return books.length
   }
 
@@ -308,7 +308,7 @@ export class KiwixLibraryService {
     }
 
     if (existingBooks.some((b) => b.path === containerPath)) {
-      logger.info(`[KiwixLibraryService] ${zimFilename} already in library, skipping.`)
+      logger.info(`[KiwixLibraryService] ${zimFilename} уже в библиотеке, пропуск.`)
       return
     }
 
@@ -316,7 +316,7 @@ export class KiwixLibraryService {
     const meta = await this._readZimMetadata(fullPath)
 
     if (meta === null) {
-      logger.error(`[KiwixLibraryService] Cannot add ${zimFilename}: file is invalid or corrupted.`)
+      logger.error(`[KiwixLibraryService] Не удалось добавить ${zimFilename}: файл недопустим или повреждён.`)
       return
     }
 
@@ -329,7 +329,7 @@ export class KiwixLibraryService {
 
     const xml = this._buildXml(existingBooks)
     await this._atomicWrite(xml)
-    logger.info(`[KiwixLibraryService] Added ${zimFilename} to library XML.`)
+    logger.info(`[KiwixLibraryService] ${zimFilename} добавлен в XML библиотеки.`)
   }
 
   async removeBook(filename: string): Promise<void> {
@@ -344,7 +344,7 @@ export class KiwixLibraryService {
       existingBooks = this._parseExistingBooks(content)
     } catch (err: any) {
       if (err.code === 'ENOENT') {
-        logger.warn(`[KiwixLibraryService] Library XML not found, nothing to remove.`)
+        logger.warn(`[KiwixLibraryService] XML библиотеки не найден, нечего удалять.`)
         return
       }
       throw err
@@ -353,12 +353,12 @@ export class KiwixLibraryService {
     const filtered = existingBooks.filter((b) => b.path !== containerPath)
 
     if (filtered.length === existingBooks.length) {
-      logger.info(`[KiwixLibraryService] ${zimFilename} not found in library, nothing to remove.`)
+      logger.info(`[KiwixLibraryService] ${zimFilename} не найден в библиотеке, нечего удалять.`)
       return
     }
 
     const xml = this._buildXml(filtered)
     await this._atomicWrite(xml)
-    logger.info(`[KiwixLibraryService] Removed ${zimFilename} from library XML.`)
+    logger.info(`[KiwixLibraryService] ${zimFilename} удалён из XML библиотеки.`)
   }
 }

@@ -79,7 +79,7 @@ export class CreatorPackService {
   async installPack(packId: string): Promise<InstallPackResult> {
     const appKey = env.get('CREATOR_PACKS_APP_KEY')
     if (!appKey) {
-      logger.error('[CreatorPackService] CREATOR_PACKS_APP_KEY is not set; cannot install packs')
+      logger.error('[CreatorPackService] CREATOR_PACKS_APP_KEY не установлен; невозможно установить пакеты')
       return { code: 'not_configured' }
     }
 
@@ -129,7 +129,7 @@ export class CreatorPackService {
       },
     })
 
-    logger.info(`[CreatorPackService] Dispatched download for pack ${pack.id} (${filename})`)
+    logger.info(`[CreatorPackService] Запущена загрузка пакета ${pack.id} (${filename})`)
     return { code: 'dispatched', filename }
   }
 
@@ -153,7 +153,7 @@ export class CreatorPackService {
     const zimService = new ZimService(this.dockerService)
     await zimService.delete(filename)
 
-    logger.info(`[CreatorPackService] Uninstalled pack ${packId} (${filename})`)
+    logger.info(`[CreatorPackService] Пакет ${packId} (${filename}) удалён`)
     return { code: 'uninstalled', filename }
   }
 
@@ -162,15 +162,15 @@ export class CreatorPackService {
       const kiwixUrl = await this.dockerService.getServiceURL(SERVICE_NAMES.KIWIX)
       if (kiwixUrl) return // already installed and resolvable
 
-      logger.info('[CreatorPackService] Kiwix not installed; auto-installing before pack download')
+      logger.info('[CreatorPackService] Kiwix не установлен; автоустановка перед загрузкой пакета')
       const result = await this.dockerService.createContainerPreflight(SERVICE_NAMES.KIWIX)
       if (!result.success) {
         // e.g. "already installing" — not fatal, the pack download proceeds regardless.
-        logger.warn(`[CreatorPackService] Kiwix preflight did not start: ${result.message}`)
+        logger.warn(`[CreatorPackService] Предварительная проверка Kiwix не запустилась: ${result.message}`)
       }
     } catch (error: any) {
       logger.warn(
-        `[CreatorPackService] Kiwix auto-install failed (continuing with pack download): ${error?.message || error}`
+        `[CreatorPackService] Автоустановка Kiwix не удалась (продолжаем загрузку пакета): ${error?.message || error}`
       )
     }
   }

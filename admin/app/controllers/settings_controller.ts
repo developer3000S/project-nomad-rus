@@ -147,6 +147,6 @@ export default class SettingsController {
       return response.status(422).send({ success: false, message: valueError })
     }
     await this.systemService.updateSetting(reqData.key, reqData.value)
-    return response.status(200).send({ success: true, message: 'Setting updated successfully' })
+    return response.status(200).send({ success: true, message: 'Настройка успешно обновлена' })
   }
 }

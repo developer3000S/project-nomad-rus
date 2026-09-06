@@ -108,27 +108,27 @@ router.get('/easy-setup/complete', [EasySetupController, 'complete'])
 documented(
   router.get('/api/easy-setup/curated-categories', [EasySetupController, 'listCuratedCategories']),
   {
-    summary: 'List curated easy-setup categories',
+    summary: 'Получить список категорий быстрой настройки',
     tags: ['easy-setup'],
   }
 )
 documented(router.post('/api/manifests/refresh', [EasySetupController, 'refreshManifests']), {
-  summary: 'Refresh content manifests',
+  summary: 'Обновить манифесты контента',
   tags: ['easy-setup'],
 })
 router
   .group(() => {
     documented(router.post('/check', [CollectionUpdatesController, 'checkForUpdates']), {
-      summary: 'Check for available content updates',
+      summary: 'Проверить доступные обновления контента',
       tags: ['content-updates'],
     })
     documented(router.post('/apply', [CollectionUpdatesController, 'applyUpdate']), {
-      summary: 'Apply a content update',
+      summary: 'Применить обновление контента',
       tags: ['content-updates'],
       request: applyContentUpdateValidator,
     })
     documented(router.post('/apply-all', [CollectionUpdatesController, 'applyAllUpdates']), {
-      summary: 'Apply all available content updates',
+      summary: 'Применить все доступные обновления контента',
       tags: ['content-updates'],
       request: applyAllContentUpdatesValidator,
     })
@@ -165,89 +165,89 @@ router
 router
   .group(() => {
     documented(router.get('/regions', [MapsController, 'listRegions']), {
-      summary: 'List available map regions',
+      summary: 'Получить список доступных регионов карт',
       tags: ['maps'],
     })
     documented(router.get('/styles', [MapsController, 'styles']), {
-      summary: 'List available map styles',
+      summary: 'Получить список доступных стилей карт',
       tags: ['maps'],
     })
     documented(router.get('/curated-collections', [MapsController, 'listCuratedCollections']), {
-      summary: 'List curated map collections',
+      summary: 'Получить список подборок карт',
       tags: ['maps'],
     })
     documented(router.post('/fetch-latest-collections', [MapsController, 'fetchLatestCollections']), {
-      summary: 'Fetch the latest map collections',
+      summary: 'Загрузить последние подборки карт',
       tags: ['maps'],
     })
     documented(router.post('/download-base-assets', [MapsController, 'downloadBaseAssets']), {
-      summary: 'Download base map assets',
+      summary: 'Скачать базовые ресурсы карт',
       tags: ['maps'],
       request: remoteDownloadValidatorOptional,
     })
     documented(router.post('/setup-world-basemap', [MapsController, 'setupWorldBasemap']), {
-      summary: 'Provision the world base map',
+      summary: 'Подготовить базовую карту мира',
       tags: ['maps'],
     })
     documented(router.post('/download-remote', [MapsController, 'downloadRemote']), {
-      summary: 'Queue a remote map download',
+      summary: 'Добавить загрузку удалённой карты в очередь',
       tags: ['maps'],
       request: remoteDownloadValidator,
     })
     documented(router.post('/download-remote-preflight', [MapsController, 'downloadRemotePreflight']), {
-      summary: 'Preflight a remote map download',
+      summary: 'Проверить возможность загрузки удалённой карты',
       tags: ['maps'],
       request: remoteDownloadValidator,
     })
     documented(router.post('/download-collection', [MapsController, 'downloadCollection']), {
-      summary: 'Download a map collection',
+      summary: 'Скачать подборку карт',
       tags: ['maps'],
       request: downloadCollectionValidator,
     })
     documented(router.get('/global-map-info', [MapsController, 'globalMapInfo']), {
-      summary: 'Get global map information',
+      summary: 'Получить информацию о глобальной карте',
       tags: ['maps'],
     })
     documented(router.post('/download-global-map', [MapsController, 'downloadGlobalMap']), {
-      summary: 'Download the global map',
+      summary: 'Скачать глобальную карту',
       tags: ['maps'],
     })
     documented(router.get('/countries', [MapsController, 'listCountries']), {
-      summary: 'List available countries',
+      summary: 'Получить список доступных стран',
       tags: ['maps'],
     })
     documented(router.get('/country-groups', [MapsController, 'listCountryGroups']), {
-      summary: 'List country groups',
+      summary: 'Получить список групп стран',
       tags: ['maps'],
     })
     documented(router.post('/extract-preflight', [MapsController, 'extractPreflight']), {
-      summary: 'Preflight a map region extraction',
+      summary: 'Проверить возможность извлечения региона карты',
       tags: ['maps'],
       request: mapExtractPreflightValidator,
     })
     documented(router.post('/extract', [MapsController, 'extractRegion']), {
-      summary: 'Extract a map region',
+      summary: 'Извлечь регион карты',
       tags: ['maps'],
       request: mapExtractValidator,
     })
     documented(router.get('/markers', [MapsController, 'listMarkers']), {
-      summary: 'List map markers',
+      summary: 'Получить список маркеров карты',
       tags: ['maps'],
     })
     documented(router.post('/markers', [MapsController, 'createMarker']), {
-      summary: 'Create a map marker',
+      summary: 'Создать маркер карты',
       tags: ['maps'],
     })
     documented(router.patch('/markers/:id', [MapsController, 'updateMarker']), {
-      summary: 'Update a map marker',
+      summary: 'Обновить маркер карты',
       tags: ['maps'],
     })
     documented(router.delete('/markers/:id', [MapsController, 'deleteMarker']), {
-      summary: 'Delete a map marker',
+      summary: 'Удалить маркер карты',
       tags: ['maps'],
     })
     documented(router.delete('/:filename', [MapsController, 'delete']), {
-      summary: 'Delete a map file',
+      summary: 'Удалить файл карты',
       tags: ['maps'],
       params: filenameParamValidator,
     })
@@ -257,7 +257,7 @@ router
 router
   .group(() => {
     documented(router.get('/list', [DocsController, 'list']), {
-      summary: 'List documentation pages',
+      summary: 'Получить список страниц документации',
       tags: ['docs'],
     })
   })
@@ -266,24 +266,24 @@ router
 router
   .group(() => {
     documented(router.get('/jobs', [DownloadsController, 'index']), {
-      summary: 'List download jobs',
+      summary: 'Получить список задач загрузки',
       tags: ['downloads'],
     })
     documented(router.get('/jobs/:filetype', [DownloadsController, 'filetype']), {
-      summary: 'List download jobs by filetype',
+      summary: 'Получить задачи загрузки по типу файла',
       tags: ['downloads'],
       params: downloadJobsByFiletypeSchema,
     })
     documented(router.delete('/jobs/:jobId', [DownloadsController, 'removeJob']), {
-      summary: 'Remove a download job',
+      summary: 'Удалить задачу загрузки',
       tags: ['downloads'],
     })
     documented(router.post('/jobs/:jobId/cancel', [DownloadsController, 'cancelJob']), {
-      summary: 'Cancel a download job',
+      summary: 'Отменить задачу загрузки',
       tags: ['downloads'],
     })
     documented(router.post('/jobs/:jobId/retry', [DownloadsController, 'retryJob']), {
-      summary: 'Retry a download job',
+      summary: 'Повторить задачу загрузки',
       tags: ['downloads'],
     })
   })
@@ -293,7 +293,7 @@ documented(
   router.get('/api/health', () => {
     return { status: 'ok' }
   }),
-  { summary: 'Health check', tags: ['meta'], responses: { 200: healthResponse } }
+  { summary: 'Проверка работоспособности', tags: ['meta'], responses: { 200: healthResponse } }
 )
 
 // Self-generating API docs: OpenAPI spec + Scalar UI. Registered top-level so
@@ -306,40 +306,40 @@ router.get('/reference/assets/standalone.js', [OpenApiController, 'standalone'])
 router
   .group(() => {
     documented(router.post('/chat', [OllamaController, 'chat']), {
-      summary: 'Send a chat completion request',
+      summary: 'Отправить запрос завершения чата',
       tags: ['ollama'],
       request: chatSchema,
     })
     documented(router.get('/models', [OllamaController, 'availableModels']), {
-      summary: 'List available models',
+      summary: 'Получить список доступных моделей',
       tags: ['ollama'],
       query: getAvailableModelsSchema,
     })
     documented(router.post('/models', [OllamaController, 'dispatchModelDownload']), {
-      summary: 'Queue a model download',
+      summary: 'Добавить загрузку модели в очередь',
       tags: ['ollama'],
       request: modelNameSchema,
     })
     documented(router.delete('/models', [OllamaController, 'deleteModel']), {
-      summary: 'Delete a model',
+      summary: 'Удалить модель',
       tags: ['ollama'],
       request: modelNameSchema,
     })
     documented(router.get('/installed-models', [OllamaController, 'installedModels']), {
-      summary: 'List installed models',
+      summary: 'Получить список установленных моделей',
       tags: ['ollama'],
     })
     documented(router.post('/unload-chat-models', [OllamaController, 'unloadChatModels']), {
-      summary: 'Unload chat models from memory',
+      summary: 'Выгрузить модели чата из памяти',
       tags: ['ollama'],
       request: unloadChatModelsSchema,
     })
     documented(router.post('/configure-remote', [OllamaController, 'configureRemote']), {
-      summary: 'Configure a remote Ollama endpoint',
+      summary: 'Настроить удалённую конечную точку Ollama',
       tags: ['ollama'],
     })
     documented(router.get('/remote-status', [OllamaController, 'remoteStatus']), {
-      summary: 'Get remote Ollama status',
+      summary: 'Получить статус удалённой Ollama',
       tags: ['ollama'],
     })
   })
@@ -348,11 +348,11 @@ router
 router
   .group(() => {
     documented(router.get('/nomad-md', [NomadMdController, 'show']), {
-      summary: 'Get the NOMAD.md system prompt',
+      summary: 'Получить системный промпт NOMAD.md',
       tags: ['ai'],
     })
     documented(router.put('/nomad-md', [NomadMdController, 'update']), {
-      summary: 'Update the NOMAD.md system prompt',
+      summary: 'Обновить системный промпт NOMAD.md',
       tags: ['ai'],
       request: updateNomadMdSchema,
     })
@@ -362,49 +362,49 @@ router
 router
   .group(() => {
     documented(router.get('/', [ChatsController, 'index']), {
-      summary: 'List chat sessions',
+      summary: 'Получить список сессий чата',
       tags: ['chat'],
       responses: { 200: chatSessionListResponse },
     })
     documented(router.post('/', [ChatsController, 'store']), {
-      summary: 'Create a chat session',
+      summary: 'Создать сессию чата',
       tags: ['chat'],
       request: createSessionSchema,
       responses: {
-        201: { description: 'The created session', schema: chatSessionResponse },
+        201: { description: 'Созданная сессия', schema: chatSessionResponse },
         500: errorResponse,
       },
     })
     documented(router.delete('/all', [ChatsController, 'destroyAll']), {
-      summary: 'Delete all chat sessions',
+      summary: 'Удалить все сессии чата',
       tags: ['chat'],
-      responses: { 204: { description: 'All sessions deleted' } },
+      responses: { 204: { description: 'Все сессии удалены' } },
     })
     documented(router.get('/:id', [ChatsController, 'show']), {
-      summary: 'Get a chat session',
+      summary: 'Получить сессию чата',
       tags: ['chat'],
       responses: {
         200: chatSessionResponse,
-        404: { description: 'Session not found', schema: errorResponse },
+        404: { description: 'Сессия не найдена', schema: errorResponse },
       },
     })
     documented(router.put('/:id', [ChatsController, 'update']), {
-      summary: 'Update a chat session',
+      summary: 'Обновить сессию чата',
       tags: ['chat'],
       request: updateSessionSchema,
       responses: { 200: chatSessionResponse, 500: errorResponse },
     })
     documented(router.delete('/:id', [ChatsController, 'destroy']), {
-      summary: 'Delete a chat session',
+      summary: 'Удалить сессию чата',
       tags: ['chat'],
-      responses: { 204: { description: 'Session deleted' } },
+      responses: { 204: { description: 'Сессия удалена' } },
     })
     documented(router.post('/:id/messages', [ChatsController, 'addMessage']), {
-      summary: 'Add a message to a chat session',
+      summary: 'Добавить сообщение в сессию чата',
       tags: ['chat'],
       request: addMessageSchema,
       responses: {
-        201: { description: 'The created message', schema: chatMessageResponse },
+        201: { description: 'Созданное сообщение', schema: chatMessageResponse },
         500: errorResponse,
       },
     })
@@ -412,104 +412,104 @@ router
   .prefix('/api/chat/sessions')
 
 documented(router.get('/api/chat/suggestions', [ChatsController, 'suggestions']), {
-  summary: 'List chat suggestions',
+  summary: 'Получить предложения для чата',
   tags: ['chat'],
 })
 
 router
   .group(() => {
     documented(router.post('/upload', [RagController, 'upload']), {
-      summary: 'Upload a file for RAG',
+      summary: 'Загрузить файл для RAG',
       tags: ['rag'],
     })
     documented(router.get('/files', [RagController, 'getStoredFiles']), {
-      summary: 'List stored RAG files',
+      summary: 'Получить список сохранённых RAG файлов',
       tags: ['rag'],
     })
     documented(router.get('/file-warnings', [RagController, 'getFileWarnings']), {
-      summary: 'List RAG file warnings',
+      summary: 'Получить предупреждения RAG файлов',
       tags: ['rag'],
     })
     documented(router.delete('/files', [RagController, 'deleteFile']), {
-      summary: 'Delete a RAG file',
+      summary: 'Удалить RAG файл',
       tags: ['rag'],
       query: deleteFileSchema,
     })
     documented(router.post('/files/embed', [RagController, 'embedFile']), {
-      summary: 'Embed a RAG file',
+      summary: 'Добавить RAG файл в индекс',
       tags: ['rag'],
       request: embedFileSchema,
     })
     documented(router.get('/files/content', [RagController, 'getFileContent']), {
-      summary: 'Get RAG file content',
+      summary: 'Получить содержимое RAG файла',
       tags: ['rag'],
       query: fileSourceSchema,
     })
     documented(router.get('/files/download', [RagController, 'downloadFile']), {
-      summary: 'Download a RAG file',
+      summary: 'Скачать RAG файл',
       tags: ['rag'],
       query: fileSourceSchema,
     })
     documented(router.get('/active-jobs', [RagController, 'getActiveJobs']), {
-      summary: 'List active RAG jobs',
+      summary: 'Получить список активных RAG задач',
       tags: ['rag'],
     })
     documented(router.get('/failed-jobs', [RagController, 'getFailedJobs']), {
-      summary: 'List failed RAG jobs',
+      summary: 'Получить список неудачных RAG задач',
       tags: ['rag'],
     })
     documented(router.delete('/failed-jobs', [RagController, 'cleanupFailedJobs']), {
-      summary: 'Clean up failed RAG jobs',
+      summary: 'Очистить неудачные RAG задачи',
       tags: ['rag'],
     })
     documented(router.delete('/jobs', [RagController, 'cancelAllJobs']), {
-      summary: 'Cancel all RAG jobs',
+      summary: 'Отменить все RAG задачи',
       tags: ['rag'],
     })
     documented(router.get('/job-status', [RagController, 'getJobStatus']), {
-      summary: 'Get RAG job status',
+      summary: 'Получить статус RAG задачи',
       tags: ['rag'],
       query: getJobStatusSchema,
     })
     documented(router.post('/sync', [RagController, 'scanAndSync']), {
-      summary: 'Scan and sync RAG files',
+      summary: 'Сканировать и синхронизировать RAG файлы',
       tags: ['rag'],
     })
     documented(router.post('/re-embed-all', [RagController, 'reembedAll']), {
-      summary: 'Re-embed all RAG files',
+      summary: 'Переиндексировать все RAG файлы',
       tags: ['rag'],
     })
     documented(router.post('/reset-and-rebuild', [RagController, 'resetAndRebuild']), {
-      summary: 'Reset and rebuild the RAG index',
+      summary: 'Сбросить и перестроить RAG индекс',
       tags: ['rag'],
     })
     documented(router.post('/estimate-batch', [RagController, 'estimateBatch']), {
-      summary: 'Estimate a RAG embedding batch',
+      summary: 'Оценить размер RAG батча',
       tags: ['rag'],
       request: estimateBatchSchema,
     })
     documented(router.get('/policy-prompt-state', [RagController, 'policyPromptState']), {
-      summary: 'Get RAG policy prompt state',
+      summary: 'Получить состояние RAG политики промптов',
       tags: ['rag'],
     })
     documented(router.get('/health', [RagController, 'health']), {
-      summary: 'RAG health check',
+      summary: 'Проверка работоспособности RAG',
       tags: ['rag'],
     })
     documented(router.get('/collections', [RagController, 'getKnowledgeCollections']), {
-      summary: 'List knowledge collections',
+      summary: 'Получить список коллекций знаний',
       tags: ['rag'],
     })
     documented(router.post('/update-collection', [RagController, 'updateFileCollection']), {
-      summary: "Update a file's knowledge collection",
+      summary: 'Обновить коллекцию знаний файла',
       tags: ['rag'],
     })
     documented(router.post('/rename-collection', [RagController, 'renameKnowledgeCollection']), {
-      summary: 'Rename a knowledge collection',
+      summary: 'Переименовать коллекцию знаний',
       tags: ['rag'],
     })
     documented(router.post('/delete-collection', [RagController, 'deleteKnowledgeCollection']), {
-      summary: 'Delete a knowledge collection',
+      summary: 'Удалить коллекцию знаний',
       tags: ['rag'],
     })
   })
@@ -518,152 +518,152 @@ router
 router
   .group(() => {
     documented(router.get('/debug-info', [SystemController, 'getDebugInfo']), {
-      summary: 'Get system debug information',
+      summary: 'Получить отладочную информацию системы',
       tags: ['system'],
     })
     documented(router.get('/info', [SystemController, 'getSystemInfo']), {
-      summary: 'Get system information',
+      summary: 'Получить информацию о системе',
       tags: ['system'],
     })
     documented(router.get('/internet-status', [SystemController, 'getInternetStatus']), {
-      summary: 'Get internet connectivity status',
+      summary: 'Получить статус подключения к интернету',
       tags: ['system'],
     })
     documented(router.get('/services', [SystemController, 'getServices']), {
-      summary: 'List services',
+      summary: 'Получить список сервисов',
       tags: ['system'],
     })
     documented(router.post('/services/affect', [SystemController, 'affectService']), {
-      summary: 'Start, stop, or restart a service',
+      summary: 'Запустить, остановить или перезапустить сервис',
       tags: ['system'],
       request: affectServiceValidator,
     })
     documented(router.post('/services/install', [SystemController, 'installService']), {
-      summary: 'Install a service',
+      summary: 'Установить сервис',
       tags: ['system'],
       request: installServiceValidator,
     })
     documented(router.post('/services/force-reinstall', [SystemController, 'forceReinstallService']), {
-      summary: 'Force reinstall a service',
+      summary: 'Принудительно переустановить сервис',
       tags: ['system'],
       request: installServiceValidator,
     })
     documented(router.post('/services/uninstall', [SystemController, 'uninstallService']), {
-      summary: 'Uninstall a service',
+      summary: 'Удалить сервис',
       tags: ['system'],
       request: uninstallServiceValidator,
     })
     documented(router.post('/services/check-updates', [SystemController, 'checkServiceUpdates']), {
-      summary: 'Check for service updates',
+      summary: 'Проверить обновления сервиса',
       tags: ['system'],
     })
     documented(router.get('/services/preflight', [SystemController, 'preflightCheck']), {
-      summary: 'Preflight a service install',
+      summary: 'Проверить возможность установки сервиса',
       tags: ['system'],
       query: preflightValidator,
     })
     documented(router.get('/services/suggest-port', [SystemController, 'suggestCustomPort']), {
-      summary: 'Suggest an available custom port',
+      summary: 'Предложить доступный пользовательский порт',
       tags: ['system'],
     })
     documented(router.post('/services/preflight-custom', [SystemController, 'preflightCustomApp']), {
-      summary: 'Preflight a custom app install',
+      summary: 'Проверить возможность установки пользовательского приложения',
       tags: ['system'],
       request: preflightCustomValidator,
     })
     documented(router.post('/services/custom', [SystemController, 'createCustomApp']), {
-      summary: 'Create a custom app',
+      summary: 'Создать пользовательское приложение',
       tags: ['system'],
       request: customAppValidator,
     })
     documented(router.put('/services/custom', [SystemController, 'updateCustomApp']), {
-      summary: 'Update a custom app',
+      summary: 'Обновить пользовательское приложение',
       tags: ['system'],
       request: updateCustomAppValidator,
     })
     documented(router.post('/services/custom/update', [SystemController, 'updateCustomApp_pullLatest']), {
-      summary: 'Pull the latest version of a custom app',
+      summary: 'Загрузить последнюю версию пользовательского приложения',
       tags: ['system'],
       request: installServiceValidator,
     })
     documented(router.delete('/services/custom', [SystemController, 'deleteCustomApp']), {
-      summary: 'Delete a custom app',
+      summary: 'Удалить пользовательское приложение',
       tags: ['system'],
       request: deleteCustomAppValidator,
     })
     documented(router.get('/services/custom/:name', [SystemController, 'getCustomApp']), {
-      summary: 'Get a custom app',
+      summary: 'Получить пользовательское приложение',
       tags: ['system'],
     })
     documented(router.put('/services/custom-url', [SystemController, 'setServiceCustomUrl']), {
-      summary: 'Set a service custom URL',
+      summary: 'Установить пользовательский URL сервиса',
       tags: ['system'],
       request: setServiceCustomUrlValidator,
     })
     documented(router.get('/services/:name/logs', [SystemController, 'getServiceLogs']), {
-      summary: 'Get service logs',
+      summary: 'Получить логи сервиса',
       tags: ['system'],
       query: serviceLogsValidator,
     })
     documented(router.get('/services/:name/stats', [SystemController, 'getServiceStats']), {
-      summary: 'Get service stats',
+      summary: 'Получить статистику сервиса',
       tags: ['system'],
     })
     documented(router.get('/services/:name/available-versions', [SystemController, 'getAvailableVersions']), {
-      summary: 'List available service versions',
+      summary: 'Получить список доступных версий сервиса',
       tags: ['system'],
     })
     documented(router.post('/services/update', [SystemController, 'updateService']), {
-      summary: 'Update a service',
+      summary: 'Обновить сервис',
       tags: ['system'],
       request: updateServiceValidator,
     })
     documented(router.post('/services/auto-update', [SystemController, 'setServiceAutoUpdate']), {
-      summary: 'Set service auto-update',
+      summary: 'Установить автообновление сервиса',
       tags: ['system'],
       request: setServiceAutoUpdateValidator,
     })
     documented(router.get('/apps/auto-update/status', [SystemController, 'getAppAutoUpdateStatus']), {
-      summary: 'Get app auto-update status',
+      summary: 'Получить статус автообновления приложений',
       tags: ['system'],
     })
     documented(router.get('/content/auto-update/status', [SystemController, 'getContentAutoUpdateStatus']), {
-      summary: 'Get content auto-update status',
+      summary: 'Получить статус автообновления контента',
       tags: ['system'],
     })
     documented(router.post('/subscribe-release-notes', [SystemController, 'subscribeToReleaseNotes']), {
-      summary: 'Subscribe to release notes',
+      summary: 'Подписаться на заметки о выпуске',
       tags: ['system'],
       request: subscribeToReleaseNotesValidator,
     })
     documented(router.get('/latest-version', [SystemController, 'checkLatestVersion']), {
-      summary: 'Check the latest available version',
+      summary: 'Проверить последнюю доступную версию',
       tags: ['system'],
       query: checkLatestVersionValidator,
     })
     documented(router.post('/update', [SystemController, 'requestSystemUpdate']), {
-      summary: 'Request a system update',
+      summary: 'Запросить обновление системы',
       tags: ['system'],
     })
     documented(router.get('/update/status', [SystemController, 'getSystemUpdateStatus']), {
-      summary: 'Get system update status',
+      summary: 'Получить статус обновления системы',
       tags: ['system'],
     })
     documented(router.get('/update/logs', [SystemController, 'getSystemUpdateLogs']), {
-      summary: 'Get system update logs',
+      summary: 'Получить логи обновления системы',
       tags: ['system'],
     })
     documented(router.get('/auto-update/status', [SystemController, 'getAutoUpdateStatus']), {
-      summary: 'Get system auto-update status',
+      summary: 'Получить статус автообновления системы',
       tags: ['system'],
     })
     documented(router.get('/settings', [SettingsController, 'getSetting']), {
-      summary: 'Get a system setting',
+      summary: 'Получить системную настройку',
       tags: ['system'],
       query: getSettingSchema,
     })
     documented(router.patch('/settings', [SettingsController, 'updateSetting']), {
-      summary: 'Update a system setting',
+      summary: 'Обновить системную настройку',
       tags: ['system'],
       request: updateSettingSchema,
     })
@@ -673,70 +673,70 @@ router
 router
   .group(() => {
     documented(router.get('/list', [ZimController, 'list']), {
-      summary: 'List installed ZIM files',
+      summary: 'Получить список установленных ZIM файлов',
       tags: ['zim'],
     })
     documented(router.get('/list-remote', [ZimController, 'listRemote']), {
-      summary: 'List remote ZIM files',
+      summary: 'Получить список удалённых ZIM файлов',
       tags: ['zim'],
       query: listRemoteZimValidator,
     })
     documented(router.get('/curated-categories', [ZimController, 'listCuratedCategories']), {
-      summary: 'List curated ZIM categories',
+      summary: 'Получить список курируемых ZIM категорий',
       tags: ['zim'],
     })
     documented(router.post('/download-remote', [ZimController, 'downloadRemote']), {
-      summary: 'Queue a remote ZIM download',
+      summary: 'Добавить загрузку удалённого ZIM файла в очередь',
       tags: ['zim'],
       request: remoteDownloadWithMetadataValidator,
     })
     documented(router.post('/download-category-tier', [ZimController, 'downloadCategoryTier']), {
-      summary: 'Download a ZIM category tier',
+      summary: 'Скачать уровень категории ZIM',
       tags: ['zim'],
       request: downloadCategoryTierValidator,
     })
 
     documented(router.post('/upload', [ZimController, 'upload']), {
-      summary: 'Upload a ZIM file',
+      summary: 'Загрузить ZIM файл',
       tags: ['zim'],
     })
     documented(router.get('/wikipedia', [ZimController, 'getWikipediaState']), {
-      summary: 'Get Wikipedia ZIM state',
+      summary: 'Получить состояние Wikipedia ZIM',
       tags: ['zim'],
     })
     documented(router.post('/wikipedia/select', [ZimController, 'selectWikipedia']), {
-      summary: 'Select a Wikipedia ZIM edition',
+      summary: 'Выбрать выпуск Wikipedia ZIM',
       tags: ['zim'],
       request: selectWikipediaValidator,
     })
 
     documented(router.get('/custom-libraries', [ZimController, 'listCustomLibraries']), {
-      summary: 'List custom ZIM libraries',
+      summary: 'Получить список пользовательских ZIM библиотек',
       tags: ['zim'],
     })
     documented(router.post('/custom-libraries', [ZimController, 'addCustomLibrary']), {
-      summary: 'Add a custom ZIM library',
+      summary: 'Добавить пользовательскую ZIM библиотеку',
       tags: ['zim'],
       request: addCustomLibraryValidator,
     })
     documented(router.delete('/custom-libraries/:id', [ZimController, 'removeCustomLibrary']), {
-      summary: 'Remove a custom ZIM library',
+      summary: 'Удалить пользовательскую ZIM библиотеку',
       tags: ['zim'],
       params: idParamValidator,
     })
     documented(router.get('/browse-library', [ZimController, 'browseLibrary']), {
-      summary: 'Browse a ZIM library',
+      summary: 'Просмотреть ZIM библиотеку',
       tags: ['zim'],
       query: browseLibraryValidator,
     })
 
     documented(router.post('/rescan-library', [ZimController, 'rescanLibrary']), {
-      summary: 'Rescan the ZIM library',
+      summary: 'Пересканировать ZIM библиотеку',
       tags: ['zim'],
     })
 
     documented(router.delete('/:filename', [ZimController, 'delete']), {
-      summary: 'Delete a ZIM file',
+      summary: 'Удалить ZIM файл',
       tags: ['zim'],
       params: filenameParamValidator,
     })
@@ -746,15 +746,15 @@ router
 router
   .group(() => {
     documented(router.get('/', [CreatorPacksController, 'index']), {
-      summary: 'List creator packs',
+      summary: 'Получить список наборов автора',
       tags: ['creator-packs'],
     })
     documented(router.post('/:id/install', [CreatorPacksController, 'install']), {
-      summary: 'Install a creator pack',
+      summary: 'Установить набор автора',
       tags: ['creator-packs'],
     })
     documented(router.delete('/:id', [CreatorPacksController, 'uninstall']), {
-      summary: 'Uninstall a creator pack',
+      summary: 'Удалить набор автора',
       tags: ['creator-packs'],
     })
   })
@@ -763,57 +763,57 @@ router
 router
   .group(() => {
     documented(router.post('/run', [BenchmarkController, 'run']), {
-      summary: 'Run a benchmark',
+      summary: 'Запустить бенчмарк',
       tags: ['benchmark'],
       request: runBenchmarkValidator,
     })
     documented(router.post('/run/system', [BenchmarkController, 'runSystem']), {
-      summary: 'Run a system benchmark',
+      summary: 'Запустить системный бенчмарк',
       tags: ['benchmark'],
     })
     documented(router.post('/run/ai', [BenchmarkController, 'runAI']), {
-      summary: 'Run an AI benchmark',
+      summary: 'Запустить AI бенчмарк',
       tags: ['benchmark'],
     })
     documented(router.get('/results', [BenchmarkController, 'results']), {
-      summary: 'List benchmark results',
+      summary: 'Получить список результатов бенчмарка',
       tags: ['benchmark'],
     })
     documented(router.get('/results/latest', [BenchmarkController, 'latest']), {
-      summary: 'Get the latest benchmark result',
+      summary: 'Получить последний результат бенчмарка',
       tags: ['benchmark'],
     })
     documented(router.get('/results/:id', [BenchmarkController, 'show']), {
-      summary: 'Get a benchmark result',
+      summary: 'Получить результат бенчмарка',
       tags: ['benchmark'],
     })
     documented(router.post('/submit', [BenchmarkController, 'submit']), {
-      summary: 'Submit a benchmark result',
+      summary: 'Отправить результат бенчмарка',
       tags: ['benchmark'],
       request: submitBenchmarkValidator,
     })
     documented(router.post('/builder-tag', [BenchmarkController, 'updateBuilderTag']), {
-      summary: 'Update the builder tag',
+      summary: 'Обновить тег сборки',
       tags: ['benchmark'],
     })
     documented(router.get('/comparison', [BenchmarkController, 'comparison']), {
-      summary: 'Get benchmark comparison data',
+      summary: 'Получить данные сравнения бенчмарков',
       tags: ['benchmark'],
     })
     documented(router.get('/status', [BenchmarkController, 'status']), {
-      summary: 'Get benchmark status',
+      summary: 'Получить статус бенчмарка',
       tags: ['benchmark'],
     })
     documented(router.get('/rerun-banner', [BenchmarkController, 'rerunBanner']), {
-      summary: 'Get the benchmark rerun banner state',
+      summary: 'Получить состояние баннера повтора бенчмарка',
       tags: ['benchmark'],
     })
     documented(router.get('/settings', [BenchmarkController, 'settings']), {
-      summary: 'Get benchmark settings',
+      summary: 'Получить настройки бенчмарка',
       tags: ['benchmark'],
     })
     documented(router.post('/settings', [BenchmarkController, 'updateSettings']), {
-      summary: 'Update benchmark settings',
+      summary: 'Обновить настройки бенчмарка',
       tags: ['benchmark'],
     })
   })
@@ -831,37 +831,37 @@ router.get('/drug-reference/:id', [DrugReferenceController, 'show'])
 router
   .group(() => {
     documented(router.get('/search', [DrugReferenceController, 'search']), {
-      summary: 'Search drug labels',
+      summary: 'Поиск по аннотациям лекарств',
       tags: ['drug-reference'],
       query: searchDrugValidator,
     })
     documented(router.get('/status', [DrugReferenceController, 'status']), {
-      summary: 'Get drug reference ingest status',
+      summary: 'Получить статус загрузки справочника лекарств',
       tags: ['drug-reference'],
     })
     documented(router.get('/interactions', [DrugReferenceController, 'interactionsApi']), {
-      summary: 'Check drug interactions',
+      summary: 'Проверить взаимодействия лекарств',
       tags: ['drug-reference'],
       query: interactionsValidator,
     })
     documented(router.post('/download', [DrugReferenceController, 'download']), {
-      summary: 'Download the drug label dataset',
+      summary: 'Скачать набор аннотаций лекарств',
       tags: ['drug-reference'],
     })
     documented(router.post('/ingest', [DrugReferenceController, 'ingest']), {
-      summary: 'Ingest drug labels',
+      summary: 'Загрузить аннотации лекарств',
       tags: ['drug-reference'],
     })
     documented(router.post('/reset-ingest', [DrugReferenceController, 'resetIngest']), {
-      summary: 'Reset the drug label ingest',
+      summary: 'Сбросить загрузку аннотаций лекарств',
       tags: ['drug-reference'],
     })
     documented(router.post('/uninstall', [DrugReferenceController, 'uninstall']), {
-      summary: 'Uninstall the drug reference dataset',
+      summary: 'Удалить набор данных справочника лекарств',
       tags: ['drug-reference'],
     })
     documented(router.get('/ingest-log', [DrugReferenceController, 'ingestLog']), {
-      summary: 'Get the drug reference ingest log',
+      summary: 'Получить журнал загрузки справочника лекарств',
       tags: ['drug-reference'],
     })
   })
@@ -878,7 +878,7 @@ router.get('/conditions/:slug', [ConditionsController, 'show'])
 router
   .group(() => {
     documented(router.get('/drugs', [ConditionsController, 'drugsApi']), {
-      summary: 'List OTC drugs for a condition',
+      summary: 'Получить список безрецептурных лекарств для состояния',
       tags: ['conditions'],
       query: conditionDrugsValidator,
     })

@@ -35,7 +35,7 @@ export class SystemUpdateService {
       if (currentStatus && !['idle', 'complete', 'error'].includes(currentStatus.stage)) {
         return {
           success: false,
-          message: `Update already in progress (stage: ${currentStatus.stage})`,
+          message: `Обновление уже выполняется (этап: ${currentStatus.stage})`,
         }
       }
 
@@ -54,17 +54,17 @@ export class SystemUpdateService {
       }
 
       await writeFile(SystemUpdateService.REQUEST_FILE, JSON.stringify(requestData, null, 2))
-      logger.info(`[SystemUpdateService]: System update requested (target tag: ${requestData.target_tag}) - sidecar will process shortly`)
+      logger.info(`[SystemUpdateService]: Запрошено системное обновление (целевой тег: ${requestData.target_tag}) - sidecar обработает запрос в ближайшее время`)
 
       return {
         success: true,
-        message: 'System update initiated. The admin container will restart during the process.',
+        message: 'Системное обновление запущено. Контейнер админки будет перезапущен в процессе обновления.',
       }
     } catch (error) {
-      logger.error({ err: error }, '[SystemUpdateService] Failed to request system update')
+      logger.error({ err: error }, '[SystemUpdateService] Не удалось запросить системное обновление')
       return {
         success: false,
-        message: 'Failed to request system update. Check server logs for details.',
+        message: 'Не удалось запросить системное обновление. Подробности смотрите в журналах сервера.',
       }
     }
   }
@@ -75,7 +75,7 @@ export class SystemUpdateService {
         return {
           stage: 'idle',
           progress: 0,
-          message: 'No update in progress',
+          message: 'Нет выполняемых обновлений',
           timestamp: new Date().toISOString(),
         }
       }
@@ -83,7 +83,7 @@ export class SystemUpdateService {
       const statusContent = readFileSync(SystemUpdateService.STATUS_FILE, 'utf-8')
       return JSON.parse(statusContent) as UpdateStatus
     } catch (error) {
-      logger.error('[SystemUpdateService]: Failed to read update status:', error)
+      logger.error('[SystemUpdateService]: Не удалось прочитать статус обновления:', error)
       return null
     }
   }
@@ -91,13 +91,13 @@ export class SystemUpdateService {
   getUpdateLogs(): string {
     try {
       if (!existsSync(SystemUpdateService.LOG_FILE)) {
-        return 'No update logs available'
+        return 'Журналы обновления недоступны'
       }
 
       return readFileSync(SystemUpdateService.LOG_FILE, 'utf-8')
     } catch (error) {
-      logger.error('[SystemUpdateService]: Failed to read update logs:', error)
-      return `Error reading logs: ${error.message}`
+      logger.error('[SystemUpdateService]: Не удалось прочитать журналы обновления:', error)
+      return `Ошибка чтения журналов: ${error.message}`
     }
   }
 

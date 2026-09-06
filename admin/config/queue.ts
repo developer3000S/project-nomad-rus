@@ -32,7 +32,7 @@ const sharedConnection = new Redis({
 // event" lines and, on some Node versions, an EventEmitter `error` with no
 // listener can crash the process. Route them through the app logger instead.
 sharedConnection.on('error', (err) => {
-  logger.error({ err }, 'Shared Redis connection error')
+  logger.error({ err }, 'Ошибка общего подключения Redis')
 })
 
 const queueConfig = {

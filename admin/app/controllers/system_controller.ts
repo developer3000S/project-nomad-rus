@@ -71,7 +71,7 @@ export default class SystemController {
         const payload = await request.validateUsing(affectServiceValidator);
         const result = await this.dockerService.affectContainer(payload.service_name, payload.action);
         if (!result) {
-            response.internalServerError({ error: 'Failed to affect service' });
+            response.internalServerError({ error: 'Не удалось выполнить действие над сервисом' });
             return;
         }
         response.send({ success: result.success, message: result.message });
@@ -86,7 +86,7 @@ export default class SystemController {
         const payload = await request.validateUsing(installServiceValidator);
         const result = await this.dockerService.forceReinstall(payload.service_name);
         if (!result) {
-            response.internalServerError({ error: 'Failed to force reinstall service' });
+            response.internalServerError({ error: 'Не удалось принудительно переустановить сервис' });
             return;
         }
         response.send({ success: result.success, message: result.message });
@@ -96,7 +96,7 @@ export default class SystemController {
         if (!this.systemUpdateService.isSidecarAvailable()) {
             response.status(503).send({
                 success: false,
-                error: 'Update sidecar is not available. Ensure the updater container is running.',
+                error: 'Сайдкар обновления недоступен. Убедитесь, что контейнер обновления запущен.',
             });
             return;
         }
@@ -107,7 +107,7 @@ export default class SystemController {
             response.send({
                 success: true,
                 message: result.message,
-                note: 'Monitor update progress via GET /api/system/update/status. The connection may drop during container restart.',
+                note: 'Отслеживайте прогресс обновления через GET /api/system/update/status. Соединение может прерваться во время перезапуска контейнера.',
             });
         } else {
             response.status(409).send({
@@ -122,7 +122,7 @@ export default class SystemController {
 
         if (!status) {
             response.status(500).send({
-                error: 'Failed to retrieve update status',
+                error: 'Не удалось получить статус обновления',
             });
             return;
         }
@@ -151,8 +151,8 @@ export default class SystemController {
             const status = await autoUpdateService.getStatus()
             response.send(status)
         } catch (error) {
-            logger.error({ err: error }, '[SystemController] Failed to get auto-update status')
-            response.status(500).send({ error: 'Failed to retrieve auto-update status' })
+            logger.error({ err: error }, '[SystemController] Не удалось получить статус автообновления')
+            response.status(500).send({ error: 'Не удалось получить статус автообновления' })
         }
     }
 
@@ -171,8 +171,8 @@ export default class SystemController {
             const status = await appAutoUpdateService.getStatus()
             response.send(status)
         } catch (error) {
-            logger.error({ err: error }, '[SystemController] Failed to get app auto-update status')
-            response.status(500).send({ error: 'Failed to retrieve app auto-update status' })
+            logger.error({ err: error }, '[SystemController] Не удалось получить статус автообновления приложений')
+            response.status(500).send({ error: 'Не удалось получить статус автообновления приложений' })
         }
     }
 
@@ -188,8 +188,8 @@ export default class SystemController {
             const status = await contentAutoUpdateService.getStatus()
             response.send(status)
         } catch (error) {
-            logger.error({ err: error }, '[SystemController] Failed to get content auto-update status')
-            response.status(500).send({ error: 'Failed to retrieve content auto-update status' })
+            logger.error({ err: error }, '[SystemController] Не удалось получить статус автообновления контента')
+            response.status(500).send({ error: 'Не удалось получить статус автообновления контента' })
         }
     }
 
@@ -197,7 +197,7 @@ export default class SystemController {
         const payload = await request.validateUsing(setServiceAutoUpdateValidator)
         const service = await Service.query().where('service_name', payload.service_name).first()
         if (!service) {
-            return response.status(404).send({ error: `Service ${payload.service_name} not found` })
+            return response.status(404).send({ error: `Сервис ${payload.service_name} не найден` })
         }
 
         service.auto_update_enabled = payload.enabled
@@ -208,7 +208,7 @@ export default class SystemController {
         }
         await service.save()
 
-        return response.send({ success: true, message: 'App auto-update preference updated' })
+        return response.send({ success: true, message: 'Настройка автообновления приложений обновлена' })
     }
 
 
@@ -224,7 +224,7 @@ export default class SystemController {
 
     async checkServiceUpdates({ response }: HttpContext) {
         await CheckServiceUpdatesJob.dispatch()
-        response.send({ success: true, message: 'Service update check dispatched' })
+        response.send({ success: true, message: 'Проверка обновлений сервисов запущена' })
     }
 
     async getAvailableVersions({ params, response }: HttpContext) {
@@ -236,7 +236,7 @@ export default class SystemController {
             .first()
 
         if (!service) {
-            return response.status(404).send({ error: `Service ${serviceName} not found or not installed` })
+            return response.status(404).send({ error: `Сервис ${serviceName} не найден или не установлен` })
         }
 
         try {
@@ -248,8 +248,8 @@ export default class SystemController {
             )
             response.send({ versions: updates })
         } catch (error) {
-            logger.error({ err: error }, `[SystemController] Failed to fetch versions for ${serviceName}`)
-            response.status(500).send({ error: 'Failed to fetch available versions for this service.' })
+            logger.error({ err: error }, `[SystemController] Не удалось получить версии для ${serviceName}`)
+            response.status(500).send({ error: 'Не удалось получить доступные версии для этого сервиса.' })
         }
     }
 
@@ -293,7 +293,7 @@ export default class SystemController {
 
         const service = await Service.query().where('service_name', payload.service_name).first()
         if (!service) {
-            return response.status(404).send({ error: `Service ${payload.service_name} not found` })
+            return response.status(404).send({ error: `Сервис ${payload.service_name} не найден` })
         }
 
         // Extract host ports from container_config — the MySQL driver may return JSON columns
@@ -378,7 +378,7 @@ export default class SystemController {
         if (existing) {
             return response.status(409).send({
                 success: false,
-                message: `A custom app named "${payload.friendly_name}" already exists. Choose a different name.`,
+                message: `Приложение с названием "${payload.friendly_name}" уже существует. Выберите другое название.`,
             })
         }
 
@@ -389,7 +389,7 @@ export default class SystemController {
         if (duplicateHostPorts.length) {
             return response.status(422).send({
                 success: false,
-                message: `Duplicate host port(s): ${duplicateHostPorts.join(', ')}. Each host port can map to only one container.`,
+                message: `Дублирующиеся порты хоста: ${duplicateHostPorts.join(', ')}. Каждый хост-порт может быть привязан только к одному контейнеру.`,
             })
         }
 
@@ -418,8 +418,8 @@ export default class SystemController {
             if (conflicts.length) {
                 return response.status(409).send({
                     success: false,
-                    message: `Port conflict: ${conflicts
-                        .map((c) => `${c.port} (in use by ${c.usedBy})`)
+                    message: `Конфликт портов: ${conflicts
+                        .map((c) => `${c.port} (занят ${c.usedBy})`)
                         .join(', ')}.`,
                     portConflicts: conflicts,
                 })
@@ -456,16 +456,16 @@ export default class SystemController {
 
         const service = await Service.query().where('service_name', payload.service_name).first()
         if (!service) {
-            return response.status(404).send({ error: `Service ${payload.service_name} not found` })
+            return response.status(404).send({ error: `Сервис ${payload.service_name} не найден` })
         }
         if (!service.is_custom) {
-            return response.status(403).send({ error: 'Only custom apps can be deleted.' })
+            return response.status(403).send({ error: 'Удалить можно только пользовательские приложения.' })
         }
 
         await this.dockerService.removeCustomAppContainer(payload.service_name, payload.remove_image ?? false)
         await service.delete()
 
-        return response.send({ success: true, message: `Custom app ${payload.service_name} deleted` })
+        return response.send({ success: true, message: `Пользовательское приложение ${payload.service_name} удалено` })
     }
 
     /** Uninstall a curated catalog app: stop + remove its container (optionally its image) and
@@ -477,16 +477,16 @@ export default class SystemController {
 
         const service = await Service.query().where('service_name', payload.service_name).first()
         if (!service) {
-            return response.status(404).send({ error: `Service ${payload.service_name} not found` })
+            return response.status(404).send({ error: `Сервис ${payload.service_name} не найден` })
         }
         if (service.is_custom) {
-            return response.status(403).send({ error: 'Custom apps are removed via delete.' })
+            return response.status(403).send({ error: 'Пользовательские приложения удаляются через удаление.' })
         }
         if (service.is_dependency_service) {
-            return response.status(403).send({ error: 'Dependency services cannot be uninstalled directly.' })
+            return response.status(403).send({ error: 'Сервисы-зависимости нельзя удалить напрямую.' })
         }
         if (!service.installed) {
-            return response.status(409).send({ error: `Service ${payload.service_name} is not installed` })
+            return response.status(409).send({ error: `Сервис ${payload.service_name} не установлен` })
         }
 
         const result = await this.dockerService.uninstallService(
@@ -511,7 +511,7 @@ export default class SystemController {
         }
         // Hidden dependency services (e.g. Qdrant) aren't user-launchable, so they have no link to set.
         if (service.is_dependency_service) {
-            return response.status(403).send({ success: false, message: 'This service cannot be configured.' })
+            return response.status(403).send({ success: false, message: 'Этот сервис нельзя настроить.' })
         }
 
         // Reject a non-empty value that isn't a valid http(s) URL; an empty value clears the override.
@@ -519,7 +519,7 @@ export default class SystemController {
         if (payload.custom_url && payload.custom_url.trim() && !normalized) {
             return response.status(422).send({
                 success: false,
-                message: 'Custom URL must be a valid http(s) address (e.g. https://jellyfin.myhomelab.net).',
+                message: 'Пользовательский URL должен быть действительным адресом http(s) (например, https://jellyfin.myhomelab.net).',
             })
         }
 
@@ -538,7 +538,7 @@ export default class SystemController {
             return response.status(404).send({ success: false, message: `Service ${payload.service_name} not found` })
         }
         if (!service.is_custom) {
-            return response.status(403).send({ success: false, message: 'Only custom apps can be updated this way.' })
+            return response.status(403).send({ success: false, message: 'Обновить этим способом можно только пользовательские приложения.' })
         }
 
         const result = await this.dockerService.recreateCustomAppContainer(payload.service_name, {
@@ -588,7 +588,7 @@ export default class SystemController {
         }
         // Custom and curated apps are both editable; hidden dependency services (e.g. Qdrant) are not.
         if (service.is_dependency_service) {
-            return response.status(403).send({ error: 'This service cannot be edited.' })
+            return response.status(403).send({ error: 'Этот сервис нельзя редактировать.' })
         }
         return response.send({ success: true, app: this.parseCustomContainerConfig(service) })
     }
@@ -605,7 +605,7 @@ export default class SystemController {
         }
         // Custom and curated apps are both editable; hidden dependency services (e.g. Qdrant) are not.
         if (service.is_dependency_service) {
-            return response.status(403).send({ success: false, message: 'This service cannot be edited.' })
+            return response.status(403).send({ success: false, message: 'Этот сервис нельзя редактировать.' })
         }
 
         // Reject duplicate host ports within the request.
@@ -614,7 +614,7 @@ export default class SystemController {
         if (duplicateHostPorts.length) {
             return response.status(422).send({
                 success: false,
-                message: `Duplicate host port(s): ${duplicateHostPorts.join(', ')}. Each host port can map to only one container.`,
+                message: `Дублирующиеся порты хоста: ${duplicateHostPorts.join(', ')}. Каждый хост-порт может быть привязан только к одному контейнеру.`,
             })
         }
 

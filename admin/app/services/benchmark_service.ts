@@ -318,20 +318,20 @@ export class BenchmarkService {
       : await this.getLatestResult()
 
     if (!result) {
-      throw new Error('No benchmark result found to submit')
+      throw new Error('Не найден результат тестирования для отправки')
     }
 
     // Only allow full benchmarks with AI data to be submitted to repository
     if (result.benchmark_type !== 'full') {
-      throw new Error('Only full benchmarks can be shared with the community. Run a Full Benchmark to share your results.')
+      throw new Error('Только полные тесты можно публиковать. Запустите полный тест, чтобы поделиться результатами.')
     }
 
     if (!result.ai_tokens_per_second || result.ai_tokens_per_second <= 0) {
-      throw new Error('Benchmark must include AI performance data. Ensure AI Assistant is installed and run a Full Benchmark.')
+      throw new Error('Тест должен включать данные о производительности ИИ. Убедитесь, что ИИ-ассистент установлен, и запустите полный тест.')
     }
 
     if (result.submitted_to_repository) {
-      throw new Error('Benchmark result has already been submitted')
+      throw new Error('Результат тестирования уже отправлен')
     }
 
     // Remote inference cannot be attributed to this machine.
@@ -351,7 +351,7 @@ export class BenchmarkService {
     const remoteOllamaUrl = await KVStore.getValue('ai.remoteOllamaUrl')
     if (remoteOllamaUrl && isSelfHostedOllamaUrl(remoteOllamaUrl)) {
       logger.info(
-        `[BenchmarkService] ai.remoteOllamaUrl (${remoteOllamaUrl}) points at this machine; treating the AI result as local for submission purposes`
+        `[BenchmarkService] ai.remoteOllamaUrl (${remoteOllamaUrl}) указывает на этот компьютер; AI-результат считается локальным для отправки`
       )
     } else if (remoteOllamaUrl) {
       throw new Error(
@@ -360,9 +360,9 @@ export class BenchmarkService {
         // already marks it installed — so it sent them looking for something
         // they believe they have, and never mentioned the one thing that fixes
         // it.
-        'This NOMAD is set to use a remote AI host, so the AI portion of this benchmark measured that machine, not this one. ' +
-          'Leaderboard results have to be measured entirely on the hardware being submitted. ' +
-          'To share a result, clear the remote host under Settings → Models so AI runs locally, then run a Full Benchmark.'
+        'Этот NOMAD настроен на использование удалённого ИИ-хоста, поэтому часть теста с ИИ измеряла другое устройство, а не это. ' +
+          'Результаты для рейтинга должны быть полностью измерены на том оборудовании, которое отправляется. ' +
+          'Чтобы поделиться результатом, очистите удалённый хост в Настройки → Модели, чтобы ИИ работал локально, затем запустите полный тест.'
       )
     }
 
@@ -401,13 +401,13 @@ export class BenchmarkService {
 
       return response.data as RepositorySubmitResponse
     } catch (error: any) {
-      const detail = error.response?.data?.error || error.message || 'Unknown error'
+      const detail = error.response?.data?.error || error.message || 'Неизвестная ошибка'
       const statusCode = error.response?.status
-      logger.error(`Failed to submit benchmark to repository: ${detail} (Status: ${statusCode})`)
-      
+      logger.error(`Не удалось отправить тест в репозиторий: ${detail} (Статус: ${statusCode})`)
+
       // Create an error with the status code and raw detail attached for proper
       // handling upstream (the controller surfaces `detail` as the user-facing reason).
-      const err: any = new Error(`Failed to submit benchmark: ${detail}`)
+      const err: any = new Error(`Не удалось отправить тест: ${detail}`)
       err.statusCode = statusCode
       err.detail = detail
       throw err
@@ -426,24 +426,24 @@ export class BenchmarkService {
    * treats it as SECONDS, so it is divided by 1000 here.
    */
   private _buildV2Submission(result: BenchmarkResult, anonymous: boolean): RepositorySubmissionV2 {
-    const reRun = 'Re-run a Full Benchmark to share your results.'
+    const reRun = 'Запустите полный тест заново, чтобы поделиться результатами.'
 
     // Required raw channels — all must be present and > 0.
     const requiredRaws: Array<[string, number | null]> = [
-      ['CPU single-thread', result.cpu_events_single],
-      ['CPU multi-thread', result.cpu_events_multi],
-      ['memory', result.memory_ops_per_sec],
-      ['disk read', result.disk_read_mb_per_sec],
-      ['disk write', result.disk_write_mb_per_sec],
+      ['CPU одно-поточный', result.cpu_events_single],
+      ['CPU много-поточный', result.cpu_events_multi],
+      ['память', result.memory_ops_per_sec],
+      ['чтение диска', result.disk_read_mb_per_sec],
+      ['запись на диск', result.disk_write_mb_per_sec],
     ]
     for (const [label, value] of requiredRaws) {
       if (value == null || !(value > 0)) {
-        throw new Error(`This benchmark is missing the ${label} raw measurement needed for the v2 leaderboard. ${reRun}`)
+        throw new Error(`В этом тесте отсутствует исходное измерение ${label}, необходимое для рейтинга v2. ${reRun}`)
       }
     }
 
     if (result.ai_time_to_first_token == null || !(result.ai_time_to_first_token > 0)) {
-      throw new Error(`This benchmark is missing AI time-to-first-token data. ${reRun}`)
+      throw new Error(`В этом тесте отсутствуют данные о времени до первого токена ИИ. ${reRun}`)
     }
     if (
       result.cpu_benchmark_threads == null ||
@@ -451,10 +451,10 @@ export class BenchmarkService {
       result.cpu_total_events == null ||
       result.cpu_total_time == null
     ) {
-      throw new Error(`This benchmark is missing CPU test parameters needed for the v2 leaderboard. ${reRun}`)
+      throw new Error(`В этом тесте отсутствуют параметры CPU-теста, необходимые для рейтинга v2. ${reRun}`)
     }
     if (!result.sysbench_digest || !result.ollama_version) {
-      throw new Error(`This benchmark is missing harness provenance (sysbench/Ollama version). ${reRun}`)
+      throw new Error(`В этом тесте отсутствуют данные о среде запуска (версия sysbench/Ollama). ${reRun}`)
     }
 
     const submission: RepositorySubmissionV2 = {
@@ -509,7 +509,7 @@ export class BenchmarkService {
       })
       return response.data as RepositoryStats
     } catch (error: any) {
-      logger.warn(`Failed to fetch comparison stats: ${error.message}`)
+      logger.warn(`Не удалось получить статистику сравнения: ${error.message}`)
       return null
     }
   }
@@ -528,7 +528,7 @@ export class BenchmarkService {
    * Detect system hardware information
    */
   async getHardwareInfo(): Promise<HardwareInfo> {
-    this._updateStatus('detecting_hardware', 'Detecting system hardware...')
+    this._updateStatus('detecting_hardware', 'Определение оборудования системы...')
 
     try {
       const [cpu, mem, diskLayout, graphics] = await Promise.all([
@@ -591,7 +591,7 @@ export class BenchmarkService {
       // as no answer so the real detection runs.
       if (gpuModel && isUnresolvedGpuModel(gpuModel)) {
         logger.info(
-          `[BenchmarkService] si.graphics() returned an unresolved PCI id ("${gpuModel}"); falling through to authoritative GPU detection`
+          `[BenchmarkService] si.graphics() вернул неразрешённый PCI id ("${gpuModel}"); переход к авторитетному определению GPU`
         )
         gpuModel = null
       }
@@ -602,18 +602,18 @@ export class BenchmarkService {
           const dockerInfo = await this.dockerService.docker.info()
           const runtimes = dockerInfo.Runtimes || {}
           if ('nvidia' in runtimes) {
-            logger.info('[BenchmarkService] NVIDIA container runtime detected, querying GPU model via nvidia-smi')
+            logger.info('[BenchmarkService] Обнаружена NVIDIA container runtime, запрос модели GPU через nvidia-smi')
 
             const systemService = new (await import('./system_service.js')).SystemService(this.dockerService)
             const nvidiaInfo = await systemService.getNvidiaSmiInfo()
             if (Array.isArray(nvidiaInfo) && nvidiaInfo.length > 0) {
               gpuModel = nvidiaInfo[0].model
             } else {
-              logger.warn(`[BenchmarkService] NVIDIA runtime detected but failed to get GPU info: ${typeof nvidiaInfo === 'string' ? nvidiaInfo : JSON.stringify(nvidiaInfo)}`)
+              logger.warn(`[BenchmarkService] NVIDIA runtime обнаружен, но не удалось получить информацию о GPU: ${typeof nvidiaInfo === 'string' ? nvidiaInfo : JSON.stringify(nvidiaInfo)}`)
             }
           }
         } catch (dockerError: any) {
-          logger.warn(`[BenchmarkService] Could not query Docker info for GPU detection: ${dockerError.message}`)
+          logger.warn(`[BenchmarkService] Не удалось получить информацию Docker для определения GPU: ${dockerError.message}`)
         }
       }
 
@@ -631,7 +631,7 @@ export class BenchmarkService {
         // e.g., "Intel Core Ultra 9 285HX" -> "Intel Arc Graphics (Integrated)"
         if (!gpuModel && cpu.manufacturer?.toLowerCase().includes('intel')) {
           if (cpu.brand?.toLowerCase().includes('core ultra')) {
-            gpuModel = 'Intel Arc Graphics (Integrated)'
+            gpuModel = 'Intel Arc Graphics (Интегрированная)'
           }
         }
       }
@@ -652,7 +652,7 @@ export class BenchmarkService {
             gpuModel = sysGpuModel
           }
         } catch (sysError: any) {
-          logger.warn(`[BenchmarkService] system_service AMD fallback failed: ${sysError.message}`)
+          logger.warn(`[BenchmarkService] Запасной путь AMD в system_service не сработал: ${sysError.message}`)
         }
       }
 
@@ -665,8 +665,8 @@ export class BenchmarkService {
         gpu_model: gpuModel,
       }
     } catch (error: any) {
-      logger.error(`Error detecting hardware: ${error.message}`)
-      throw new Error(`Failed to detect hardware: ${error.message}`)
+      logger.error(`Ошибка при определении оборудования: ${error.message}`)
+      throw new Error(`Не удалось определить оборудование: ${error.message}`)
     }
   }
 
@@ -675,7 +675,7 @@ export class BenchmarkService {
    */
   private async _runBenchmark(type: BenchmarkType, includeAI: boolean): Promise<BenchmarkResult> {
     if (this.currentStatus !== 'idle') {
-      throw new Error('A benchmark is already running')
+      throw new Error('Тест уже выполняется')
     }
 
     this.currentBenchmarkId = randomUUID()
@@ -687,7 +687,7 @@ export class BenchmarkService {
     this.telemetry = new BenchmarkTelemetrySampler(this.currentBenchmarkId)
     this.telemetry.start()
 
-    this._updateStatus('starting', 'Starting benchmark...')
+    this._updateStatus('starting', 'Запуск теста...')
 
     try {
       // Fail fast: if this run will download the (large) AI model, make sure there's
@@ -730,10 +730,10 @@ export class BenchmarkService {
         } catch (error: any) {
           // For AI-only benchmarks, failing is fatal - don't save useless results with all zeros
           if (type === 'ai') {
-            throw new Error(`AI benchmark failed: ${error.message}. Make sure AI Assistant is installed and running.`)
+            throw new Error(`Тест ИИ не удался: ${error.message}. Убедитесь, что ИИ-ассистент установлен и запущен.`)
           }
           // For full benchmarks, AI is optional - continue without it
-          logger.warn(`AI benchmark skipped: ${error.message}`)
+          logger.warn(`Тест ИИ пропущен: ${error.message}`)
         }
       }
 
@@ -762,7 +762,7 @@ export class BenchmarkService {
         } catch (error: any) {
           // A non-positive channel shouldn't reach here (each sysbench step throws
           // on a bad parse), but never let a v2 math error sink the whole run.
-          logger.warn(`NOMAD Score v2 not computed: ${error.message}`)
+          logger.warn(`NOMAD Score v2 не вычислен: ${error.message}`)
         }
       }
 
@@ -809,13 +809,13 @@ export class BenchmarkService {
         os_version: env.os_version,
       })
 
-      this._updateStatus('completed', 'Benchmark completed successfully')
+      this._updateStatus('completed', 'Тест успешно завершён')
       this.currentStatus = 'idle'
       this.currentBenchmarkId = null
 
       return result
     } catch (error: any) {
-      this._updateStatus('error', `Benchmark failed: ${error.message}`)
+      this._updateStatus('error', `Тест не удался: ${error.message}`)
       this.currentStatus = 'idle'
       this.currentBenchmarkId = null
       throw error
@@ -841,14 +841,14 @@ export class BenchmarkService {
     await this._ensureSysbenchImage()
 
     // Run CPU benchmarks: single-thread then all-thread.
-    this._updateStatus('running_cpu', 'Running CPU benchmark (single-thread)...')
+    this._updateStatus('running_cpu', 'Выполнение теста CPU (однопоточно)...')
     const cpuSingle = await this._runSysbenchCpu(1)
 
-    this._updateStatus('running_cpu', `Running CPU benchmark (${multiThreads}-thread)...`)
+    this._updateStatus('running_cpu', `Выполнение теста CPU (${multiThreads} потоков)...`)
     const cpuMulti = await this._runSysbenchCpu(multiThreads)
 
     // Run memory benchmark
-    this._updateStatus('running_memory', 'Running memory benchmark...')
+    this._updateStatus('running_memory', 'Выполнение теста памяти...')
     const memoryResult = await this._runSysbenchMemory()
     this._emitPartialResult({
       status: 'running_memory',
@@ -858,7 +858,7 @@ export class BenchmarkService {
     })
 
     // Run disk benchmarks
-    this._updateStatus('running_disk_read', 'Running disk read benchmark...')
+    this._updateStatus('running_disk_read', 'Выполнение теста чтения диска...')
     const diskReadResult = await this._runSysbenchDiskRead()
     this._emitPartialResult({
       status: 'running_disk_read',
@@ -867,7 +867,7 @@ export class BenchmarkService {
       unit: 'MB/s',
     })
 
-    this._updateStatus('running_disk_write', 'Running disk write benchmark...')
+    this._updateStatus('running_disk_write', 'Выполнение теста записи на диск...')
     const diskWriteResult = await this._runSysbenchDiskWrite()
     this._emitPartialResult({
       status: 'running_disk_write',

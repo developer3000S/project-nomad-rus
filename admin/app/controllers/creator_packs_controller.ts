@@ -20,8 +20,8 @@ export default class CreatorPacksController {
       const downloads = await downloadService.listDownloadJobs('zim')
       return { configured, packs, downloads }
     } catch (error: any) {
-      logger.error('[CreatorPacksController] Failed to list creator packs:', error?.message || error)
-      return response.status(500).send({ message: 'Failed to load creator packs' })
+      logger.error('[CreatorPacksController] Не удалось получить список creator-паков:', error?.message || error)
+      return response.status(500).send({ message: 'Не удалось загрузить creator-паки' })
     }
   }
 
@@ -32,18 +32,18 @@ export default class CreatorPacksController {
     switch (result.code) {
       case 'dispatched':
         return response.status(202).send({
-          message: 'Pack download started',
+          message: 'Загрузка пака началась',
           filename: result.filename,
         })
       case 'already_installed':
-        return { message: 'Pack is already installed' }
+        return { message: 'Пак уже установлен' }
       case 'already_downloading':
-        return { message: 'Pack download is already in progress' }
+        return { message: 'Загрузка пака уже выполняется' }
       case 'not_found':
-        return response.status(404).send({ message: `Creator pack not found: ${packId}` })
+        return response.status(404).send({ message: `Creator-пак не найден: ${packId}` })
       case 'not_configured':
         return response.status(503).send({
-          message: 'Creator Packs are not configured on this server',
+          message: 'Creator Packs не настроены на этом сервере',
         })
     }
   }
@@ -54,9 +54,9 @@ export default class CreatorPacksController {
 
     switch (result.code) {
       case 'uninstalled':
-        return { message: 'Pack uninstalled', filename: result.filename }
+        return { message: 'Пак удалён', filename: result.filename }
       case 'not_installed':
-        return response.status(404).send({ message: `Creator pack is not installed: ${packId}` })
+        return response.status(404).send({ message: `Creator-пак не установлен: ${packId}` })
     }
   }
 }

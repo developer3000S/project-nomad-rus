@@ -38,13 +38,13 @@ export default class ConditionsController {
   async show({ inertia, params, response }: HttpContext) {
     const slug = String(params.slug ?? '').trim()
     if (!slug) {
-      return response.notFound({ error: 'invalid condition' })
+      return response.notFound({ error: 'Недействительное состояние' })
     }
 
     try {
       const condition = this.service.findCondition(slug)
       if (!condition) {
-        return response.notFound({ error: 'Condition not found' })
+        return response.notFound({ error: 'Состояние не найдено' })
       }
 
       const [result, drugRowCount, remediesOn] = await Promise.all([
@@ -63,8 +63,8 @@ export default class ConditionsController {
       })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[ConditionsController] show(${slug}) failed: ${msg}`)
-      return response.internalServerError({ error: 'Could not load condition' })
+      logger.error(`[ConditionsController] show(${slug}) ошибка: ${msg}`)
+      return response.internalServerError({ error: 'Не удалось загрузить состояние' })
     }
   }
 
@@ -78,7 +78,7 @@ export default class ConditionsController {
       const params = await request.validateUsing(conditionDrugsValidator)
 
       if (params.slug && params.q) {
-        return response.badRequest({ error: 'Provide either slug or q, not both' })
+        return response.badRequest({ error: 'Укажите либо slug, либо q, но не оба' })
       }
 
       const filterOpts = {
@@ -94,7 +94,7 @@ export default class ConditionsController {
       if (params.slug) {
         const result = await this.service.drugsForSlug(params.slug, params.limit, filterOpts)
         if (!result) {
-          return response.notFound({ error: 'Condition not found' })
+          return response.notFound({ error: 'Состояние не найдено' })
         }
         return remediesOn ? result : { ...result, remedies: [] }
       }
@@ -104,7 +104,7 @@ export default class ConditionsController {
         return remediesOn ? result : { ...result, remedies: [] }
       }
 
-      return response.badRequest({ error: 'Provide a slug or q query parameter' })
+      return response.badRequest({ error: 'Укажите параметр запроса slug или q' })
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
       logger.warn(`[ConditionsController] drugsApi failed: ${msg}`)

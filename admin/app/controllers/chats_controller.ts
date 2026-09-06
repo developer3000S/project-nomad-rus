@@ -14,7 +14,7 @@ export default class ChatsController {
   async inertia({ inertia, response }: HttpContext) {
     const aiAssistantInstalled = await this.systemService.checkServiceInstalled(SERVICE_NAMES.OLLAMA)
     if (!aiAssistantInstalled) {
-      return response.status(404).json({ error: 'AI Assistant service not installed' })
+      return response.status(404).json({ error: 'Сервис AI-помощника не установлен' })
     }
     
     const chatSuggestionsEnabled = await KVStore.getValue('chat.suggestionsEnabled')
@@ -34,7 +34,7 @@ export default class ChatsController {
     const session = await this.chatService.getSession(sessionId)
 
     if (!session) {
-      return response.status(404).json({ error: 'Session not found' })
+      return response.status(404).json({ error: 'Сессия не найдена' })
     }
 
     return session
@@ -46,9 +46,9 @@ export default class ChatsController {
       const session = await this.chatService.createSession(data.title, data.model)
       return response.status(201).json(session)
     } catch (error) {
-      logger.error({ err: error }, '[ChatsController] Failed to create session')
+      logger.error({ err: error }, '[ChatsController] Не удалось создать сессию')
       return response.status(500).json({
-        error: 'Failed to create session',
+        error: 'Не удалось создать сессию',
       })
     }
   }
@@ -58,9 +58,9 @@ export default class ChatsController {
       const suggestions = await this.chatService.getChatSuggestions()
       return response.status(200).json({ suggestions })
     } catch (error) {
-      logger.error({ err: error }, '[ChatsController] Failed to get suggestions')
+      logger.error({ err: error }, '[ChatsController] Не удалось получить предложения')
       return response.status(500).json({
-        error: 'Failed to get suggestions',
+        error: 'Не удалось получить предложения',
       })
     }
   }
@@ -72,9 +72,9 @@ export default class ChatsController {
       const session = await this.chatService.updateSession(sessionId, data)
       return session
     } catch (error) {
-      logger.error({ err: error }, '[ChatsController] Failed to update session')
+      logger.error({ err: error }, '[ChatsController] Не удалось обновить сессию')
       return response.status(500).json({
-        error: 'Failed to update session',
+        error: 'Не удалось обновить сессию',
       })
     }
   }
@@ -85,9 +85,9 @@ export default class ChatsController {
       await this.chatService.deleteSession(sessionId)
       return response.status(204)
     } catch (error) {
-      logger.error({ err: error }, '[ChatsController] Failed to delete session')
+      logger.error({ err: error }, '[ChatsController] Не удалось удалить сессию')
       return response.status(500).json({
-        error: 'Failed to delete session',
+        error: 'Не удалось удалить сессию',
       })
     }
   }
@@ -99,9 +99,9 @@ export default class ChatsController {
       const message = await this.chatService.addMessage(sessionId, data.role, data.content)
       return response.status(201).json(message)
     } catch (error) {
-      logger.error({ err: error }, '[ChatsController] Failed to add message')
+      logger.error({ err: error }, '[ChatsController] Не удалось добавить сообщение')
       return response.status(500).json({
-        error: 'Failed to add message',
+        error: 'Не удалось добавить сообщение',
       })
     }
   }
@@ -111,9 +111,9 @@ export default class ChatsController {
       const result = await this.chatService.deleteAllSessions()
       return response.status(200).json(result)
     } catch (error) {
-      logger.error({ err: error }, '[ChatsController] Failed to delete all sessions')
+      logger.error({ err: error }, '[ChatsController] Не удалось удалить все сессии')
       return response.status(500).json({
-        error: 'Failed to delete all sessions',
+        error: 'Не удалось удалить все сессии',
       })
     }
   }

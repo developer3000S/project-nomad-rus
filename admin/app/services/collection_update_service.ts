@@ -76,7 +76,7 @@ export class CollectionUpdateService {
       }
 
       logger.info(
-        `[CollectionUpdateService] Local update check complete: ${updates.length} update(s) available`
+        `[CollectionUpdateService] Локальная проверка обновлений завершена: доступно ${updates.length} обновление(й)`
       )
 
       const enriched = await this.enrichWithSizes(updates)
@@ -85,12 +85,12 @@ export class CollectionUpdateService {
         checked_at: new Date().toISOString(),
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error during update check'
-      logger.error(`[CollectionUpdateService] Failed to check for updates: ${message}`)
+      const message = error instanceof Error ? error.message : 'Неизвестная ошибка при проверке обновлений'
+      logger.error(`[CollectionUpdateService] Не удалось проверить обновления: ${message}`)
       return {
         updates: [],
         checked_at: new Date().toISOString(),
-        error: 'Failed to check for content updates. Please try again later.',
+        error: 'Не удалось проверить обновления контента. Попробуйте ещё раз позже.',
       }
     }
   }
@@ -106,7 +106,7 @@ export class CollectionUpdateService {
       if (state === 'active' || state === 'waiting' || state === 'delayed') {
         return {
           success: false,
-          error: `A download is already in progress for ${update.resource_id}`,
+          error: `Загрузка для ${update.resource_id} уже выполняется`,
         }
       }
     }
@@ -132,11 +132,11 @@ export class CollectionUpdateService {
     })
 
     if (!result || !result.job) {
-      return { success: false, error: 'Failed to dispatch download job' }
+      return { success: false, error: 'Не удалось запустить задание загрузки' }
     }
 
     logger.info(
-      `[CollectionUpdateService] Dispatched update download for ${update.resource_id}: ${update.installed_version} → ${update.latest_version}`
+      `[CollectionUpdateService] Запущена загрузка обновления для ${update.resource_id}: ${update.installed_version} → ${update.latest_version}`
     )
 
     return { success: true, jobId: result.job.id }

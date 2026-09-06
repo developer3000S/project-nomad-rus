@@ -31,7 +31,7 @@ const REFERENCE_HTML = `<!doctype html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nomad Admin API Reference</title>
+    <title>Справочник API администратора Nomad</title>
   </head>
   <body>
     <div id="app"></div>

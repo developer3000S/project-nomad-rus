@@ -22,20 +22,20 @@ export class ContentAutoUpdateJob {
   }
 
   async handle(_job: Job) {
-    logger.info('[ContentAutoUpdateJob] Evaluating content auto-updates...')
+    logger.info('[ContentAutoUpdateJob] Оценка автообновления контента...')
 
     const contentAutoUpdateService = new ContentAutoUpdateService(
       new DownloadService(QueueService.getInstance())
     )
 
     const result = await contentAutoUpdateService.attempt()
-    logger.info(`[ContentAutoUpdateJob] ${result.started} started: ${result.reason}`)
+    logger.info(`[ContentAutoUpdateJob] Запущено: ${result.started} — ${result.reason}`)
 
     // The FDA drug dataset refreshes on the same cycle and master switch as the
     // ZIM/map catalog (its apply path differs, so it's a separate step, not part
     // of attempt()). Governed by the same `contentAutoUpdate.*` settings.
     const drugResult = await contentAutoUpdateService.attemptDrugDataset()
-    logger.info(`[ContentAutoUpdateJob] ${drugResult.started} started: ${drugResult.reason}`)
+    logger.info(`[ContentAutoUpdateJob] Запущено: ${drugResult.started} — ${drugResult.reason}`)
 
     return {
       started: result.started + drugResult.started,
@@ -59,7 +59,7 @@ export class ContentAutoUpdateJob {
       }
     )
 
-    logger.info('[ContentAutoUpdateJob] Content auto-update evaluation scheduled with cron: 0 * * * *')
+    logger.info('[ContentAutoUpdateJob] Оценка автообновления контента запланирована с cron: 0 * * * *')
   }
 
   static async dispatch() {
@@ -76,7 +76,7 @@ export class ContentAutoUpdateJob {
       }
     )
 
-    logger.info(`[ContentAutoUpdateJob] Dispatched ad-hoc content auto-update evaluation job ${job.id}`)
+    logger.info(`[ContentAutoUpdateJob] Запущена разовая задача оценки автообновления контента ${job.id}`)
     return job
   }
 }

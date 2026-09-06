@@ -18,7 +18,7 @@ export class CheckServiceUpdatesJob {
   }
 
   async handle(_job: Job) {
-    logger.info('[CheckServiceUpdatesJob] Checking for service updates...')
+    logger.info('[CheckServiceUpdatesJob] Проверка обновлений сервисов...')
 
     const dockerService = new DockerService()
     const registryService = new ContainerRegistryService()
@@ -54,19 +54,19 @@ export class CheckServiceUpdatesJob {
         if (latestUpdate) {
           updatesFound++
           logger.info(
-            `[CheckServiceUpdatesJob] Update available for ${service.service_name}: ${service.container_image} → ${latestUpdate}`
+            `[CheckServiceUpdatesJob] Доступно обновление для ${service.service_name}: ${service.container_image} → ${latestUpdate}`
           )
         }
       } catch (error) {
         logger.error(
-          `[CheckServiceUpdatesJob] Failed to check updates for ${service.service_name}: ${error.message}`
+          `[CheckServiceUpdatesJob] Не удалось проверить обновления для ${service.service_name}: ${error.message}`
         )
         // Continue checking other services
       }
     }
 
     logger.info(
-      `[CheckServiceUpdatesJob] Completed. ${updatesFound} update(s) found for ${installedServices.length} service(s).`
+      `[CheckServiceUpdatesJob] Завершено. Найдено ${updatesFound} обновление(й) для ${installedServices.length} сервис(ов).`
     )
 
     // Broadcast completion so the frontend can refresh
@@ -96,7 +96,7 @@ export class CheckServiceUpdatesJob {
       return archMap[arch] || arch.toLowerCase()
     } catch (error) {
       logger.warn(
-        `[CheckServiceUpdatesJob] Could not detect host architecture: ${error.message}. Defaulting to amd64.`
+        `[CheckServiceUpdatesJob] Не удалось определить архитектуру хоста: ${error.message}. По умолчанию amd64.`
       )
       return 'amd64'
     }
@@ -118,7 +118,7 @@ export class CheckServiceUpdatesJob {
       }
     )
 
-    logger.info('[CheckServiceUpdatesJob] Service update check scheduled with cron: 0 3 * * *')
+    logger.info('[CheckServiceUpdatesJob] Проверка обновлений сервисов запланирована с cron: 0 3 * * *')
   }
 
   static async dispatch() {
@@ -136,7 +136,7 @@ export class CheckServiceUpdatesJob {
       }
     )
 
-    logger.info(`[CheckServiceUpdatesJob] Dispatched ad-hoc service update check job ${job.id}`)
+    logger.info(`[CheckServiceUpdatesJob] Запущена разовая задача проверки обновлений сервисов ${job.id}`)
     return job
   }
 }

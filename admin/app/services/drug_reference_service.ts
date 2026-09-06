@@ -86,7 +86,7 @@ export class DrugReferenceService {
           return await this.searchIndicationFulltext(normalized, options.productType, limit, offset)
         } catch (err) {
           logger.warn(
-            `[DrugReferenceService] FULLTEXT indication search failed, falling back to LIKE: ${
+            `[DrugReferenceService] FULLTEXT поиск показаний не удался, переход на LIKE: ${
               err instanceof Error ? err.message : String(err)
             }`
           )
@@ -101,7 +101,7 @@ export class DrugReferenceService {
         return await this.searchFulltext(normalized, options, limit, offset)
       } catch (err) {
         logger.warn(
-          `[DrugReferenceService] FULLTEXT search failed, falling back to LIKE: ${
+          `[DrugReferenceService] FULLTEXT поиск не удался, переход на LIKE: ${
             err instanceof Error ? err.message : String(err)
           }`
         )
@@ -476,11 +476,11 @@ export class DrugReferenceService {
     } catch (err) {
       // Offline or manifest fetch failed — transient, retried next run.
       logger.warn(
-        `[DrugReferenceService] Freshness check failed (will retry next run): ${
+        `[DrugReferenceService] Проверка актуальности не удалась (повтор в следующем запуске): ${
           err instanceof Error ? err.message : String(err)
         }`
       )
-      return { started: false, reason: 'check-failed' }
+      return { started: false, reason: 'проверка не удалась' }
     }
 
     if (!check.updateAvailable) {
@@ -494,9 +494,9 @@ export class DrugReferenceService {
     }
 
     logger.info(
-      `[DrugReferenceService] Newer export_date available ` +
-        `(current=${check.currentExportDate ?? 'none'} → latest=${check.latestExportDate}); ` +
-        'triggering re-download.'
+      `[DrugReferenceService] Доступна более новая export_date ` +
+        `(текущая=${check.currentExportDate ?? 'нет'} → latest=${check.latestExportDate}); ` +
+        'запуск повторной загрузки.'
     )
     const result = await this.triggerDownload()
     return {
@@ -518,7 +518,7 @@ export class DrugReferenceService {
       return {
         job: undefined,
         created: false,
-        message: 'Nothing downloaded — run Download FDA data first.',
+        message: 'Ничего не загружено — сначала запустите Загрузку данных FDA.',
         nothingDownloaded: true,
       }
     }
@@ -543,7 +543,7 @@ export class DrugReferenceService {
       return {
         job: undefined,
         created: false,
-        message: 'Nothing downloaded — run Download FDA data first.',
+        message: 'Ничего не загружено — сначала запустите Загрузку данных FDA.',
         nothingDownloaded: true,
       }
     }
@@ -553,10 +553,10 @@ export class DrugReferenceService {
       // force: true removes the active/locked stuck job too. Scoped to the
       // single-purpose ingest queue, so nothing else is affected.
       await queue.obliterate({ force: true })
-      logger.info('[DrugReferenceService] drug-ingest queue obliterated for restart')
+      logger.info('[DrugReferenceService] очередь drug-ingest удалена для перезапуска')
     } catch (err) {
       logger.warn(
-        `[DrugReferenceService] ingest queue obliterate failed (continuing to dispatch): ${
+        `[DrugReferenceService] удаление очереди ingest не удалось (продолжаем отправку): ${
           err instanceof Error ? err.message : String(err)
         }`
       )
@@ -603,10 +603,10 @@ export class DrugReferenceService {
     for (const queueName of [DownloadDrugDataJob.queue, IngestDrugDataJob.queue]) {
       try {
         await QueueService.getInstance().getQueue(queueName).obliterate({ force: true })
-        logger.info(`[DrugReferenceService] obliterated ${queueName} for uninstall`)
+        logger.info(`[DrugReferenceService] удалена очередь ${queueName} для удаления`)
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err)
-        logger.warn(`[DrugReferenceService] obliterate ${queueName} failed: ${msg}`)
+        logger.warn(`[DrugReferenceService] удаление очереди ${queueName} не удалось: ${msg}`)
         errors.push(`queue ${queueName}: ${msg}`)
       }
     }
@@ -615,10 +615,10 @@ export class DrugReferenceService {
     // (never a client filename), so this is not a path-traversal surface.
     try {
       await rm(STORAGE_BASE, { recursive: true, force: true })
-      logger.info(`[DrugReferenceService] removed on-disk parts dir ${STORAGE_BASE}`)
+      logger.info(`[DrugReferenceService] удалён каталог частей с диска ${STORAGE_BASE}`)
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.warn(`[DrugReferenceService] could not remove ${STORAGE_BASE}: ${msg}`)
+      logger.warn(`[DrugReferenceService] не удалось удалить ${STORAGE_BASE}: ${msg}`)
       errors.push(`storage: ${msg}`)
     }
 
@@ -626,10 +626,10 @@ export class DrugReferenceService {
     // so reinstall re-ingests cleanly with no migration.
     try {
       await db.rawQuery('TRUNCATE TABLE drug_labels')
-      logger.info('[DrugReferenceService] truncated drug_labels')
+      logger.info('[DrugReferenceService] таблица drug_labels очищена')
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.error(`[DrugReferenceService] TRUNCATE drug_labels failed: ${msg}`)
+      logger.error(`[DrugReferenceService] Очистка таблицы drug_labels не удалась: ${msg}`)
       errors.push(`truncate: ${msg}`)
     }
 
@@ -639,7 +639,7 @@ export class DrugReferenceService {
       await KVStore.clearValue('drugReference.lastUpdatedExportDate')
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.warn(`[DrugReferenceService] clearing KV markers failed: ${msg}`)
+      logger.warn(`[DrugReferenceService] очистка KV-маркеров не удалась: ${msg}`)
       errors.push(`kv: ${msg}`)
     }
 
@@ -650,10 +650,10 @@ export class DrugReferenceService {
         .where('resource_type', 'dataset')
         .where('resource_id', DRUG_DATASET_RESOURCE_ID)
         .delete()
-      logger.info('[DrugReferenceService] deleted installed_resources dataset row')
+      logger.info('[DrugReferenceService] удалена строка набора данных installed_resources')
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
-      logger.warn(`[DrugReferenceService] deleting install row failed: ${msg}`)
+      logger.warn(`[DrugReferenceService] удаление строки установки не удалось: ${msg}`)
       errors.push(`install-row: ${msg}`)
     }
 
@@ -663,8 +663,8 @@ export class DrugReferenceService {
       success,
       rowsDropped,
       message: success
-        ? `Uninstalled FDA drug reference (${rowsDropped} labels removed).`
-        : `Uninstall completed with ${errors.length} issue(s): ${errors.join('; ')}`,
+        ? `Справочник FDA лекарств удалён (${rowsDropped} записей удалено).`
+        : `Удаление завершено с ${errors.length} проблема(ми): ${errors.join('; ')}`,
     }
   }
 

@@ -174,7 +174,7 @@ export class RunDownloadJob {
                   await recordResourceUpdateSuccess(installed)
                 } catch (error) {
                   console.error(
-                    `[RunDownloadJob] Error clearing auto-update backoff for ${resourceMetadata.resource_id}:`,
+                    `[RunDownloadJob] Ошибка сброса backoff автообновления для ${resourceMetadata.resource_id}:`,
                     error
                   )
                 }
@@ -188,16 +188,16 @@ export class RunDownloadJob {
                 if (isSafeOldContentPath(oldFilePath, resourceMetadata.resource_id, filetype)) {
                   try {
                     await deleteFileIfExists(oldFilePath)
-                    console.log(`[RunDownloadJob] Deleted old file: ${oldFilePath}`)
+                    console.log(`[RunDownloadJob] Удалён старый файл: ${oldFilePath}`)
                   } catch (deleteError) {
                     console.warn(
-                      `[RunDownloadJob] Failed to delete old file ${oldFilePath}:`,
+                      `[RunDownloadJob] Не удалось удалить старый файл ${oldFilePath}:`,
                       deleteError
                     )
                   }
                 } else {
                   console.warn(
-                    `[RunDownloadJob] Refusing to delete unexpected old file path for ` +
+                    `[RunDownloadJob] Отказано в удалении неожиданного пути старого файла для ` +
                       `${resourceMetadata.resource_id} (${filetype}): ${oldFilePath}`
                   )
                 }
@@ -237,11 +237,11 @@ export class RunDownloadJob {
                       fileName: url.split('/').pop() || '',
                     })
                     console.log(
-                      `[RunDownloadJob] KB reconciliation for replaced ${filepath}: ${outcome}`
+                      `[RunDownloadJob] Сверка базы знаний для заменённого ${filepath}: ${outcome}`
                     )
                   } catch (error) {
                     console.error(
-                      `[RunDownloadJob] Error reconciling knowledge base for replaced file ${filepath}:`,
+                      `[RunDownloadJob] Ошибка сверки базы знаний для заменённого файла ${filepath}:`,
                       error
                     )
                   }
@@ -268,7 +268,7 @@ export class RunDownloadJob {
                       )
                     } catch (error) {
                       console.error(
-                        `[RunDownloadJob] Error recording pending_decision state for ${filepath}:`,
+                        `[RunDownloadJob] Ошибка записи состояния pending_decision для ${filepath}:`,
                         error
                       )
                     }
@@ -279,7 +279,7 @@ export class RunDownloadJob {
                         filePath: filepath,
                       })
                     } catch (error) {
-                      console.error(`[RunDownloadJob] Error dispatching EmbedFileJob for URL ${url}:`, error)
+                      console.error(`[RunDownloadJob] Ошибка запуска EmbedFileJob для URL ${url}:`, error)
                     }
                   }
                 }
@@ -290,7 +290,7 @@ export class RunDownloadJob {
             }
           } catch (error) {
             console.error(
-              `[RunDownloadJob] Error in download success callback for URL ${url}:`,
+              `[RunDownloadJob] Ошибка в коллбэке успешной загрузки для URL ${url}:`,
               error
             )
           }
@@ -314,7 +314,7 @@ export class RunDownloadJob {
       // can also abort the stream, and those should be retried with backoff.
       // Check both the flag (Redis poll) and abort reason (in-process cancel).
       if (userCancelled || abortController.signal.reason === 'user-cancel') {
-        throw new UnrecoverableError(`Download cancelled: ${error.message}`)
+        throw new UnrecoverableError(`Загрузка отменена: ${error.message}`)
       }
       // A rejected entitlement is permanent - this build either has the key or it
       // doesn't. Left as a plain Error it consumes all 10 attempts with exponential
@@ -379,7 +379,7 @@ export class RunDownloadJob {
       return {
         job,
         created: true,
-        message: `Dispatched download job for URL ${params.url}`,
+        message: `Задача загрузки для URL ${params.url} запущена`,
       }
     } catch (error) {
       if (error.message.includes('job already exists')) {
@@ -387,7 +387,7 @@ export class RunDownloadJob {
         return {
           job: existing,
           created: false,
-          message: `Job already exists for URL ${params.url}`,
+          message: `Задача для URL ${params.url} уже существует`,
         }
       }
       throw error

@@ -15,7 +15,7 @@ export class CheckUpdateJob {
   }
 
   async handle(_job: Job) {
-    logger.info('[CheckUpdateJob] Running update check...')
+    logger.info('[CheckUpdateJob] Запуск проверки обновлений...')
 
     const dockerService = new DockerService()
     const systemService = new SystemService(dockerService)
@@ -25,18 +25,18 @@ export class CheckUpdateJob {
 
       if (result.updateAvailable) {
         logger.info(
-          `[CheckUpdateJob] Update available: ${result.currentVersion} → ${result.latestVersion}`
+          `[CheckUpdateJob] Доступно обновление: ${result.currentVersion} → ${result.latestVersion}`
         )
       } else {
         await KVStore.setValue('system.updateAvailable', false)
         logger.info(
-          `[CheckUpdateJob] System is up to date (${result.currentVersion})`
+          `[CheckUpdateJob] Система обновлена (${result.currentVersion})`
         )
       }
 
       return result
     } catch (error) {
-      logger.error(`[CheckUpdateJob] Update check failed: ${error.message}`)
+      logger.error(`[CheckUpdateJob] Ошибка проверки обновлений: ${error.message}`)
       throw error
     }
   }
@@ -57,7 +57,7 @@ export class CheckUpdateJob {
       }
     )
 
-    logger.info('[CheckUpdateJob] Update check scheduled with cron: 0 2,14 * * *')
+    logger.info('[CheckUpdateJob] Проверка обновлений запланирована с cron: 0 2,14 * * *')
   }
 
   static async dispatch() {
@@ -71,7 +71,7 @@ export class CheckUpdateJob {
       removeOnFail: { count: 5 },
     })
 
-    logger.info(`[CheckUpdateJob] Dispatched ad-hoc update check job ${job.id}`)
+    logger.info(`[CheckUpdateJob] Запущена разовая задача проверки обновлений ${job.id}`)
     return job
   }
 }

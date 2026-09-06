@@ -17,7 +17,7 @@ export class RunBenchmarkJob {
   async handle(job: Job) {
     const { benchmark_id, benchmark_type } = job.data as RunBenchmarkJobParams
 
-    logger.info(`[RunBenchmarkJob] Starting benchmark ${benchmark_id} of type ${benchmark_type}`)
+    logger.info(`[RunBenchmarkJob] Запуск бенчмарка ${benchmark_id} типа ${benchmark_type}`)
 
     const dockerService = new DockerService()
     const benchmarkService = new BenchmarkService(dockerService)
@@ -36,10 +36,10 @@ export class RunBenchmarkJob {
           result = await benchmarkService.runAIBenchmark()
           break
         default:
-          throw new Error(`Unknown benchmark type: ${benchmark_type}`)
+          throw new Error(`Неизвестный тип бенчмарка: ${benchmark_type}`)
       }
 
-      logger.info(`[RunBenchmarkJob] Benchmark ${benchmark_id} completed with NOMAD score: ${result.nomad_score}`)
+      logger.info(`[RunBenchmarkJob] Бенчмарк ${benchmark_id} завершён с оценкой NOMAD: ${result.nomad_score}`)
 
       return {
         success: true,
@@ -47,7 +47,7 @@ export class RunBenchmarkJob {
         nomad_score: result.nomad_score,
       }
     } catch (error) {
-      logger.error(`[RunBenchmarkJob] Benchmark ${benchmark_id} failed: ${error.message}`)
+      logger.error(`[RunBenchmarkJob] Бенчмарк ${benchmark_id} не удался: ${error.message}`)
       throw error
     }
   }
@@ -68,12 +68,12 @@ export class RunBenchmarkJob {
         },
       })
 
-      logger.info(`[RunBenchmarkJob] Dispatched benchmark job ${params.benchmark_id}`)
+      logger.info(`[RunBenchmarkJob] Запущена задача бенчмарка ${params.benchmark_id}`)
 
       return {
         job,
         created: true,
-        message: `Benchmark job ${params.benchmark_id} dispatched successfully`,
+        message: `Задача бенчмарка ${params.benchmark_id} успешно запущена`,
       }
     } catch (error) {
       if (error.message.includes('job already exists')) {
@@ -81,7 +81,7 @@ export class RunBenchmarkJob {
         return {
           job: existing,
           created: false,
-          message: `Benchmark job ${params.benchmark_id} already exists`,
+          message: `Задача бенчмарка ${params.benchmark_id} уже существует`,
         }
       }
       throw error

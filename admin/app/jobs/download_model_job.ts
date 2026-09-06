@@ -43,7 +43,7 @@ export class DownloadModelJob {
   async handle(job: Job) {
     const { modelName } = job.data as DownloadModelJobParams
 
-    logger.info(`[DownloadModelJob] Attempting to download model: ${modelName}`)
+    logger.info(`[DownloadModelJob] Попытка загрузить модель: ${modelName}`)
 
     const ollamaService = new OllamaService()
 
@@ -51,13 +51,13 @@ export class DownloadModelJob {
     const existingModels = await ollamaService.getModels()
     if (!existingModels) {
       logger.warn(
-        `[DownloadModelJob] Ollama service not ready yet for model ${modelName}. Will retry...`
+        `[DownloadModelJob] Сервис Ollama ещё не готов для модели ${modelName}. Повторная попытка...`
       )
-      throw new Error('Ollama service not ready yet')
+      throw new Error('Сервис Ollama ещё не готов')
     }
 
     logger.info(
-      `[DownloadModelJob] Ollama service is ready. Initiating download for ${modelName}`
+      `[DownloadModelJob] Сервис Ollama готов. Запуск загрузки для ${modelName}`
     )
 
     // Register abort controller for this job — used both by in-process cancels (same process
@@ -118,7 +118,7 @@ export class DownloadModelJob {
 
       if (!result.success) {
         logger.error(
-          `[DownloadModelJob] Failed to initiate download for model ${modelName}: ${result.message}`
+          `[DownloadModelJob] Не удалось запустить загрузку модели ${modelName}: ${result.message}`
         )
         // User-initiated cancel — must be unrecoverable to avoid the 40-attempt retry storm.
         // The downloadModel() catch block returns retryable: false for cancels, so this branch
@@ -126,10 +126,10 @@ export class DownloadModelJob {
         if (result.retryable === false) {
           throw new UnrecoverableError(result.message)
         }
-        throw new Error(`Failed to initiate download for model: ${result.message}`)
+        throw new Error(`Не удалось запустить загрузку модели: ${result.message}`)
       }
 
-      logger.info(`[DownloadModelJob] Successfully completed download for model ${modelName}`)
+      logger.info(`[DownloadModelJob] Загрузка модели ${modelName} успешно завершена`)
       return {
         modelName,
         message: result.message,
@@ -140,7 +140,7 @@ export class DownloadModelJob {
       // flag tells us this was a user action and should be unrecoverable.
       if (userCancelled || abortController.signal.reason === 'user-cancel') {
         if (!(error instanceof UnrecoverableError)) {
-          throw new UnrecoverableError(`Model download cancelled: ${error.message ?? error}`)
+          throw new UnrecoverableError(`Загрузка модели отменена: ${error.message ?? error}`)
         }
       }
       throw error
@@ -189,7 +189,7 @@ export class DownloadModelJob {
       return {
         job,
         created: true,
-        message: `Dispatched model download job for ${params.modelName}`,
+        message: `Задача загрузки модели для ${params.modelName} запущена`,
       }
     } catch (error) {
       if (error.message.includes('job already exists')) {
@@ -197,7 +197,7 @@ export class DownloadModelJob {
         return {
           job: active,
           created: false,
-          message: `Job already exists for model ${params.modelName}`,
+          message: `Задача для модели ${params.modelName} уже существует`,
         }
       }
       throw error

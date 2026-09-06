@@ -195,7 +195,7 @@ export class ConditionService {
         return orderOtcFirst(rows)
       } catch (err) {
         logger.warn(
-          `[ConditionService] FULLTEXT indication search failed, falling back to LIKE: ${
+          `[ConditionService] FULLTEXT поиск показаний не удался, переход на LIKE: ${
             err instanceof Error ? err.message : String(err)
           }`
         )

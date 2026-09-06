@@ -151,7 +151,7 @@ export class CountriesService {
     this.groups = groups
 
     logger.info(
-      `[CountriesService] Loaded ${countries.length} countries across ${groups.length} groups`
+      `[CountriesService] Загружено ${countries.length} стран в ${groups.length} группах`
     )
   }
 
@@ -171,7 +171,7 @@ export class CountriesService {
     const normalized = [...new Set(codes.map((c) => c.toUpperCase()))].sort()
     const unknown = normalized.filter((c) => !this.byCode.has(c))
     if (unknown.length > 0) {
-      throw new Error(`Unknown country code(s): ${unknown.join(', ')}`)
+      throw new Error(`Неизвестный код(ы) страны: ${unknown.join(', ')}`)
     }
     return normalized
   }

@@ -69,7 +69,7 @@ export default class OllamaController {
           role: 'system' as const,
           content: SYSTEM_PROMPTS.default,
         }
-        logger.debug('[OllamaController] Injecting system prompt')
+        logger.debug('[OllamaController] Добавляем системный промпт')
         reqData.messages.unshift(systemPrompt)
       }
 
@@ -79,7 +79,7 @@ export default class OllamaController {
       // blank file yields null and changes nothing.
       const nomadPrompt = await this.nomadMdService.getSystemPrompt()
       if (nomadPrompt) {
-        logger.debug('[OllamaController] Injecting NOMAD.md system prompt')
+        logger.debug('[OllamaController] Добавляем системный промпт из NOMAD.md')
         reqData.messages.unshift({ role: 'system' as const, content: nomadPrompt })
       }
 
@@ -87,7 +87,7 @@ export default class OllamaController {
       // Will return user's latest message if no rewriting is needed
       const rewrittenQuery = await this.rewriteQueryWithContext(reqData.messages, reqData.model)
 
-      logger.debug(`[OllamaController] Rewritten query for RAG: "${rewrittenQuery}"`)
+      logger.debug(`[OllamaController] Переписанный запрос для RAG: "${rewrittenQuery}"`)
       if (rewrittenQuery) {
         const collectionFilter: string | null = request.input('collection', null)
         const relevantDocs = await this.ragService.searchSimilarDocuments(
@@ -97,7 +97,7 @@ export default class OllamaController {
           collectionFilter ?? undefined
         )
 
-        logger.debug(`[RAG] Retrieved ${relevantDocs.length} relevant documents for query: "${rewrittenQuery}"`)
+        logger.debug(`[RAG] Получено ${relevantDocs.length} релевантных документов по запросу: "${rewrittenQuery}"`)
 
         // If relevant context is found, inject as a system message with adaptive limits
         if (relevantDocs.length > 0) {
@@ -117,7 +117,7 @@ export default class OllamaController {
           }
 
           logger.debug(
-            `[RAG] Injecting ${trimmedDocs.length}/${relevantDocs.length} results (model: ${reqData.model}, maxResults: ${maxResults}, maxTokens: ${maxTokens || 'unlimited'})`
+            `[RAG] Добавление ${trimmedDocs.length}/${relevantDocs.length} результатов (модель: ${reqData.model}, maxResults: ${maxResults}, maxTokens: ${maxTokens || 'без ограничений'})`
           )
 
           // Label each context block with its source title when available (a neutral,
@@ -155,7 +155,7 @@ export default class OllamaController {
       if (estimatedSystemTokens > 3000) {
         const needed = estimatedSystemTokens + 2048 // leave room for conversation + response
         numCtx = [8192, 16384, 32768, 65536].find((n) => n >= needed) ?? 65536
-        logger.debug(`[OllamaController] Large system prompt (~${estimatedSystemTokens} tokens), requesting num_ctx: ${numCtx}`)
+        logger.debug(`[OllamaController] Большой системный промпт (~${estimatedSystemTokens} токенов), запрашиваем num_ctx: ${numCtx}`)
       }
 
       // Check if the model supports "thinking" capability for enhanced response generation.
@@ -185,7 +185,7 @@ export default class OllamaController {
       }
 
       if (reqData.stream) {
-        logger.debug(`[OllamaController] Initiating streaming response for model: "${reqData.model}" with think: ${think}`)
+        logger.debug(`[OllamaController] Запуск потокового ответа для модели: "${reqData.model}" с think: ${think}`)
         // Headers already flushed above.
         // Abort the upstream generation if the client disconnects — otherwise an abandoned
         // request keeps decoding server-side and, with Ollama's default OLLAMA_NUM_PARALLEL=1,
@@ -209,7 +209,7 @@ export default class OllamaController {
           }
         } catch (err) {
           if (abortController.signal.aborted) {
-            logger.debug('[OllamaController] Client disconnected; aborted upstream Ollama generation')
+            logger.debug('[OllamaController] Клиент отключился; генерация Ollama прервана')
             return
           }
           throw err
@@ -222,7 +222,7 @@ export default class OllamaController {
           const messageCount = await this.chatService.getMessageCount(sessionId)
           if (messageCount <= 2 && userContent) {
             this.chatService.generateTitle(sessionId, userContent, fullContent, reqData.model).catch((err) => {
-              logger.error(`[OllamaController] Title generation failed: ${err instanceof Error ? err.message : err}`)
+              logger.error(`[OllamaController] Не удалось сгенерировать заголовок: ${err instanceof Error ? err.message : err}`)
             })
           }
         }
@@ -237,7 +237,7 @@ export default class OllamaController {
         const messageCount = await this.chatService.getMessageCount(sessionId)
         if (messageCount <= 2 && userContent) {
           this.chatService.generateTitle(sessionId, userContent, result.message.content, reqData.model).catch((err) => {
-            logger.error(`[OllamaController] Title generation failed: ${err instanceof Error ? err.message : err}`)
+            logger.error(`[OllamaController] Не удалось сгенерировать заголовок: ${err instanceof Error ? err.message : err}`)
           })
         }
       }
@@ -273,7 +273,7 @@ export default class OllamaController {
 
     const ollamaService = await Service.query().where('service_name', SERVICE_NAMES.OLLAMA).first()
     if (!ollamaService) {
-      return response.status(404).send({ success: false, message: 'Ollama service record not found.' })
+      return response.status(404).send({ success: false, message: 'Запись сервиса Ollama не найдена.' })
     }
 
     // Clear path: null or empty URL removes remote config. If a local nomad_ollama container
@@ -288,8 +288,8 @@ export default class OllamaController {
       return {
         success: true,
         message: hasLocalContainer
-          ? 'Remote Ollama cleared. Local Ollama container restored.'
-          : 'Remote Ollama configuration cleared.',
+          ? 'Удалённая конфигурация Ollama сброшена. Локальный контейнер Ollama восстановлен.'
+          : 'Удалённая конфигурация Ollama сброшена.',
       }
     }
 
@@ -310,13 +310,13 @@ export default class OllamaController {
       if (!testResponse.ok) {
         return response.status(400).send({
           success: false,
-          message: `Could not connect to ${remoteUrl} (HTTP ${testResponse.status}). Make sure the server is running and accessible. For Ollama, start it with OLLAMA_HOST=0.0.0.0.`,
+          message: `Не удалось подключиться к ${remoteUrl} (HTTP ${testResponse.status}). Убедитесь, что сервер запущен и доступен. Для Ollama запустите его с OLLAMA_HOST=0.0.0.0.`,
         })
       }
     } catch (error) {
       return response.status(400).send({
         success: false,
-        message: `Could not connect to ${remoteUrl}. Make sure the server is running and reachable. For Ollama, start it with OLLAMA_HOST=0.0.0.0.`,
+        message: `Не удалось подключиться к ${remoteUrl}. Убедитесь, что сервер запущен и доступен. Для Ollama запустите его с OLLAMA_HOST=0.0.0.0.`,
       })
     }
 
@@ -334,17 +334,17 @@ export default class OllamaController {
     const qdrantService = await Service.query().where('service_name', SERVICE_NAMES.QDRANT).first()
     if (qdrantService && !qdrantService.installed) {
       this.dockerService.createContainerPreflight(SERVICE_NAMES.QDRANT).catch((error) => {
-        logger.error('[OllamaController] Failed to start Qdrant preflight:', error)
+        logger.error('[OllamaController] Не удалось запустить preflight Qdrant:', error)
       })
     }
 
     // Mirror post-install side effects: disable suggestions, trigger docs discovery
     await KVStore.setValue('chat.suggestionsEnabled', false)
     this.ragService.discoverNomadDocs().catch((error) => {
-      logger.error('[OllamaController] Failed to discover Nomad docs:', error)
+      logger.error('[OllamaController] Не удалось обнаружить документацию Nomad:', error)
     })
 
-    return { success: true, message: 'Remote Ollama configured.' }
+    return { success: true, message: 'Удалённая Ollama настроена.' }
   }
 
   private async _stopLocalOllamaContainer(): Promise<void> {
@@ -358,11 +358,11 @@ export default class OllamaController {
       }
       await this.dockerService.docker.getContainer(ollamaContainer.Id).stop()
       this.dockerService.invalidateServicesStatusCache()
-      logger.info('[OllamaController] Stopped local nomad_ollama (remote Ollama configured)')
+      logger.info('[OllamaController] Локальный nomad_ollama остановлен (настроена удалённая Ollama)')
     } catch (error: any) {
       logger.error(
         { err: error },
-        '[OllamaController] Failed to stop local nomad_ollama; remote Ollama is still active'
+        '[OllamaController] Не удалось остановить локальный nomad_ollama; удалённая Ollama по-прежнему активна'
       )
     }
   }
@@ -379,13 +379,13 @@ export default class OllamaController {
       if (ollamaContainer.State !== 'running') {
         await this.dockerService.docker.getContainer(ollamaContainer.Id).start()
         this.dockerService.invalidateServicesStatusCache()
-        logger.info('[OllamaController] Started local nomad_ollama (remote Ollama cleared)')
+        logger.info('[OllamaController] Локальный nomad_ollama запущен (удалённая Ollama сброшена)')
       }
       return true
     } catch (error: any) {
       logger.error(
         { err: error },
-        '[OllamaController] Failed to start local nomad_ollama on remote clear'
+        '[OllamaController] Не удалось запустить локальный nomad_ollama при сбросе удалённой конфигурации'
       )
       return false
     }
@@ -396,7 +396,7 @@ export default class OllamaController {
     await this.ollamaService.deleteModel(reqData.model)
     return {
       success: true,
-      message: `Model deleted: ${reqData.model}`,
+      message: `Модель удалена: ${reqData.model}`,
     }
   }
 
@@ -405,7 +405,7 @@ export default class OllamaController {
     await this.ollamaService.dispatchModelDownload(reqData.model)
     return {
       success: true,
-      message: `Download job dispatched for model: ${reqData.model}`,
+      message: `Задание на загрузку модели отправлено: ${reqData.model}`,
     }
   }
 
@@ -493,11 +493,11 @@ export default class OllamaController {
       })
 
       const rewrittenQuery = response.message.content.trim()
-      logger.info(`[RAG] Query rewritten: "${rewrittenQuery}"`)
+      logger.info(`[RAG] Запрос переписан: "${rewrittenQuery}"`)
       return rewrittenQuery
     } catch (error) {
       logger.error(
-        `[RAG] Query rewriting failed: ${error instanceof Error ? error.message : error}`
+        `[RAG] Не удалось переписать запрос: ${error instanceof Error ? error.message : error}`
       )
       // Fallback to last user message if rewriting fails
       return lastUserMessage?.content || null

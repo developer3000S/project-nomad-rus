@@ -58,11 +58,11 @@ export function evaluateBindMounts(
     const host = normalizeHostPath(hostPath)
 
     if (!hostPath.startsWith('/')) {
-      blocked.push(`Volume host path "${hostPath}" must be an absolute path.`)
+      blocked.push(`Путь тома на хосте "${hostPath}" должен быть абсолютным.`)
       continue
     }
     if (!containerPath.startsWith('/')) {
-      blocked.push(`Volume container path "${containerPath}" must be an absolute path.`)
+      blocked.push(`Путь тома в контейнере "${containerPath}" должен быть абсолютным.`)
       continue
     }
 
@@ -71,28 +71,28 @@ export function evaluateBindMounts(
     // the checks below can't be bypassed by a parse-differential. (The validator blocks this too;
     // this keeps the guard self-defending for any caller that skips validation.)
     if (hostPath.includes(':') || containerPath.includes(':')) {
-      blocked.push(`Volume paths must not contain a colon (":"): "${hostPath}" → "${containerPath}".`)
+      blocked.push(`Пути томов не должны содержать двоеточие (":"): "${hostPath}" → "${containerPath}".`)
       continue
     }
 
     // The Docker socket is the most dangerous mount of all — full control of the host daemon.
     if (host.endsWith('docker.sock') || /\/docker\.sock$/.test(host)) {
       blocked.push(
-        `Mounting the Docker socket ("${hostPath}") is not allowed — it grants full host control.`
+        `Монтирование сокета Docker ("${hostPath}") не разрешено — это даёт полный контроль над хостом.`
       )
       continue
     }
 
     // Core system directories.
     if (host === '/' || SYSTEM_BLOCK_PREFIXES.some((p) => isWithin(host, p))) {
-      blocked.push(`Mounting system directory "${hostPath}" is not allowed.`)
+      blocked.push(`Монтирование системного каталога "${hostPath}" не разрешено.`)
       continue
     }
 
     // At or above project-nomad's own install tree (covers `/`, `/opt`, `/opt/project-nomad`).
     if (host === installRoot || isWithin(installRoot, host)) {
       blocked.push(
-        `Mounting "${hostPath}" would expose project-nomad's own files and is not allowed.`
+        `Монтирование "${hostPath}" раскроет собственные файлы project-nomad и не разрешено.`
       )
       continue
     }
@@ -100,7 +100,7 @@ export function evaluateBindMounts(
     // Anything outside the managed storage root is allowed but flagged.
     if (!isWithin(host, storageRoot)) {
       warnings.push(
-        `Volume "${hostPath}" is outside the managed storage root (${storageRoot}). Make sure you trust this image with access to that path.`
+        `Том "${hostPath}" находится за пределами управляемого корня хранилища (${storageRoot}). Убедитесь, что доверяете этому образу доступ к указанному пути.`
       )
     }
   }
@@ -119,7 +119,7 @@ export function evaluateImageReference(image: string): GuardEvaluation {
   const ref = image.trim()
   // Loose validity check: no whitespace/control chars, and a sane character set for an image ref.
   if (!ref || /\s/.test(ref) || !/^[\w./:@-]+$/.test(ref)) {
-    blocked.push(`"${image}" is not a valid image reference.`)
+    blocked.push(`"${image}" не является допустимой ссылкой на образ.`)
     return { blocked, warnings }
   }
 
@@ -132,7 +132,7 @@ export function evaluateImageReference(image: string): GuardEvaluation {
 
   if (!TRUSTED_REGISTRIES.includes(registry)) {
     warnings.push(
-      `Image is from "${registry}", which is outside project-nomad's trusted registries. Only install images you trust.`
+      `Образ из "${registry}", что за пределами доверенных реестров project-nomad. Устанавливайте только те образы, которым доверяете.`
     )
   }
 
@@ -142,7 +142,7 @@ export function evaluateImageReference(image: string): GuardEvaluation {
   const hasDigest = ref.includes('@sha256:')
   if (!hasDigest && (!tag || tag === 'latest')) {
     warnings.push(
-      `Image "${image}" uses a moving tag (${tag ? ':latest' : 'no tag'}). Pin a specific version for reproducible installs.`
+      `Образ "${image}" использует плавающий тег (${tag ? ':latest' : 'без тега'}). Укажите конкретную версию для воспроизводимых установок.`
     )
   }
 

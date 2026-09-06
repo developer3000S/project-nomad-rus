@@ -25,7 +25,7 @@ export class AutoUpdateJob {
   }
 
   async handle(_job: Job) {
-    logger.info('[AutoUpdateJob] Evaluating auto-update...')
+    logger.info('[AutoUpdateJob] Оценка автообновления...')
 
     const dockerService = new DockerService()
     const autoUpdateService = new AutoUpdateService(
@@ -37,7 +37,7 @@ export class AutoUpdateJob {
     )
 
     const result = await autoUpdateService.attempt()
-    logger.info(`[AutoUpdateJob] ${result.updated ? 'Updating' : 'No update'}: ${result.reason}`)
+    logger.info(`[AutoUpdateJob] ${result.updated ? 'Обновление' : 'Обновлений нет'}: ${result.reason}`)
     return result
   }
 
@@ -57,7 +57,7 @@ export class AutoUpdateJob {
       }
     )
 
-    logger.info('[AutoUpdateJob] Auto-update evaluation scheduled with cron: 0 * * * *')
+    logger.info('[AutoUpdateJob] Оценка автообновления запланирована с cron: 0 * * * *')
   }
 
   static async dispatch() {
@@ -74,7 +74,7 @@ export class AutoUpdateJob {
       }
     )
 
-    logger.info(`[AutoUpdateJob] Dispatched ad-hoc auto-update evaluation job ${job.id}`)
+    logger.info(`[AutoUpdateJob] Запущена разовая задача оценки автообновления ${job.id}`)
     return job
   }
 }

@@ -45,14 +45,14 @@ export default class MapsController {
       if (!ready) {
         return response.status(500).send({
           message:
-            'Could not download the base map. Please connect this NOMAD to the internet and try again.',
+            'Не удалось загрузить базовую карту. Подключите NOMAD к интернету и попробуйте снова.',
         })
       }
       return { success: true }
     } catch {
       return response.status(500).send({
         message:
-          'Could not download the base map. Please connect this NOMAD to the internet and try again.',
+          'Не удалось загрузить базовую карту. Подключите NOMAD к интернету и попробуйте снова.',
       })
     }
   }
@@ -62,7 +62,7 @@ export default class MapsController {
     assertNotPrivateUrl(payload.url)
     const filename = await this.mapService.downloadRemote(payload.url)
     return {
-      message: 'Download started successfully',
+      message: 'Загрузка успешно началась',
       filename,
       url: payload.url,
     }
@@ -72,7 +72,7 @@ export default class MapsController {
     const payload = await request.validateUsing(downloadCollectionValidator)
     const resources = await this.mapService.downloadCollection(payload.slug)
     return {
-      message: 'Collection download started successfully',
+      message: 'Загрузка подборки успешно началась',
       slug: payload.slug,
       resources,
     }
@@ -106,7 +106,7 @@ export default class MapsController {
   async downloadGlobalMap({}: HttpContext) {
     const result = await this.mapService.downloadGlobalMap()
     return {
-      message: 'Download started successfully',
+      message: 'Загрузка успешно началась',
       ...result,
     }
   }
@@ -128,7 +128,7 @@ export default class MapsController {
     const payload = await request.validateUsing(mapExtractValidator)
     const result = await this.mapService.extractRegion(payload)
     return {
-      message: 'Extract started successfully',
+      message: 'Извлечение успешно началось',
       ...result,
     }
   }
@@ -139,7 +139,7 @@ export default class MapsController {
     if (!baseAssetsExist) {
       return response.status(500).send({
         message:
-          'Base map assets are missing and could not be downloaded. Please check your connection and try again.',
+          'Ресурсы базовой карты отсутствуют и не могут быть загружены. Проверьте подключение и попробуйте снова.',
       })
     }
 
@@ -161,14 +161,14 @@ export default class MapsController {
     } catch (error) {
       if (error.message === 'not_found') {
         return response.status(404).send({
-          message: `Map file with key ${payload.params.filename} not found`,
+          message: `Файл карты с ключом ${payload.params.filename} не найден`,
         })
       }
       throw error // Re-throw any other errors and let the global error handler catch
     }
 
     return {
-      message: 'Map file deleted successfully',
+      message: 'Файл карты успешно удалён',
     }
   }
 
@@ -206,7 +206,7 @@ export default class MapsController {
     const { id } = request.params()
     const marker = await MapMarker.find(id)
     if (!marker) {
-      return response.status(404).send({ message: 'Marker not found' })
+      return response.status(404).send({ message: 'Маркер не найден' })
     }
     const payload = await request.validateUsing(
       vine.compile(
@@ -234,9 +234,9 @@ export default class MapsController {
     const { id } = request.params()
     const marker = await MapMarker.find(id)
     if (!marker) {
-      return response.status(404).send({ message: 'Marker not found' })
+      return response.status(404).send({ message: 'Маркер не найден' })
     }
     await marker.delete()
-    return { message: 'Marker deleted' }
+    return { message: 'Маркер удалён' }
   }
 }

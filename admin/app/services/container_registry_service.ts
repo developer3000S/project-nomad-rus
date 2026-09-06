@@ -98,14 +98,14 @@ export class ContainerRegistryService {
 
     const response = await this.fetchWithRetry(tokenUrl)
     if (!response.ok) {
-      throw new Error(`Failed to get auth token from ${registry}: ${response.status}`)
+      throw new Error(`Не удалось получить токен авторизации от ${registry}: ${response.status}`)
     }
 
     const data = (await response.json()) as { token?: string; access_token?: string }
     const token = data.token || data.access_token || ''
 
     if (!token) {
-      throw new Error(`No token returned from ${registry}`)
+      throw new Error(`Токен не получен от ${registry}`)
     }
 
     // Cache for 5 minutes (tokens usually last longer, but be conservative)
@@ -131,7 +131,7 @@ export class ContainerRegistryService {
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to list tags for ${parsed.fullName}: ${response.status}`)
+        throw new Error(`Не удалось получить список тегов для ${parsed.fullName}: ${response.status}`)
       }
 
       const data = (await response.json()) as { tags?: string[] }
@@ -201,7 +201,7 @@ export class ContainerRegistryService {
       // Single manifest — assume compatible (can't easily determine arch without fetching config blob)
       return true
     } catch (error) {
-      logger.warn(`[ContainerRegistryService] Error checking arch for ${tag}: ${error.message}`)
+      logger.warn(`[ContainerRegistryService] Ошибка проверки архитектуры для ${tag}: ${error.message}`)
       return true // Assume compatible on error
     }
   }
@@ -260,7 +260,7 @@ export class ContainerRegistryService {
       return manifest.layers.reduce((total, layer) => total + (layer.size || 0), 0)
     } catch (error) {
       logger.warn(
-        `[ContainerRegistryService] Failed to get image size for ${parsed.fullName}:${tag}: ${error.message}`
+        `[ContainerRegistryService] Не удалось получить размер образа для ${parsed.fullName}:${tag}: ${error.message}`
       )
       return null
     }
@@ -349,7 +349,7 @@ export class ContainerRegistryService {
       this.sourceUrlCache.set(cacheKey, sourceUrl)
       return sourceUrl
     } catch (error) {
-      logger.warn(`[ContainerRegistryService] Failed to get source URL for ${cacheKey}: ${error.message}`)
+      logger.warn(`[ContainerRegistryService] Не удалось получить URL источника для ${cacheKey}: ${error.message}`)
       this.sourceUrlCache.set(cacheKey, null)
       return null
     }
@@ -468,7 +468,7 @@ export class ContainerRegistryService {
 
     if (currentTag === 'latest') {
       logger.warn(
-        `[ContainerRegistryService] Cannot check updates for ${containerImage} — using :latest tag`
+        `[ContainerRegistryService] Не удаётся проверить обновления для ${containerImage} — используется тег :latest`
       )
       return []
     }
@@ -536,7 +536,7 @@ export class ContainerRegistryService {
           ? parseInt(retryAfter, 10) * 1000
           : Math.pow(2, attempt) * 1000
         logger.warn(
-          `[ContainerRegistryService] Rate limited on ${url}, retrying in ${delay}ms`
+          `[ContainerRegistryService] Превышен лимит запросов к ${url}, повтор через ${delay}мс`
         )
         await new Promise((resolve) => setTimeout(resolve, delay))
         continue
@@ -545,6 +545,6 @@ export class ContainerRegistryService {
       return response
     }
 
-    throw new Error(`Failed to fetch ${url} after ${maxRetries} retries`)
+    throw new Error(`Не удалось получить ${url} после ${maxRetries} попыток`)
   }
 }

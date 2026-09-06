@@ -78,7 +78,7 @@ export class RagService {
       this.qdrantInitPromise = (async () => {
         const qdrantUrl = await this.dockerService.getServiceURL(SERVICE_NAMES.QDRANT)
         if (!qdrantUrl) {
-          throw new Error('Qdrant vector database is offline. Restart the AI Assistant service in Settings to restore the Knowledge Base.')
+          throw new Error('Векторная база данных Qdrant не в сети. Перезапустите сервис AI Assistant в настройках, чтобы восстановить базу знаний.')
         }
         this.qdrant = new QdrantClient({ url: qdrantUrl })
       })().catch((err) => {
@@ -153,7 +153,7 @@ export class RagService {
       // Only memoize after every step succeeded, so a partial failure is retried
       this.ensuredCollections.add(collectionName)
     } catch (error) {
-      logger.error('Error ensuring Qdrant collection:', error)
+      logger.error('Ошибка при проверке коллекции Qdrant:', error)
       throw error
     }
   }
@@ -216,7 +216,7 @@ export class RagService {
     }
 
     logger.warn(
-      `[RAG] Truncated text from ${text.length} to ${truncated.length} chars (est. ${estimatedTokens} → ${this.estimateTokenCount(truncated)} tokens)`
+      `[RAG] Текст обрезан с ${text.length} до ${truncated.length} символов (оценка: ${estimatedTokens} → ${this.estimateTokenCount(truncated)} токенов)`
     )
 
     return truncated
@@ -273,11 +273,11 @@ export class RagService {
 
     if (expansions.length > 0) {
       expanded = `${expanded} ${expansions.join(' ')}`
-      logger.debug(`[RAG] Query expanded with domain terms: "${expanded}"`)
+      logger.debug(`[RAG] Запрос расширен доменными терминами: "${expanded}"`)
     }
 
-    logger.debug(`[RAG] Original query: "${query}"`)
-    logger.debug(`[RAG] Preprocessed query: "${expanded}"`)
+    logger.debug(`[RAG] Исходный запрос: "${query}"`)
+    logger.debug(`[RAG] Предобработанный запрос: "${expanded}"`)
     return expanded
   }
 
@@ -317,11 +317,11 @@ export class RagService {
           try {
             const downloadResult = await this.ollamaService.downloadModel(EMBEDDING_MODEL_NAME)
             if (!downloadResult.success) {
-              throw new Error(downloadResult.message || 'Unknown error during model download')
+              throw new Error(downloadResult.message || 'Неизвестная ошибка при загрузке модели')
             }
           } catch (modelError) {
             logger.error(
-              `[RAG] Embedding model ${EMBEDDING_MODEL_NAME} not found locally and failed to download:`,
+              `[RAG] Модель эмбеддинга ${EMBEDDING_MODEL_NAME} не найдена локально и не удалось её загрузить:`,
               modelError
             )
             this.embeddingModelVerified = false
@@ -346,7 +346,7 @@ export class RagService {
       const chunkResults = await chunker.chunk(text)
 
       if (!chunkResults || chunkResults.length === 0) {
-        throw new Error('No text chunks generated for embedding.')
+        throw new Error('Текстовые фрагменты для создания эмбеддингов не были сгенерированы.')
       }
 
       // Extract text from chunk results
@@ -366,7 +366,7 @@ export class RagService {
           const prefixTokens = this.estimateTokenCount(prefixText)
           const maxTokensForText = RagService.MAX_SAFE_TOKENS - prefixTokens
           logger.warn(
-            `[RAG] Chunk ${i} estimated at ${estimatedTokens} tokens (${chunkText.length} chars), truncating to ${maxTokensForText} tokens`
+            `[RAG] Фрагмент ${i}: оценка ${estimatedTokens} токенов (${chunkText.length} символов), обрезаем до ${maxTokensForText} токенов`
           )
           chunkText = this.truncateToTokenLimit(chunkText, maxTokensForText)
         }
@@ -383,7 +383,7 @@ export class RagService {
         const batchStart = batchIdx * batchSize
         const batch = prefixedChunks.slice(batchStart, batchStart + batchSize)
 
-        logger.debug(`[RAG] Embedding batch ${batchIdx + 1}/${totalBatches} (${batch.length} chunks)`)
+        logger.debug(`[RAG] Пачка эмбеддингов ${batchIdx + 1}/${totalBatches} (${batch.length} фрагментов)`)
 
         const response = await this.ollamaService.embed(this.resolvedEmbeddingModel ?? EMBEDDING_MODEL_NAME, batch)
 
@@ -414,9 +414,9 @@ export class RagService {
         // Combine and dedup keywords
         const allKeywords = [...new Set([...structuralKeywords, ...contentKeywords])]
 
-        logger.debug(`[RAG] Extracted keywords for chunk ${index}: [${allKeywords.join(', ')}]`)
+        logger.debug(`[RAG] Извлечены ключевые слова для фрагмента ${index}: [${allKeywords.join(', ')}]`)
         if (structuralKeywords.length > 0) {
-          logger.debug(`[RAG]   - Structural: [${structuralKeywords.join(', ')}], Content: [${contentKeywords.join(', ')}]`)
+          logger.debug(`[RAG]   - Структурные: [${structuralKeywords.join(', ')}], Контентные: [${contentKeywords.join(', ')}]`)
         }
 
         // Sanitize source metadata as well
@@ -442,13 +442,13 @@ export class RagService {
 
       await this.qdrant!.upsert(RagService.CONTENT_COLLECTION_NAME, { points })
 
-      logger.debug(`[RAG] Successfully embedded and stored ${chunks.length} chunks`)
-      logger.debug(`[RAG] First chunk preview: "${chunks[0].substring(0, 100)}..."`)
+      logger.debug(`[RAG] Успешно встроено и сохранено ${chunks.length} фрагментов`)
+      logger.debug(`[RAG] Предпросмотр первого фрагмента: "${chunks[0].substring(0, 100)}..."`)
 
       return { chunks: chunks.length }
     } catch (error) {
       console.error(error)
-      logger.error('[RAG] Error embedding text:', error)
+      logger.error('[RAG] Ошибка при создании эмбеддинга текста:', error)
       return null
     }
   }
@@ -505,7 +505,7 @@ export class RagService {
 
     // Check if there was no extracted text or it was very minimal
     if (!extractedText || extractedText.trim().length < 100) {
-      logger.debug('[RAG] PDF text extraction minimal, attempting OCR on pages')
+      logger.debug('[RAG] Текст в PDF минимален, пробуем OCR на страницах')
       // Convert PDF pages to images for OCR if text extraction was poor
       const imageBuffers = await this.convertPDFtoImages(fileBuffer)
       extractedText = ''
@@ -538,7 +538,7 @@ export class RagService {
     const startOffset = batchOffset || 0
 
     logger.info(
-      `[RAG] Extracting ZIM content (batch: offset=${startOffset}, size=${ZIM_BATCH_SIZE})`
+      `[RAG] Извлечение содержимого ZIM (пачка: offset=${startOffset}, size=${ZIM_BATCH_SIZE})`
     )
 
     const { chunks: zimChunks, totalArticles } = await zimExtractionService.extractZIMContent(
@@ -547,7 +547,7 @@ export class RagService {
     )
 
     logger.info(
-      `[RAG] Extracted ${zimChunks.length} chunks from ZIM file with enhanced metadata (file totalArticles=${totalArticles})`
+      `[RAG] Извлечено ${zimChunks.length} фрагментов из ZIM файла с расширенными метаданными (всего статей=${totalArticles})`
     )
 
     // Process each chunk individually with its metadata
@@ -603,7 +603,7 @@ export class RagService {
     const hasMoreBatches = articlesInBatch >= ZIM_BATCH_SIZE
 
     logger.info(
-      `[RAG] Successfully embedded ${totalChunks} total chunks from ${articlesInBatch} articles (hasMore: ${hasMoreBatches})`
+      `[RAG] Успешно встроено ${totalChunks} фрагментов из ${articlesInBatch} статей (осталось: ${hasMoreBatches})`
     )
 
     // Only delete the file when:
@@ -612,10 +612,10 @@ export class RagService {
     // This prevents race conditions where early batches complete after later ones
     const shouldDelete = deleteAfterEmbedding && !hasMoreBatches
     if (shouldDelete) {
-      logger.info(`[RAG] Final batch complete, deleting ZIM file: ${filepath}`)
+      logger.info(`[RAG] Финальная пачка завершена, удаляем ZIM файл: ${filepath}`)
       await deleteFileIfExists(filepath)
     } else if (!hasMoreBatches) {
-      logger.info(`[RAG] Final batch complete, but file deletion was not requested`)
+      logger.info(`[RAG] Финальная пачка завершена, но удаление файла не запрашивалось`)
     }
 
     return {
@@ -656,14 +656,14 @@ export class RagService {
     // Read container.xml to find the OPF file path
     const containerXml = await zip.file('META-INF/container.xml')?.async('text')
     if (!containerXml) {
-      throw new Error('Invalid EPUB: missing META-INF/container.xml')
+      throw new Error('Недопустимый EPUB: отсутствует META-INF/container.xml')
     }
 
     // Parse container.xml to get the OPF rootfile path
     const $container = cheerio.load(containerXml, { xml: true })
     const opfPath = $container('rootfile').attr('full-path')
     if (!opfPath) {
-      throw new Error('Invalid EPUB: no rootfile found in container.xml')
+      throw new Error('Недопустимый EPUB: корневой файл не найден в container.xml')
     }
 
     // Determine the base directory of the OPF file for resolving relative paths
@@ -672,7 +672,7 @@ export class RagService {
     // Read and parse the OPF file
     const opfContent = await zip.file(opfPath)?.async('text')
     if (!opfContent) {
-      throw new Error(`Invalid EPUB: OPF file not found at ${opfPath}`)
+      throw new Error(`Недопустимый EPUB: OPF файл не найден по пути ${opfPath}`)
     }
 
     const $opf = cheerio.load(opfContent, { xml: true })
@@ -720,7 +720,7 @@ export class RagService {
     }
 
     const fullText = textParts.join('\n\n')
-    logger.debug(`[RAG] EPUB extracted ${textParts.length} chapters, ${fullText.length} characters total`)
+    logger.debug(`[RAG] EPUB: извлечено ${textParts.length} глав, ${fullText.length} символов всего`)
     return fullText
   }
 
@@ -745,7 +745,7 @@ export class RagService {
     }
 
     if (deleteAfterEmbedding) {
-      logger.info(`[RAG] Embedding complete, deleting uploaded file: ${filepath}`)
+      logger.info(`[RAG] Встраивание завершено, удаляем загруженный файл: ${filepath}`)
       await deleteFileIfExists(filepath)
     }
 
@@ -772,7 +772,7 @@ export class RagService {
   ): Promise<ProcessAndEmbedFileResponse> {
     try {
       const fileType = determineFileType(filepath)
-      logger.debug(`[RAG] Processing file: ${filepath} (detected type: ${fileType})`)
+      logger.debug(`[RAG] Обработка файла: ${filepath} (определён тип: ${fileType})`)
 
       if (fileType === 'unknown') {
         return { success: false, message: 'Unsupported file type.' }
@@ -822,7 +822,7 @@ export class RagService {
       // Embed extracted text and cleanup
       return await this.embedTextAndCleanup(extractedText, filepath, deleteAfterEmbedding, scaledProgress, collection)
     } catch (error) {
-      logger.error('[RAG] Error processing and embedding file:', error)
+      logger.error('[RAG] Ошибка при обработке и встраивании файла:', error)
       return { success: false, message: 'Error processing and embedding file.' }
     }
   }
@@ -843,7 +843,7 @@ export class RagService {
     collection?: string
   ): Promise<Array<{ text: string; score: number; metadata?: Record<string, any> }>> {
     try {
-      logger.debug(`[RAG] Starting similarity search for query: "${query}"`)
+      logger.debug(`[RAG] Запуск поиска похожих для запроса: "${query}"`)
 
       await this._ensureCollection(
         RagService.CONTENT_COLLECTION_NAME,
@@ -853,10 +853,10 @@ export class RagService {
       // Check if collection has any points
       const collectionInfo = await this.qdrant!.getCollection(RagService.CONTENT_COLLECTION_NAME)
       const pointCount = collectionInfo.points_count || 0
-      logger.debug(`[RAG] Knowledge base contains ${pointCount} document chunks`)
+      logger.debug(`[RAG] База знаний содержит ${pointCount} фрагментов документов`)
 
       if (pointCount === 0) {
-        logger.debug('[RAG] Knowledge base is empty. Could not perform search.')
+        logger.debug('[RAG] База знаний пуста. Поиск невозможен.')
         return []
       }
 
@@ -868,7 +868,7 @@ export class RagService {
 
         if (!embeddingModel) {
           logger.warn(
-            `[RAG] ${EMBEDDING_MODEL_NAME} not found. Cannot perform similarity search.`
+            `[RAG] ${EMBEDDING_MODEL_NAME} не найдена. Поиск похожих документов невозможен.`
           )
           this.embeddingModelVerified = false
           return []
@@ -880,7 +880,7 @@ export class RagService {
       // Preprocess query for better matching
       const processedQuery = this.preprocessQuery(query)
       const keywords = this.extractKeywords(processedQuery)
-      logger.debug(`[RAG] Extracted keywords: [${keywords.join(', ')}]`)
+      logger.debug(`[RAG] Извлечены ключевые слова: [${keywords.join(', ')}]`)
 
       // Generate embedding for the query with search_query prefix
       // Ensure query doesn't exceed token limit
@@ -889,13 +889,13 @@ export class RagService {
       const truncatedQuery = this.truncateToTokenLimit(processedQuery, maxQueryTokens)
 
       const prefixedQuery = RagService.SEARCH_QUERY_PREFIX + truncatedQuery
-      logger.debug(`[RAG] Generating embedding with prefix: "${RagService.SEARCH_QUERY_PREFIX}"`)
+      logger.debug(`[RAG] Генерация эмбеддинга с префиксом: "${RagService.SEARCH_QUERY_PREFIX}"`)
 
       // Validate final token count
       const queryTokenCount = this.estimateTokenCount(prefixedQuery)
       if (queryTokenCount > RagService.MAX_SAFE_TOKENS) {
         logger.error(
-          `[RAG] Query too long even after truncation: ${queryTokenCount} tokens (max: ${RagService.MAX_SAFE_TOKENS})`
+          `[RAG] Запрос слишком длинный даже после обрезки: ${queryTokenCount} токенов (макс: ${RagService.MAX_SAFE_TOKENS})`
         )
         return []
       }
@@ -905,7 +905,7 @@ export class RagService {
       // Perform semantic search with a higher limit to enable reranking
       const searchLimit = limit * 3 // Get more results for reranking
       logger.debug(
-        `[RAG] Searching for top ${searchLimit} semantic matches (threshold: ${scoreThreshold})`
+        `[RAG] Поиск top-${searchLimit} семантических совпадений (порог: ${scoreThreshold})`
       )
 
       const searchResults = await this.qdrant!.search(RagService.CONTENT_COLLECTION_NAME, {
@@ -916,7 +916,7 @@ export class RagService {
         ...(collection ? { filter: { must: [{ key: 'collection', match: { value: collection } }] } } : {}),
       })
 
-      logger.debug(`[RAG] Found ${searchResults.length} results above threshold ${scoreThreshold}`)
+      logger.debug(`[RAG] Найдено ${searchResults.length} результатов выше порога ${scoreThreshold}`)
 
       // Map results with metadata for reranking
       const resultsWithMetadata: RAGResult[] = searchResults.map((result) => ({
@@ -937,10 +937,10 @@ export class RagService {
 
       const rerankedResults = this.rerankResults(resultsWithMetadata, keywords, query)
 
-      logger.debug(`[RAG] Top 3 results after reranking:`)
+      logger.debug(`[RAG] Топ-3 результата после переранжирования:`)
       rerankedResults.slice(0, 3).forEach((result, idx) => {
         logger.debug(
-          `[RAG]   ${idx + 1}. Score: ${result.finalScore.toFixed(4)} (semantic: ${result.score.toFixed(4)}) - "${result.text.substring(0, 100)}..."`
+          `[RAG]   ${idx + 1}. Итоговый: ${result.finalScore.toFixed(4)} (семант.: ${result.score.toFixed(4)}) - "${result.text.substring(0, 100)}..."`
         )
       })
 
@@ -965,7 +965,7 @@ export class RagService {
         },
       }))
     } catch (error) {
-      logger.error('[RAG] Error searching similar documents:', error)
+      logger.error('[RAG] Ошибка поиска похожих документов:', error)
       return []
     }
   }
@@ -1178,7 +1178,7 @@ export class RagService {
         // rather return the Qdrant-derived list than 500 the whole panel.
         logger.warn(
           { err: error },
-          '[RagService.getStoredFiles] state-machine union skipped; returning Qdrant-only list'
+          '[RagService.getStoredFiles] объединение state-machine пропущено; возвращаем только список из Qdrant'
         )
       }
 
@@ -1202,7 +1202,7 @@ export class RagService {
         })
       )
     } catch (error) {
-      logger.error('Error retrieving stored files:', error)
+      logger.error('Ошибка при получении сохранённых файлов:', error)
       return []
     }
   }
@@ -1254,7 +1254,7 @@ export class RagService {
 
       return { success: true, message: collection ? `Moved to "${collection}".` : 'Moved to Uncategorized.' }
     } catch (error) {
-      logger.error('[RAG] Error updating file collection:', error)
+      logger.error('[RAG] Ошибка при обновлении коллекции файлов:', error)
       return { success: false, message: 'Error updating file collection.' }
     }
   }
@@ -1283,7 +1283,7 @@ export class RagService {
 
       return { success: true, message: `Renamed "${oldName}" to "${newName}".` }
     } catch (error) {
-      logger.error('[RAG] Error renaming knowledge collection:', error)
+      logger.error('[RAG] Ошибка при переименовании коллекции знаний:', error)
       return { success: false, message: 'Error renaming collection.' }
     }
   }
@@ -1312,7 +1312,7 @@ export class RagService {
 
       return { success: true, message: `"${name}" removed. Files moved to Uncategorized.` }
     } catch (error) {
-      logger.error('[RAG] Error deleting knowledge collection:', error)
+      logger.error('[RAG] Ошибка при удалении коллекции знаний:', error)
       return { success: false, message: 'Error deleting collection.' }
     }
   }
@@ -1361,7 +1361,7 @@ export class RagService {
       const fileName = resolved.split(/[/\\]/).at(-1) ?? resolved
       return { content, extension, fileName }
     } catch (error) {
-      logger.warn({ err: error, source }, '[RagService.readFileContent] read failed')
+      logger.warn({ err: error, source }, '[RagService.readFileContent] ошибка чтения')
       return null
     }
   }
@@ -1482,7 +1482,7 @@ export class RagService {
 
       return { ok: true, warnings: out }
     } catch (error) {
-      logger.error('[RAG] Error computing file warnings:', error)
+      logger.error('[RAG] Ошибка при вычислении предупреждений о файлах:', error)
       return { ok: false, warnings: {} }
     }
   }
@@ -1505,7 +1505,7 @@ export class RagService {
         },
       })
 
-      logger.info(`[RAG] Deleted all points for source: ${source}`)
+      logger.info(`[RAG] Удалены все точки для источника: ${source}`)
 
       /** Delete the physical file only if it lives inside the uploads directory.
       * resolve() normalises path traversal sequences (e.g. "/../..") before the
@@ -1516,9 +1516,9 @@ export class RagService {
       const resolvedSource = resolve(source)
       if (resolvedSource.startsWith(uploadsAbsPath + sep)) {
         await deleteFileIfExists(resolvedSource)
-        logger.info(`[RAG] Deleted uploaded file from disk: ${resolvedSource}`)
+        logger.info(`[RAG] Удалён загруженный файл с диска: ${resolvedSource}`)
       } else {
-        logger.warn(`[RAG] File was removed from knowledge base but doesn't live in Nomad's uploads directory, so it can't be safely removed. Skipping deletion of physical file...`)
+        logger.warn(`[RAG] Файл был удалён из базы знаний, но не находится в директории загрузок Nomad, поэтому его нельзя безопасно удалить. Пропускаем удаление физического файла...`)
       }
 
       // Drop the ingest state row last so the file disappears entirely. Without
@@ -1528,7 +1528,7 @@ export class RagService {
 
       return { success: true, message: 'File removed from knowledge base.' }
     } catch (error) {
-      logger.error('[RAG] Error deleting file from knowledge base:', error)
+      logger.error('[RAG] Ошибка при удалении файла из базы знаний:', error)
       return { success: false, message: 'Error deleting file from knowledge base.' }
     }
   }
@@ -1632,7 +1632,7 @@ export class RagService {
 
       const alreadyEmbeddedRaw = await KVStore.getValue('rag.docsEmbedded')
       if (alreadyEmbeddedRaw && !force) {
-        logger.info('[RAG] Nomad docs have already been discovered and queued. Skipping.')
+        logger.info('[RAG] Документы Nomad уже обнаружены и поставлены в очередь. Пропускаем.')
         return { success: true, message: 'Nomad docs have already been discovered and queued. Skipping.' }
       }
 
@@ -1650,7 +1650,7 @@ export class RagService {
         }
       }
 
-      logger.info(`[RAG] Discovered ${filesToEmbed.length} Nomad doc files to embed`)
+      logger.info(`[RAG] Обнаружено ${filesToEmbed.length} файлов документов Nomad для встраивания`)
 
       // Import EmbedFileJob dynamically to avoid circular dependencies
       const { EmbedFileJob } = await import('#jobs/embed_file_job')
@@ -1658,12 +1658,12 @@ export class RagService {
       // Dispatch an EmbedFileJob for each discovered file
       for (const fileInfo of filesToEmbed) {
         try {
-          logger.info(`[RAG] Dispatching embed job for: ${fileInfo.source}`)
+          logger.info(`[RAG] Запуск задания встраивания для: ${fileInfo.source}`)
           await EmbedFileJob.dispatch({
             filePath: fileInfo.path,
             fileName: fileInfo.source,
           })
-          logger.info(`[RAG] Successfully dispatched job for ${fileInfo.source}`)
+          logger.info(`[RAG] Задание успешно запущено для ${fileInfo.source}`)
         } catch (fileError) {
           logger.error(
             `[RAG] Error dispatching job for file ${fileInfo.source}:`,
@@ -1677,7 +1677,7 @@ export class RagService {
 
       return { success: true, message: `Nomad docs discovery completed. Dispatched ${filesToEmbed.length} embedding jobs.` }
     } catch (error) {
-      logger.error('Error discovering Nomad docs:', error)
+      logger.error('Ошибка при обнаружении документов Nomad:', error)
       return { success: false, message: 'Error discovering Nomad docs.' }
     }
   }
@@ -1705,7 +1705,7 @@ export class RagService {
         logger.debug(`[RAG] Found ${contents.length} files in ${label}`)
       } catch (error) {
         if (error.code === 'ENOENT') {
-          logger.debug(`[RAG] ${label} directory does not exist, skipping`)
+          logger.debug(`[RAG] Директория ${label} не существует, пропускаем`)
         } else {
           throw error
         }
@@ -1751,7 +1751,7 @@ export class RagService {
         }
       } catch (fileError) {
         failedPaths.push(filePath)
-        logger.error(`[RAG] Error dispatching job for file ${filePath}:`, fileError)
+        logger.error(`[RAG] Ошибка при запуске задания для файла ${filePath}:`, fileError)
       }
     }
     return { queuedCount, dedupedCount, failedPaths }
@@ -1802,7 +1802,7 @@ export class RagService {
       try {
         await this._deletePointsBySource(source)
       } catch (err) {
-        logger.error(`[RAG] Failed to delete prior points for ${source}; aborting re-embed:`, err)
+        logger.error(`[RAG] Не удалось удалить предыдущие точки для ${source}; прерываем перевстраивание:`, err)
         return {
           success: false,
           code: 'delete_failed',
@@ -1866,14 +1866,14 @@ export class RagService {
     filesQueued?: number
   }> {
     try {
-      logger.info('[RAG] Starting knowledge base sync scan')
+      logger.info('[RAG] Запуск сканирования синхронизации базы знаний')
 
       await this.discoverNomadDocs(true).catch((error) => {
-        logger.error('[RAG] Error during Nomad docs discovery in sync process:', error)
+        logger.error('[RAG] Ошибка при обнаружении документов Nomad в процессе синхронизации:', error)
       })
 
       const filesInStorage = await this._discoverKbFiles()
-      logger.info(`[RAG] Found ${filesInStorage.length} embeddable files in storage`)
+      logger.info(`[RAG] Найдено ${filesInStorage.length} файлов для встраивания в хранилище`)
 
       await this._ensureCollection(
         RagService.CONTENT_COLLECTION_NAME,
@@ -1893,7 +1893,7 @@ export class RagService {
         if (typeof hit.value === 'string') sourcesInQdrant.add(hit.value)
       }
 
-      logger.info(`[RAG] Found ${sourcesInQdrant.size} unique sources in Qdrant`)
+      logger.info(`[RAG] Найдено ${sourcesInQdrant.size} уникальных источников в Qdrant`)
 
       // Load all known per-file ingest states. The state row is authoritative
       // over the "any chunks in Qdrant" heuristic — it captures user choices
@@ -1966,7 +1966,7 @@ export class RagService {
       }
 
       logger.info(
-        `[RAG] Scan results (policy=${policy}): ${filesToEmbed.length} to embed, ${backfilled} backfilled, ${createdRows} new pending, ${createdPending} waiting on user, ${skipped} skipped`
+        `[RAG] Результаты сканирования (политика=${policy}): ${filesToEmbed.length} для встраивания, ${backfilled} восстановлено, ${createdRows} новых в очереди, ${createdPending} ожидает пользователя, ${skipped} пропущено`
       )
 
       if (filesToEmbed.length === 0) {
@@ -1987,7 +1987,7 @@ export class RagService {
         filesQueued: queuedCount,
       }
     } catch (error) {
-      logger.error('[RAG] Error scanning and syncing knowledge base:', error)
+      logger.error('[RAG] Ошибка при сканировании и синхронизации базы знаний:', error)
       return { success: false, message: 'Error scanning and syncing knowledge base' }
     }
   }
@@ -2016,10 +2016,10 @@ export class RagService {
         }
       }
 
-      logger.info('[RAG] Starting full re-embed (per-file replace)')
+      logger.info('[RAG] Запуск полного перевстраивания (позаменное обновление)')
 
       await this.discoverNomadDocs(true).catch((error) => {
-        logger.error('[RAG] Error re-running Nomad docs discovery during re-embed:', error)
+        logger.error('[RAG] Ошибка при повторном обнаружении документов Nomad во время перевстраивания:', error)
       })
 
       const filesInStorage = await this._discoverKbFiles()
@@ -2045,7 +2045,7 @@ export class RagService {
         try {
           await this._deletePointsBySource(filePath)
         } catch (err) {
-          logger.error(`[RAG] Failed to delete prior points for ${filePath}; skipping dispatch:`, err)
+          logger.error(`[RAG] Не удалось удалить предыдущие точки для ${filePath}; пропускаем запуск:`, err)
           failedPaths.push(filePath)
           continue
         }
@@ -2060,14 +2060,14 @@ export class RagService {
         } catch (fileError) {
           // Old points already deleted but the new job never made it onto the
           // queue. Logged + surfaced so an operator can rerun a sync.
-          logger.error(`[RAG] Re-embed dispatch failed for ${filePath} after delete; file is now unindexed until next sync:`, fileError)
+          logger.error(`[RAG] Запуск перевстраивания не удался для ${filePath} после удаления; файл не проиндексирован до следующей синхронизации:`, fileError)
           failedPaths.push(filePath)
         }
       }
 
       logger.info(
-        `[RAG] Re-embed dispatched ${queuedCount}/${filesInStorage.length} files` +
-          (failedPaths.length > 0 ? ` (${failedPaths.length} failed)` : '')
+        `[RAG] Перевстраивание запущено ${queuedCount}/${filesInStorage.length} файлов` +
+          (failedPaths.length > 0 ? ` (${failedPaths.length} не удалось)` : '')
       )
 
       const failureSuffix =
@@ -2085,7 +2085,7 @@ export class RagService {
         ...(failedPaths.length > 0 ? { failedPaths } : {}),
       }
     } catch (error) {
-      logger.error('[RAG] Error during re-embed:', error)
+      logger.error('[RAG] Ошибка во время перевстраивания:', error)
       return { success: false, message: 'Error during re-embed' }
     }
   }
@@ -2113,15 +2113,15 @@ export class RagService {
         }
       }
 
-      logger.info('[RAG] Starting destructive reset & rebuild')
+      logger.info('[RAG] Запуск полного сброса и перестроения')
 
       await this._initializeQdrantClient()
       try {
         await this.qdrant!.deleteCollection(RagService.CONTENT_COLLECTION_NAME)
-        logger.info(`[RAG] Dropped collection ${RagService.CONTENT_COLLECTION_NAME}`)
+        logger.info(`[RAG] Коллекция ${RagService.CONTENT_COLLECTION_NAME} удалена`)
       } catch (err) {
         // Collection may not exist yet on a fresh install — log and continue.
-        logger.warn(`[RAG] deleteCollection failed (may not exist): ${(err as Error).message}`)
+        logger.warn(`[RAG] deleteCollection не удался (возможно, коллекция не существует): ${(err as Error).message}`)
       }
 
       // The collection is gone — drop it from the ensured cache so the
@@ -2136,7 +2136,7 @@ export class RagService {
       // Force Nomad docs to be re-dispatched.
       await KVStore.setValue('rag.docsEmbedded', false)
       await this.discoverNomadDocs(true).catch((error) => {
-        logger.error('[RAG] Error re-running Nomad docs discovery after reset:', error)
+        logger.error('[RAG] Ошибка при повторном обнаружении документов Nomad после сброса:', error)
       })
 
       const filesInStorage = await this._discoverKbFiles()
@@ -2145,8 +2145,8 @@ export class RagService {
       })
 
       logger.info(
-        `[RAG] Reset complete — dispatched ${queuedCount}/${filesInStorage.length} files` +
-          (failedPaths.length > 0 ? ` (${failedPaths.length} failed)` : '')
+        `[RAG] Сброс завершён — запущено ${queuedCount}/${filesInStorage.length} файлов` +
+          (failedPaths.length > 0 ? ` (${failedPaths.length} не удалось)` : '')
       )
 
       // Collection was already dropped, so dispatch failures here mean the
@@ -2167,7 +2167,7 @@ export class RagService {
         ...(failedPaths.length > 0 ? { failedPaths } : {}),
       }
     } catch (error) {
-      logger.error('[RAG] Error during reset & rebuild:', error)
+      logger.error('[RAG] Ошибка при сбросе и перестроении:', error)
       return { success: false, message: 'Error during reset & rebuild' }
     }
   }
