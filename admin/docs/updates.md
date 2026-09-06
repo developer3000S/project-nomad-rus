@@ -1,67 +1,67 @@
-# Keeping NOMAD Updated
+# Обновление NOMAD
 
-NOMAD works best when it's kept current while you have internet, so it's ready with the latest software and content the next time you go offline. This page explains what can be updated, how to do it on demand, and how to let NOMAD handle it for you automatically.
-
----
-
-## The three kinds of updates
-
-There are three separate things that can be updated, and you control each one independently:
-
-1. **Software (the core)** — NOMAD itself: the Command Center, new features, bug fixes, and security improvements.
-2. **Apps** — the installable apps from the [Supply Depot](/supply-depot) (Kiwix, the AI Assistant, and any others you've added).
-3. **Content** — your offline material: Wikipedia and other Kiwix libraries, and downloaded map regions.
-
-You can update any of these on demand, or set any of them to update automatically.
+NOMAD работает лучше всего, когда он обновляется в текущем состоянии, пока у вас есть интернет, чтобы он был готов с последними версиями программного обеспечения и контента в следующий раз, когда вы окажетесь без подключения. На этой странице объясняется, что можно обновлять, как делать это по требованию и как позволить NOMAD обрабатывать это автоматически.
 
 ---
 
-## Updating on demand
+## Три вида обновлений
 
-To check for and install updates yourself:
+Существует три отдельных вида обновлений, и вы управляете каждым из них независимо:
 
-1. Go to **[Settings → Check for Updates](/settings/update)**.
-2. If a software update is available, click to install it. NOMAD downloads the update and restarts (usually 2–5 minutes).
-3. Apps can be updated from their card in the [Supply Depot](/supply-depot) using **Manage › Update**.
-4. Content is managed from **Settings → Content Manager** and **Content Explorer**, where you can download newer versions of installed libraries and maps.
+1. **Программное обеспечение (ядро)** — сам NOMAD: Панель управления, новые функции, исправления ошибок и улучшения безопасности.
+2. **Приложения** — устанавливаемые приложения из [Supply Depot](/supply-depot) (Kiwix, AI Assistant и любые другие, которые вы добавили).
+3. **Контент** — ваш оффлайн-материал: Википедия и другие библиотеки Kiwix, а также загруженные регионы карт.
 
-If a software or app update ever fails, NOMAD is designed to recover gracefully — the previous working version keeps running, so your server stays up.
-
----
-
-## Automatic updates
-
-NOMAD can keep itself current without you having to remember to check. **Automatic updates are opt-in and off by default** — nothing updates on its own until you turn it on. You manage all of it from **Settings → Updates**.
-
-A few things are true across all three:
-
-- **You choose a time window.** Automatic updates only run during the hours you set, so they never interrupt you mid-use.
-- **Major versions are never automatic.** Only minor and patch updates apply on their own; a big version jump always waits for you to do it manually, on purpose.
-- **Safety checks come first.** Before applying anything, NOMAD confirms there's enough disk space and that no other update, download, or install is already in progress.
-- **Being offline is harmless.** If NOMAD can't reach the internet to check, it simply skips that round and tries again later.
-
-### Automatic software (core) updates
-
-Turn this on from **Settings → Updates**. When enabled, NOMAD updates its own core to newer releases within the same major version, during your chosen window, after a configurable **cool-off** period (so a brand-new release has time to prove itself before your server takes it). The same page shows the toggle, the window, the cool-off setting, and live status. If updates fail repeatedly for a real reason, NOMAD turns the feature back off and lets you know rather than retrying forever.
-
-### Automatic app updates
-
-App auto-updates are opt-in at **two levels**: a master switch in **Settings → Updates**, *and* a per-app toggle on each app's card in the [Supply Depot](/supply-depot). Both have to be on for an app to update itself. App updates share the same update window and cool-off as the core, apply only minor and patch versions, and back off automatically for any individual app that keeps failing.
-
-### Automatic content updates
-
-Installed Wikipedia/ZIM libraries and map regions can refresh themselves too. Because content downloads are large (often many gigabytes), content updates run on their **own dedicated overnight window** with a **bandwidth cap**, separate from the software and app schedule. NOMAD checks the upstream Kiwix and map catalogs directly, and when a Wikipedia library is replaced with a newer version, it keeps the AI Knowledge Base in sync automatically.
+Вы можете обновлять любое из этих трех по требованию или установить автоматическое обновление для любого из них.
 
 ---
 
-## Early Access Channel
+## Обновление по требованию
 
-Want new features before they reach the stable release? Enable the **Early Access Channel** from the [Check for Updates](/settings/update) page to receive release-candidate builds. Early-access builds may contain rough edges — you can switch back to stable at any time.
+Чтобы проверить и установить обновления самостоятельно:
+
+1. Перейдите в **[Настройки → Проверить обновления](/settings/update)**.
+2. Если доступно обновление программного обеспечения, нажмите, чтобы установить его. NOMAD загружает обновление и перезапускается (обычно 2–5 минут).
+3. Приложения можно обновлять с карточки приложения в [Supply Depot](/supply-depot) с помощью **Управление › Обновить**.
+4. Контент управляется из **Настройки → Менеджер контента** и **Обозреватель контента**, где вы можете загружать новые версии установленных библиотек и карт.
+
+Если обновление программного обеспечения или приложения когда-либо завершается неудачей, NOMAD разработан таким образом, чтобы восстанавливаться грациозно — предыдущая рабочая версия продолжает работать, поэтому ваш сервер остается в рабочем состоянии.
 
 ---
 
-## Before you go offline
+## Автоматические обновления
 
-Whatever you choose, the habit that matters most is simple: **update while you still have internet.** Whether you do it by hand or let automatic updates handle it, make sure your software and content are current before you head somewhere without a connection. When you're offline, you'll have the last synced versions of everything ready to go.
+NOMAD может обновляться самостоятельно, не требуя от вас помнить о проверке. **Автоматические обновления являются опциональными и отключены по умолчанию** — ничего не обновляется самостоятельно, пока вы не включите эту функцию. Вы управляете всем этим из **Настройки → Обновления**.
 
-**[Check for Updates →](/settings/update)** · **[See what's new in each version →](/docs/release-notes)**
+Несколько вещей верны для всех трех:
+
+- **Вы выбираете временное окно.** Автоматические обновления запускаются только в течение часов, которые вы установили, поэтому они никогда не прерывают вас во время использования.
+- **Основные версии никогда не автоматические.** Только минорные и исправления обновляются самостоятельно; крупное обновление версии всегда ожидает, пока вы не сделаете это вручную, по назначению.
+- **Проверки безопасности идут первыми.** Перед применением чего-либо NOMAD подтверждает, что есть достаточно места на диске и что ни одно другое обновление, загрузка или установка еще не выполняется.
+- **Быть оффлайн безопасно.** Если NOMAD не может подключиться к интернету для проверки, он просто пропускает этот раунд и пытается снова позже.
+
+### Автоматические обновления программного обеспечения (ядра)
+
+Включите эту функцию из **Настройки → Обновления**. Когда включено, NOMAD обновляет себя до новых релизов в пределах той же основной версии, в течение выбранного вами окна, после настраиваемого **периода охлаждения** (чтобы новому релизу было время доказать себя, прежде чем ваш сервер возьмет его). На той же странице показаны переключатель, окно, настройка охлаждения и статус в реальном времени. Если обновления повторно завершаются неудачей по реальной причине, NOMAD отключает функцию и сообщает вам, а не пытается бесконечно.
+
+### Автоматические обновления приложений
+
+Автоматические обновления приложений являются опциональными на **двух уровнях**: мастер-переключатель в **Настройки → Обновления**, *и* переключатель для каждого приложения на карточке приложения в [Supply Depot](/supply-depot). Оба должны быть включены, чтобы приложение обновлялось само. Обновления приложений используют то же окно обновления и охлаждение, что и ядро, применяют только минорные и исправления версий, и отключаются автоматически для любого отдельного приложения, которое продолжает завершаться неудачей.
+
+### Автоматические обновления контента
+
+Установленные библиотеки Википедии/ZIM и регионы карт также могут обновляться. Поскольку загрузки контента крупные (часто многие гигабайты), обновления контента запускаются в **собственном отдельном ночном окне с ограничением пропускной способности**, отдельно от графика программного обеспечения и приложений. NOMAD проверяет каталоги Kiwix и карт напрямую, и когда библиотека Википедии заменяется на новую версию, он автоматически синхронизирует Базу знаний AI.
+
+---
+
+## Канал раннего доступа
+
+Хотите новые функции до того, как они достигнут стабильного релиза? Включите **Канал раннего доступа** со страницы [Проверить обновления](/settings/update), чтобы получать кандидаты на выпуск. Ранние версии могут содержать грубые края — вы можете переключиться обратно на стабильную версию в любое время.
+
+---
+
+## Перед тем, как выйдете оффлайн
+
+Что бы вы ни выбрали, привычка, которая имеет наибольшее значение, проста: **обновляйтесь, пока у вас еще есть интернет.** Будь то ручное обновление или автоматическое обновление, убедитесь, что ваше программное обеспечение и контент обновлены до последней версии, прежде чем выйдете в место без подключения. Когда вы оффлайн, у вас будут последние синхронизированные версии всего, готовые к использованию.
+
+**[Проверить обновления →](/settings/update)** · **[Узнайте, что нового в каждой версии →](/docs/release-notes)**

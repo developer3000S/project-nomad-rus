@@ -35,7 +35,7 @@ export default function AppLayout({
             )}
           >
             <IconArrowLeft className="mr-2" size={24} />
-            <p className="text-lg text-text-secondary">Back to Home</p>
+            <p className="text-lg text-text-secondary">На главную</p>
           </Link>
         )}
       <div
@@ -56,7 +56,7 @@ export default function AppLayout({
             compact ? 'text-2xl' : 'text-5xl'
           )}
         >
-          Command Center
+          Центр управления
         </h1>
       </div>
       <hr className={

@@ -30,35 +30,35 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
 
   const navigation = [
     ...(aiAssistantInstallStatus.isInstalled ? [{ name: aiAssistantName, href: '/settings/models', icon: IconWand, current: false }] : []),
-    { name: 'Supply Depot', href: '/supply-depot', icon: IconBox, current: false },
-    { name: 'Benchmark', href: '/settings/benchmark', icon: IconChartBar, current: false },
-    { name: 'Content Explorer', href: '/settings/zim/remote-explorer', icon: IconZoom, current: false },
-    { name: 'Content Manager', href: '/settings/zim', icon: IconFolder, current: false },
-    ...(creatorPacksConfigured ? [{ name: 'Creator Packs', href: '/settings/creator-packs', icon: IconMovie, current: false }] : []),
-    { name: 'Maps Manager', href: '/settings/maps', icon: IconMapRoute, current: false },
+    { name: 'Склад снаряжения', href: '/supply-depot', icon: IconBox, current: false },
+    { name: 'Тест производительности', href: '/settings/benchmark', icon: IconChartBar, current: false },
+    { name: 'Обзор контента', href: '/settings/zim/remote-explorer', icon: IconZoom, current: false },
+    { name: 'Менеджер контента', href: '/settings/zim', icon: IconFolder, current: false },
+    ...(creatorPacksConfigured ? [{ name: 'Пакеты создателей', href: '/settings/creator-packs', icon: IconMovie, current: false }] : []),
+    { name: 'Менеджер карт', href: '/settings/maps', icon: IconMapRoute, current: false },
     {
-      name: 'Service Logs & Metrics',
+      name: 'Логи и метрики сервисов',
       href: getServiceLink('9999'),
       icon: IconDashboard,
       current: false,
       target: '_blank',
     },
     {
-      name: 'Check for Updates',
+      name: 'Проверить обновления',
       href: '/settings/update',
       icon: IconArrowBigUpLines,
       current: false,
     },
-    { name: 'System', href: '/settings/system', icon: IconSettings, current: false },
-    { name: 'Advanced', href: '/settings/advanced', icon: IconAdjustments, current: false },
-    { name: 'API Reference', href: '/reference', icon: IconCode, current: false },
-    { name: 'Support the Project', href: '/settings/support', icon: IconHeart, current: false },
-    { name: 'Legal Notices', href: '/settings/legal', icon: IconGavel, current: false },
+    { name: 'Система', href: '/settings/system', icon: IconSettings, current: false },
+    { name: 'Расширенные', href: '/settings/advanced', icon: IconAdjustments, current: false },
+    { name: 'Справочник API', href: '/reference', icon: IconCode, current: false },
+    { name: 'Поддержать проект', href: '/settings/support', icon: IconHeart, current: false },
+    { name: 'Правовые уведомления', href: '/settings/legal', icon: IconGavel, current: false },
   ]
 
   return (
     <div className="min-h-screen flex flex-row bg-surface-secondary/90">
-      <StyledSidebar title="Settings" items={navigation} />
+      <StyledSidebar title="Настройки" items={navigation} />
       {children}
     </div>
   )

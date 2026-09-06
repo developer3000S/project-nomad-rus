@@ -26,10 +26,10 @@ import { SERVICE_NAMES } from '../../constants/service_names'
 
 // Maps is a Core Capability (display_order: 4)
 const MAPS_ITEM = {
-  label: 'Maps',
+  label: 'Карты',
   to: '/maps',
   target: '',
-  description: 'View offline maps',
+  description: 'Просмотр офлайн-карт',
   icon: <IconMapRoute size={48} />,
   installed: true,
   displayOrder: 4,
@@ -40,10 +40,10 @@ const MAPS_ITEM = {
 // icon and displayOrder here are a reasonable default; both are open for the
 // maintainer to re-pick to fit the dashboard's ordering conventions.
 const DRUG_REFERENCE_ITEM = {
-  label: 'Drug Reference',
+  label: 'Справочник лекарств',
   to: '/drug-reference',
   target: '',
-  description: 'Offline FDA drug labels — search by drug name, or by situation (burn, fever, diarrhea)',
+  description: 'Офлайн-справочник лекарств FDA — поиск по названию или ситуации (ожог, жар, диарея)',
   icon: <IconPill size={48} />,
   installed: true,
   displayOrder: 5,
@@ -53,41 +53,41 @@ const DRUG_REFERENCE_ITEM = {
 // System items shown after all apps
 const SYSTEM_ITEMS = [
   {
-    label: 'Easy Setup',
+    label: 'Быстрая настройка',
     to: '/easy-setup',
     target: '',
     description:
-      'Not sure where to start? Use the setup wizard to quickly configure your NOMAD!',
+      'Не знаете с чего начать? Используйте мастер настройки для быстрой конфигурации НОМАД!',
     icon: <IconBolt size={48} />,
     installed: true,
     displayOrder: 50,
     poweredBy: null,
   },
   {
-    label: 'Supply Depot',
+    label: 'Склад снаряжения',
     to: '/supply-depot',
     target: '',
-    description: 'Browse and install curated apps, or add your own Docker container',
+    description: 'Просматривайте и устанавливайте приложения или добавляйте собственные Docker-контейнеры',
     icon: <IconBox size={48} />,
     installed: true,
     displayOrder: 51,
     poweredBy: null,
   },
   {
-    label: 'Docs',
+    label: 'Документация',
     to: '/docs/home',
     target: '',
-    description: 'Read Project NOMAD manuals and guides',
+    description: 'Читайте руководства и инструкции Project NOMAD',
     icon: <IconHelp size={48} />,
     installed: true,
     displayOrder: 52,
     poweredBy: null,
   },
   {
-    label: 'Settings',
+    label: 'Настройки',
     to: '/settings/system',
     target: '',
-    description: 'Configure your NOMAD settings',
+    description: 'Настройте параметры вашего НОМАД',
     icon: <IconSettings size={48} />,
     installed: true,
     displayOrder: 53,
@@ -146,7 +146,7 @@ export default function Home(props: {
         target: '_blank',
         description:
           service.description ||
-          `Access the ${service.friendly_name || service.service_name} application`,
+          `Открыть приложение ${service.friendly_name || service.service_name}`,
         icon: service.icon ? (
           <DynamicIcon icon={service.icon as DynamicIconName} className="!size-12" />
         ) : (
@@ -176,18 +176,18 @@ export default function Home(props: {
 
   return (
     <AppLayout>
-      <Head title="Command Center" />
+      <Head title="Центр управления" />
       {
         updateInfo?.updateAvailable && (
           <div className='flex justify-center items-center p-4 w-full'>
             <Alert
-              title="An update is available for Project NOMAD!"
+              title="Доступно обновление для Project NOMAD!"
               type="info-inverted"
               variant="solid"
               className="w-full"
               buttonProps={{
                 variant: 'primary',
-                children: 'Go to Settings',
+                children: 'Перейти в настройки',
                 icon: 'IconSettings',
                 onClick: () => router.visit('/settings/update'),
               }}
@@ -200,8 +200,8 @@ export default function Home(props: {
         rerunBanner?.show && (
           <div className='flex justify-center items-center px-4 pt-4 w-full'>
             <Alert
-              title="Your benchmark can be re-scored with Score v2"
-              message="We've upgraded the benchmark scoring system. Re-run your benchmark to get an updated Score v2 result on the community leaderboard."
+              title="Ваш тест производительности можно пересчитать по системе Score v2"
+              message="Мы улучшили систему подсчёта результатов. Запустите тест повторно, чтобы получить обновлённый результат Score v2 в таблице лидеров сообщества."
               type="info-inverted"
               variant="solid"
               className="w-full"
@@ -209,7 +209,7 @@ export default function Home(props: {
               onDismiss={handleDismissRerunBanner}
               buttonProps={{
                 variant: 'primary',
-                children: 'Re-run benchmark',
+                children: 'Запустить тест повторно',
                 icon: 'IconRefresh',
                 onClick: () => router.visit('/settings/benchmark'),
               }}

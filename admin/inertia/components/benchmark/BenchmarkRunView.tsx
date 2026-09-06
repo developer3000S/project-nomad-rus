@@ -21,14 +21,14 @@ function StageHero({ run }: { run: BenchmarkRunHook }) {
   if (status === 'running_ai') {
     return (
       <div className={heroCard}>
-        <div className={title}><IconRobot className="w-4 h-4" /> AI Inference</div>
+        <div className={title}><IconRobot className="w-4 h-4" /> AI-инференс</div>
         <div className="flex-1 flex flex-col justify-center gap-4">
           <LiveReadout
             value={run.aiTokensPerSec}
             unit="tok/s"
-            label="Tokens per Second"
+            label="Токенов в секунду"
             size="lg"
-            sub={run.aiTtftMs !== null ? `First token in ${Math.round(run.aiTtftMs)} ms` : 'Waiting for first token...'}
+            sub={run.aiTtftMs !== null ? `Первый токен за ${Math.round(run.aiTtftMs)} мс` : 'Ожидание первого токена...'}
           />
           <div className="text-desert-green">
             <Sparkline data={run.aiTokHistory} height={64} />
@@ -39,13 +39,13 @@ function StageHero({ run }: { run: BenchmarkRunHook }) {
                 <IconChartBar className="w-4 h-4" /> GPU
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <LiveReadout value={run.gpuUtil} unit="%" label="Utilization" />
+                <LiveReadout value={run.gpuUtil} unit="%" label="Загрузка" />
                 <LiveReadout
                   value={run.gpuVramUsedMb !== null ? run.gpuVramUsedMb / 1024 : null}
                   unit="GB"
                   label={
                     run.gpuVramTotalMb !== null
-                      ? `VRAM (of ${(run.gpuVramTotalMb / 1024).toFixed(1)} GB)`
+                      ? `VRAM (из ${(run.gpuVramTotalMb / 1024).toFixed(1)} ГБ)`
                       : 'VRAM'
                   }
                 />
@@ -64,12 +64,12 @@ function StageHero({ run }: { run: BenchmarkRunHook }) {
     const hasInTest = run.diskMibs !== null
     return (
       <div className={heroCard}>
-        <div className={title}><IconServer className="w-4 h-4" /> {isRead ? 'Disk Read' : 'Disk Write'}</div>
+        <div className={title}><IconServer className="w-4 h-4" /> {isRead ? 'Чтение диска' : 'Запись диска'}</div>
         <div className="flex-1 flex flex-col justify-center gap-4">
           <LiveReadout
             value={hasInTest ? run.diskMibs : isRead ? run.diskReadMbs : run.diskWriteMbs}
             unit="MB/s"
-            label={hasInTest ? 'Benchmark throughput' : 'System disk activity'}
+            label={hasInTest ? 'Пропускная способность теста' : 'Системная активность диска'}
             size="lg"
           />
           <div className="text-desert-olive">
@@ -86,11 +86,11 @@ function StageHero({ run }: { run: BenchmarkRunHook }) {
   if (status === 'calculating_score') {
     return (
       <div className={heroCard}>
-        <div className={title}><IconChartBar className="w-4 h-4" /> Compiling Report</div>
+        <div className={title}><IconChartBar className="w-4 h-4" /> Формирование отчёта</div>
         <div className="flex-1 flex items-center justify-center">
           <div className="flex items-center gap-3 text-desert-green">
             <div className="animate-spin h-6 w-6 border-2 border-desert-green border-t-transparent rounded-full" />
-            <span className="text-lg font-medium">Calculating your NOMAD Score...</span>
+            <span className="text-lg font-medium">Вычисление оценки НОМАД...</span>
           </div>
         </div>
       </div>
@@ -100,11 +100,11 @@ function StageHero({ run }: { run: BenchmarkRunHook }) {
   if (status === 'detecting_hardware' || status === 'starting' || status === null) {
     return (
       <div className={heroCard}>
-        <div className={title}><IconCpu className="w-4 h-4" /> Identifying Hardware</div>
+        <div className={title}><IconCpu className="w-4 h-4" /> Определение оборудования</div>
         <div className="flex-1 flex items-center justify-center">
           <div className="flex items-center gap-3 text-desert-stone-dark">
             <div className="animate-spin h-6 w-6 border-2 border-desert-green border-t-transparent rounded-full" />
-            <span className="text-lg font-medium">Detecting your system...</span>
+            <span className="text-lg font-medium">Определение вашей системы...</span>
           </div>
         </div>
       </div>
@@ -115,13 +115,13 @@ function StageHero({ run }: { run: BenchmarkRunHook }) {
   return (
     <div className={heroCard}>
       <div className={title}>
-        <IconCpu className="w-4 h-4" /> {status === 'running_memory' ? 'Memory Throughput' : 'CPU Load'}
+        <IconCpu className="w-4 h-4" /> {status === 'running_memory' ? 'Пропускная способность памяти' : 'Нагрузка на CPU'}
       </div>
       <div className="flex-1 flex flex-col justify-center">
         <CoreGrid loads={run.perCore} />
         {status === 'running_cpu' && run.cpuEventsPerSec !== null && (
           <div className="mt-4 space-y-2">
-            <LiveReadout value={run.cpuEventsPerSec} unit="ev/s" label="Events per second" />
+            <LiveReadout value={run.cpuEventsPerSec} unit="ev/s" label="Событий в секунду" />
             <div className="text-desert-olive">
               <Sparkline data={run.cpuEventsHistory} height={48} />
             </div>

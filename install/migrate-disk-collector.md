@@ -1,30 +1,30 @@
-# Project NOMAD — About the Disk Collector Migration Script
+# Проект NOMAD — О миграции скрипта сбора информации о диске
 
-This script migrates your Project NOMAD installation from the old host-based disk info collector to the new disk-collector sidecar. It modifies `/opt/project-nomad/compose.yml` to add the new service and remove the old bind mount, then restarts the full compose stack to apply the changes.
+Этот скрипт мигрирует вашу установку Project NOMAD с устаревшего хост-ориентированного сборщика информации о диске на новый sidecar disk-collector. Он изменяет `/opt/project-nomad/compose.yml`, чтобы добавить новую службу и удалить старую привязку монтирования, а затем перезапускает весь стек compose для применения изменений.
 
-### Why the Migration?
-The new disk-collector sidecar provides a more robust and scalable way to collect disk information from the host. It removes the original bind mount to `/tmp/nomad-disk-info.json`, which was fragile and prone to issues on host reboots.
+### Почему нужна миграция?
+Новый sidecar disk-collector предоставляет более надежный и масштабируемый способ сбора информации о дисках с хоста. Он удаляет оригинальную привязку монтирования к `/tmp/nomad-disk-info.json`, которая была хрупкой и склонной к проблемам при перезагрузке хоста.
 
-The original host-based collector relied on a process running on the host that wrote disk info to a file, which was then read by the admin container via a bind mount. This approach had several drawbacks:
-- The host process could fail or be killed, leading to stale or missing disk info.
-- The bind mount to `/tmp/nomad-disk-info.json` was cleared on host reboots, causing Docker to create a directory at the mount point instead of a file.
-- Necessitated a tighter coupling to the host, which would make more flexible future deployment options tougher to achieve.
+Оригинальный хост-ориентированный сборщик информации о дисках полагался на процесс, работающий на хосте, который записывал информацию о дисках в файл, который затем считывался контейнером администратора через привязку монтирования. Этот подход имел несколько недостатков:
+- Процесс на хосте мог завершиться или быть убит, что приводило к устаревшей или отсутствующей информации о дисках.
+- Привязка монтирования к `/tmp/nomad-disk-info.json` очищалась при перезагрузке хоста, что заставляло Docker создавать каталог в точке монтирования вместо файла.
+- Требует более тесной связи с хостом, что усложняет более гибкие будущие варианты развертывания.
 
-The migration script automates the necessary changes to your compose configuration and ensures a smooth transition to the new architecture.
+Скрипт миграции автоматизирует необходимые изменения в вашей конфигурации compose и обеспечивает плавный переход к новой архитектуре.
 
-### Why does NOMAD need the nomad-disk-info.json file?
-NOMAD uses the disk info stored and updated in `nomad-disk-info.json` to allow users to view disk usage and availability within the NOMAD "Command Center". While not critical to the core functionality of NOMAD, it provides a more pleasant experience for users with limited storage space and/or who aren't familiar with command-line tools and Linux management.
+### Почему NOMAD нуждается в файле nomad-disk-info.json?
+NOMAD использует информацию о дисках, хранящуюся и обновляемую в `nomad-disk-info.json`, чтобы позволить пользователям просматривать использование и доступность дисков в "Центре команд NOMAD". Хотя это не критично для основной функциональности NOMAD, это предоставляет более приятный опыт для пользователей с ограниченным объемом хранилища и/или незнакомых с инструментами командной строки и управлением Linux.
 
-### Why a separate container?
-The disk-collector runs in a separate container to isolate its functionality from the main admin container. This separation provides several benefits:
-- **Stability**: If the disk-collector encounters an issue or crashes, it won't affect the main admin container and vice versa.
-- **Security**: The main admin container already has significant host access via the Docker socket, storage directory, and host.docker.internal. Additionally, NOMAD may add more features in the future that support multi-user environments and/or more network exposure, so isolating the disk-collector reduces the exposure of the host filesystem (even if read-only) to just the one container, which has a very limited scope of functionality and access.
-- **Modularity**: Because having the host disk info is not a critical component of NOMAD's core functionality, isolating it in a sidecar allows users who don't need/want the disk info features to simply not run that container, without impacting the main admin container or other services. It also allows for more flexible future development of the disk-collector without needing to modify the main admin container.
+### Почему отдельный контейнер?
+Сборщик информации о дисках работает в отдельном контейнере для изоляции его функциональности от основного контейнера администратора. Это разделение предоставляет несколько преимуществ:
+- **Стабильность**: Если сборщик информации о дисках сталкивается с проблемой или падает, это не влияет на основной контейнер администратора и наоборот.
+- **Безопасность**: Основной контейнер администратора уже имеет значительный доступ к хосту через Docker-сокет, каталог хранения и host.docker.internal. Кроме того, в будущем NOMAD может добавить больше функций, поддерживающих многопользовательские среды и/или большее взаимодействие по сети, поэтому изоляция сборщика информации о дисках уменьшает экспозицию файловой системы хоста (даже если она доступна только для чтения) только для одного контейнера, который имеет очень ограниченную область функциональности и доступа.
+- **Модульность**: Поскольку информация о дисках хоста не является критически важной частью основной функциональности NOMAD, изоляция ее в sidecar позволяет пользователям, которые не нуждаются/не хотят в функциях информации о дисках, просто не запускать этот контейнер, не влияя на основной контейнер администратора или другие службы. Это также позволяет более гибко развивать сборщик информации о дисках в будущем без необходимости модифицировать основной контейнер администратора.
 
-### What if I don't want to run the migration script?
-No worries - you can replicate the changes manually by editing your `/opt/project-nomad/compose.yml` to add the new disk-collector service and remove the old bind mount from the admin service, then restarting your compose stack. The migration script just automates these steps and ensures they're done correctly, but the underlying changes are straightforward if you prefer to do it yourself. Just be sure to back up your `compose.yml` before making any changes.
+### Что, если я не хочу запускать скрипт миграции?
+Не беспокойтесь — вы можете воссоздать изменения вручную, отредактировав свой `/opt/project-nomad/compose.yml`, чтобы добавить новую службу disk-collector и удалить старую привязку монтирования из службы администратора, а затем перезапустив стек compose. Скрипт миграции просто автоматизирует эти шаги и обеспечивает их правильное выполнение, но сами изменения достаточно просты, если вы предпочитаете сделать это самостоятельно. Просто убедитесь, что вы сделали резервную копию вашего `compose.yml` перед внесением любых изменений.
 
-Here's the disk-collector service configuration to add to your `compose.yml`:
+Вот конфигурация службы disk-collector, которую нужно добавить в ваш `compose.yml`:
 
 ```yml
   disk-collector:
@@ -33,8 +33,8 @@ Here's the disk-collector service configuration to add to your `compose.yml`:
     container_name: nomad_disk_collector
     restart: unless-stopped
     volumes:
-      - /:/host:ro,rslave  # Read-only view of host FS with rslave propagation so /sys and /proc submounts are visible
+      - /:/host:ro,rslave  # Только для чтения представление файловой системы хоста с rslave распространением, чтобы подмонтирования /sys и /proc были видны
       - /opt/project-nomad/storage:/storage
 ```
 
-and remove the `- /tmp/nomad-disk-info.json:/app/storage/nomad-disk-info.json` bind mount from the admin service volumes.
+и удалите привязку монтирования `- /tmp/nomad-disk-info.json:/app/storage/nomad-disk-info.json` из томов службы администратора.

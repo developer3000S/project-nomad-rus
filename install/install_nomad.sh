@@ -56,12 +56,12 @@ header_red() {
 
 check_has_sudo() {
   if sudo -n true 2>/dev/null; then
-    echo -e "${GREEN}#${RESET} User has sudo permissions.\\n"
+    echo -e "${GREEN}#${RESET} Пользователь имеет права sudo.\\n"
   else
-    echo "User does not have sudo permissions"
+    echo "Пользователь не имеет прав sudo"
     header_red
-    echo -e "${RED}#${RESET} This script requires sudo permissions to run. Please run the script with sudo.\\n"
-    echo -e "${RED}#${RESET} For example: sudo bash $(basename "$0")"
+    echo -e "${RED}#${RESET} Для запуска этого скрипта необходимы права sudo. Запустите скрипт с sudo.\\n"
+    echo -e "${RED}#${RESET} Например: sudo bash $(basename "$0")"
     exit 1
   fi
 }
@@ -69,36 +69,36 @@ check_has_sudo() {
 check_is_bash() {
   if [[ -z "$BASH_VERSION" ]]; then
     header_red
-    echo -e "${RED}#${RESET} This script requires bash to run. Please run the script using bash.\\n"
-    echo -e "${RED}#${RESET} For example: bash $(basename "$0")"
+    echo -e "${RED}#${RESET} Для запуска этого скрипта необходим bash. Запустите скрипт с использованием bash.\\n"
+    echo -e "${RED}#${RESET} Например: bash $(basename "$0")"
     exit 1
   fi
-    echo -e "${GREEN}#${RESET} This script is running in bash.\\n"
+    echo -e "${GREEN}#${RESET} Скрипт запущен в bash.\\n"
 }
 
 check_is_debian_based() {
   if [[ ! -f /etc/debian_version ]]; then
     header_red
-    echo -e "${RED}#${RESET} This script is designed to run on Debian-based systems only.\\n"
-    echo -e "${RED}#${RESET} Please run this script on a Debian-based system and try again."
+    echo -e "${RED}#${RESET} Этот скрипт предназначен только для систем на основе Debian.\\n"
+    echo -e "${RED}#${RESET} Запустите этот скрипт на системе на основе Debian и попробуйте снова."
     exit 1
   fi
-    echo -e "${GREEN}#${RESET} This script is running on a Debian-based system.\\n"
+    echo -e "${GREEN}#${RESET} Скрипт запущен на системе на основе Debian.\\n"
 }
 
 check_is_x86_64() {
   local arch
   arch="$(uname -m)"
   if [[ "${arch}" != "x86_64" && "${arch}" != "amd64" ]]; then
-    echo -e "${YELLOW}#${RESET} WARNING: Detected architecture '${arch}'. NOMAD officially supports x86_64 only.\\n"
-    echo -e "${YELLOW}#${RESET} ARM64/aarch64 support is tracked in PR #419 and is not yet ready.\\n"
-    echo -e "${YELLOW}#${RESET} Continuing on an unsupported architecture will likely fail and may leave\\n"
-    echo -e "${YELLOW}#${RESET} partial Docker images and files behind that you'll need to clean up manually.\\n"
-    echo -e "${YELLOW}#${RESET} Continuing in 10 seconds... press Ctrl+C now to abort.\\n"
+    echo -e "${YELLOW}#${RESET} ПРЕДУПРЕЖДЕНИЕ: Обнаружена архитектура '${arch}'. NOMAD официально поддерживает только x86_64.\\n"
+    echo -e "${YELLOW}#${RESET} Поддержка ARM64/aarch64 отслеживается в PR #419 и ещё не готова.\\n"
+    echo -e "${YELLOW}#${RESET} Продолжение работы на неподдерживаемой архитектуре, скорее всего, завершится сбоем и может оставить\\n"
+    echo -e "${YELLOW}#${RESET} частично загруженные образы Docker и файлы, которые потребуется очистить вручную.\\n"
+    echo -e "${YELLOW}#${RESET} Продолжение через 10 секунд... нажмите Ctrl+C для отмены.\\n"
     sleep 10
     return
   fi
-  echo -e "${GREEN}#${RESET} Architecture check passed (${arch}).\\n"
+  echo -e "${GREEN}#${RESET} Проверка архитектуры пройдена (${arch}).\\n"
 }
 
 ensure_dependencies_installed() {

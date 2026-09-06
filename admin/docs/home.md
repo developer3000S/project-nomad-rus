@@ -1,85 +1,85 @@
-# Welcome to Project NOMAD
+# Добро пожаловать в Project NOMAD
 
-Your personal offline knowledge server is ready to use.
+Ваш персональный оффлайн-сервер знаний готов к использованию.
 
-## What is NOMAD?
+## Что такое NOMAD?
 
-**NOMAD** is an offline-first knowledge and education server. It's your personal server for accessing knowledge, education, and AI assistance — even when you have no internet connection.
+**NOMAD** — это оффлайн-ориентированный сервер знаний и образования. Это ваш персональный сервер для доступа к знаниям, образованию и помощи AI — даже когда у вас нет подключения к интернету.
 
-Think of it as having Wikipedia, Khan Academy, an AI assistant, and offline maps all in one place, running on hardware you control.
+Представьте, что у вас есть Википедия, Khan Academy, AI-ассистент и оффлайн-карты в одном месте, работающие на оборудовании, которое вы контролируете.
 
-![Command Center Dashboard](/docs/dashboard.webp)
+![Панель управления Command Center](/docs/dashboard.webp)
 
-## What Can You Do?
+## Что вы можете сделать?
 
-### Browse Offline Knowledge
-Access millions of Wikipedia articles, medical references, how-to guides, and ebooks — all stored locally on your server. No internet required.
+### Просматривать знания оффлайн
+Доступ к миллионам статей Википедии, медицинским справочникам, руководствам по эксплуатации и электронным книгам — все хранится локально на вашем сервере. Интернет не требуется.
 
-*Launch the Information Library from the home screen or the [Supply Depot](/supply-depot).*
+*Запустите Информационную библиотеку с домашнего экрана или [Supply Depot](/supply-depot).*
 
-### Learn Something New
-Khan Academy courses covering math, science, economics, and more. Complete with videos and exercises, all available offline.
+### Узнать что-то новое
+Курсы Khan Academy по математике, науке, экономике и многому другому. С видео и упражнениями, все доступны оффлайн.
 
-*Launch the Education Platform from the home screen or the [Supply Depot](/supply-depot).*
+*Запустите Платформу образования с домашнего экрана или [Supply Depot](/supply-depot).*
 
-### Chat with AI
-Ask questions, get explanations, brainstorm ideas, or get help with writing. Your local AI assistant works completely offline — and you can upload documents to the Knowledge Base for document-aware responses.
+### Общаться с AI
+Задавайте вопросы, получайте объяснения, разрабатывайте идеи или получайте помощь с написанием. Ваш локальный AI-ассистент работает полностью оффлайн — и вы можете загружать документы в Базу знаний для ответов, основанных на документах.
 
-**[Open AI Chat →](/chat)**
+**[Открыть чат AI →](/chat)**
 
-### Upload Documents to the Knowledge Base
-Upload PDFs, text files, and other documents for the AI to reference. The Knowledge Base uses semantic search to find relevant information from your uploaded documents when you ask questions.
+### Загружать документы в Базу знаний
+Загружайте PDF, текстовые файлы и другие документы для ссылки AI. База знаний использует семантический поиск для поиска релевантной информации из ваших загруженных документов, когда вы задаете вопросы.
 
-**[Open Knowledge Base →](/knowledge-base)**
+**[Открыть Базу знаний →](/knowledge-base)**
 
-### View Offline Maps
-Navigate and explore maps without an internet connection. Download regions you need before going offline.
+### Просматривать оффлайн-карты
+Навигация и исследование карт без подключения к интернету. Загружайте регионы, которые вам нужны, перед тем, как выйдете оффлайн.
 
-**[Open Maps →](/maps)**
+**[Открыть карты →](/maps)**
 
-### Benchmark Your Hardware
-Run a System Benchmark to see how your hardware performs and compare your NOMAD Score with the community leaderboard.
+### Тестировать производительность вашего оборудования
+Запустите Системный бенчмарк, чтобы увидеть, как работает ваше оборудование, и сравните ваш NOMAD Score с лидербордом сообщества.
 
-**[Open Benchmark →](/settings/benchmark)**
-
----
-
-## Getting Started
-
-**New to NOMAD?** Use the Easy Setup wizard to configure your server and download content collections.
-
-**[Run Easy Setup →](/easy-setup)**
-
-Or explore the **[Getting Started Guide](/docs/getting-started)** for a walkthrough of all features.
+**[Открыть бенчмарк →](/settings/benchmark)**
 
 ---
 
-## Quick Links
+## Начало работы
 
-| I want to... | Go here |
+**Новичок в NOMAD?** Используйте мастер настройки Easy Setup для настройки вашего сервера и загрузки коллекций контента.
+
+**[Запустить Easy Setup →](/easy-setup)**
+
+Или изучите **[Руководство по началу работы](/docs/getting-started)** для обзора всех функций.
+
+---
+
+## Быстрые ссылки
+
+| Я хочу... | Перейти сюда |
 |--------------|---------|
-| Chat with the AI | [AI Chat →](/chat) |
-| Upload documents for AI | [Knowledge Base →](/knowledge-base) |
-| Install more apps | [Supply Depot →](/supply-depot) |
-| Add Wikipedia/reference content | [Content Explorer →](/settings/zim/remote-explorer) |
-| Manage installed content | [Content Manager →](/settings/zim) |
-| Download map regions | [Maps Manager →](/settings/maps) |
-| Run a benchmark | [System Benchmark →](/settings/benchmark) |
-| Check for updates | [System Update →](/settings/update) |
-| View system status | [System Info →](/settings/system) |
+| Поговорить с AI | [Чат AI →](/chat) |
+| Загрузить документы для AI | [База знаний →](/knowledge-base) |
+| Установить больше приложений | [Supply Depot →](/supply-depot) |
+| Добавить контент Википедии/справочников | [Обозреватель контента →](/settings/zim/remote-explorer) |
+| Управлять установленным контентом | [Менеджер контента →](/settings/zim) |
+| Загрузить регионы карт | [Менеджер карт →](/settings/maps) |
+| Запустить бенчмарк | [Системный бенчмарк →](/settings/benchmark) |
+| Проверить обновления | [Обновление системы →](/settings/update) |
+| Просмотреть статус системы | [Информация о системе →](/settings/system) |
 
 ---
 
-## Keeping Your Server Updated
+## Обновление вашего сервера
 
-NOMAD works best when kept up to date while you have internet access. This ensures you have the latest:
-- Software features and bug fixes
-- Wikipedia and reference content
-- Educational materials
-- AI model improvements
+NOMAD работает лучше всего, когда он обновляется в текущем состоянии, пока у вас есть интернет, чтобы он был готов с последними версиями программного обеспечения и контента в следующий раз, когда вы окажетесь без подключения. Это обеспечивает у вас:
+- Последние функции и исправления ошибок программного обеспечения
+- Последние версии Википедии и справочников
+- Образовательные материалы
+- Улучшения модели AI
 
-When you go offline, you'll have everything you need — the last synced versions of all your content.
+Когда вы оффлайн, у вас будет все необходимое — последние синхронизированные версии всего вашего контента.
 
-You can update on demand, or turn on **automatic updates** so NOMAD keeps its software, apps, and content current on its own while you have internet. See the **[Updates guide](/docs/updates)** for how it works.
+Вы можете обновляться по требованию, или включить **автоматические обновления**, чтобы NOMAD обновлял свое программное обеспечение, приложения и контент самостоятельно, пока у вас есть интернет. См. **[Руководство по обновлениям](/docs/updates)** для того, как это работает.
 
-**[Check for Updates →](/settings/update)**
+**[Проверить обновления →](/settings/update)**

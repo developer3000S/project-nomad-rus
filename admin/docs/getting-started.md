@@ -1,286 +1,284 @@
-# Getting Started with NOMAD
+# Начало работы с NOMAD
 
-This guide will help you get the most out of your NOMAD server.
+Это руководство поможет вам получить максимальную отдачу от вашего сервера NOMAD.
 
 ---
 
-## System Requirements
+## Системные требования
 
-If you already have NOMAD running, you can skip this section. It is here for when you are planning a second server, moving to different hardware, or helping someone else get set up.
+Если у вас уже запущен NOMAD, вы можете пропустить этот раздел. Он здесь для тех, кто планирует второй сервер, переходит на другое оборудование или помогает кому-то другому настроить систему.
 
-### Operating System
+### Операционная система
 
-NOMAD runs on Debian-based Linux.
+NOMAD работает на Linux на базе Debian.
 
-| Support level | Operating system |
+| Уровень поддержки | Операционная система |
 |---|---|
-| **Recommended** | Ubuntu 26.04 LTS |
-| **Also supported** | Ubuntu 24.04 LTS, Debian 12 |
-| **Community-supported** | Windows via WSL2, other Debian derivatives |
+| **Рекомендуется** | Ubuntu 26.04 LTS |
+| **Также поддерживается** | Ubuntu 24.04 LTS, Debian 12 |
+| **Поддержка сообщества** | Windows через WSL2, другие производные Debian |
 
-Ubuntu 26.04 LTS is the version we test on and the one we recommend for new installs. If you are already running 24.04 LTS or Debian 12, there is no need to reinstall, both are still supported.
+Ubuntu 26.04 LTS — это версия, которую мы тестируем, и которую мы рекомендуем для новых установок. Если вы уже используете 24.04 LTS или Debian 12, нет необходимости переустанавливать, обе версии все еще поддерживаются.
 
-Ubuntu Desktop is the friendlier choice if you are coming from Windows or macOS. Ubuntu Server works just as well if you are comfortable at the terminal, and NOMAD does not need a desktop environment either way since everything is accessed through a browser.
+Ubuntu Desktop — более дружелюбный выбор, если вы переходите с Windows или macOS. Ubuntu Server работает так же хорошо, если вы комфортно чувствуете себя в терминале, и NOMAD не нуждается в графическом окружении рабочего стола в любом случае, так как доступ ко всему осуществляется через браузер.
 
-macOS and non-Debian distributions like Fedora or Arch are not officially supported.
+macOS и дистрибутивы, отличные от Debian, такие как Fedora или Arch, официально не поддерживаются.
 
-### Hardware
+### Оборудование
 
-NOMAD itself is lightweight. What drives your requirements is the content and tools you choose to install, and whether you want to run AI locally.
+NOMAD сам по себе легковесный. Требования определяются контентом и инструментами, которые вы выбираете для установки, а также тем, хотите ли вы запускать AI локально.
 
-**Minimum, without local AI:**
+**Минимальные требования, без локального AI:**
 
-- 2 GHz dual-core processor
-- 4 GB RAM
-- 5 GB free disk space, plus room for whatever content you download
+- Двухъядерный процессор 2 ГГц
+- 4 ГБ ОЗУ
+- 5 ГБ свободного места на диске, плюс место для загружаемого контента
 
-**Recommended, with local AI:**
+**Рекомендуемые требования, с локальным AI:**
 
-- AMD Ryzen 7 or Intel Core i7 or better
-- 32 GB RAM
-- NVIDIA RTX 3060 or AMD equivalent, more VRAM lets you run larger models
-- 250 GB or more of free disk space, preferably an SSD
+- AMD Ryzen 7 или Intel Core i7 или лучше
+- 32 ГБ ОЗУ
+- NVIDIA RTX 3060 или эквивалент от AMD, больший объем VRAM позволяет запускать более крупные модели
+- 250 ГБ или больше свободного места на диске, желательно SSD
 
-A stable internet connection is required during installation only. After that, NOMAD is designed to run fully offline.
+Стабильное интернет-соединение требуется только во время установки. После этого NOMAD разработан для полностью автономной работы.
 
-### A note on GPU drivers
+### Примечание о драйверах GPU
 
-The installer sets up Docker and the NVIDIA Container Toolkit for you, but it does **not** install the GPU driver itself. You need that on the host beforehand.
+Установщик настраивает Docker и NVIDIA Container Toolkit, но он **не** устанавливает сам драйвер GPU. Вам нужно установить его заранее на хосте.
 
-On Ubuntu, the easiest way is to check **"Install third-party drivers for graphics and Wi-Fi hardware"** during setup. If you skipped that, or you added the GPU later, install the driver first and then use **Force Reinstall** on the AI Assistant in the [Supply Depot](/supply-depot) to pick it up.
+В Ubuntu самый простой способ — установить флажок **«Установить сторонние драйверы для графического оборудования и оборудования Wi-Fi»** во время установки. Если вы пропустили это, или добавили GPU позже, сначала установите драйвер, а затем используйте **Force Reinstall** на AI Assistant в [Supply Depot](/supply-depot), чтобы он его обнаружил.
 
-Without a GPU, the AI Assistant still works. It just runs on the CPU, which is considerably slower.
-
----
-
-## Easy Setup Wizard
-
-If this is your first time using NOMAD, the Easy Setup wizard will help you get everything configured.
-
-**[Launch Easy Setup →](/easy-setup)**
-
-![Easy Setup Wizard — Step 1: Choose your capabilities](/docs/easy-setup-step1.webp)
-
-The wizard walks you through four simple steps:
-1. **Capabilities** — Choose what to enable: Information Library, AI Assistant, Education Platform, Maps, Data Tools, and Notes
-2. **Maps** — Select geographic regions for offline maps
-3. **Content** — Choose curated content collections with Essential, Standard, or Comprehensive tiers
-
-![Content tiers — Essential, Standard, and Comprehensive](/docs/easy-setup-tiers.webp)
-4. **Review** — Confirm your selections and start downloading
-
-Depending on what you selected, downloads may take a while. You can monitor progress in the Settings area, continue using features that are already installed, or leave your server running overnight for large downloads.
+Без GPU AI Assistant все равно работает. Он просто работает на CPU, что значительно медленнее.
 
 ---
 
-## Understanding Your Tools
+## Мастер Easy Setup
 
-### Information Library — Offline Knowledge (Kiwix)
+Если это ваш первый опыт работы с NOMAD, мастер Easy Setup поможет вам настроить все.
 
-The Information Library stores compressed versions of websites and references that work without internet.
+**[Запустить Easy Setup →](/easy-setup)**
+![Мастер Easy Setup — Шаг 1: Выберите возможности](/docs/easy-setup-step1.webp)
 
-**What's included:**
-- Full Wikipedia (millions of articles)
-- Medical references and first aid guides
-- How-to guides and survival information
-- Classic books from Project Gutenberg
+Мастер проведет вас через четыре простых шага:
+1. **Возможности** — Выберите, что включить: Информационная библиотека, AI Assistant, Платформа образования, Карты, Инструменты данных и Заметки
+2. **Карты** — Выберите географические регионы для оффлайн-карт
+3. **Контент** — Выберите курируемые коллекции контента с уровнями Essential, Standard или Comprehensive
 
-**How to use it:**
-1. Click **Information Library** from the Command Center home screen or the [Supply Depot](/supply-depot)
-2. Choose a collection (like Wikipedia)
-3. Search or browse just like the regular website
+![Уровни контента — Essential, Standard и Comprehensive](/docs/easy-setup-tiers.webp)
+4. **Обзор** — Подтвердите свои выборы и начните загрузку
 
----
-
-### Education Platform — Offline Courses (Kolibri)
-
-The Education Platform provides complete educational courses that work offline.
-
-**What's included:**
-- Khan Academy video courses
-- Math, science, reading, and more
-- Progress tracking for learners
-- Works for all ages
-
-**How to use it:**
-1. Click **Education Platform** from the Command Center home screen or the [Supply Depot](/supply-depot)
-2. Sign in or create a learner account
-3. Browse courses and start learning
-
-**Tip:** Kolibri supports multiple users. Create accounts for each family member to track individual progress.
+В зависимости от того, что вы выбрали, загрузки могут занять некоторое время. Вы можете отслеживать прогресс в разделе Настройки, продолжать использовать уже установленные функции или оставить сервер работать на ночь для больших загрузок.
 
 ---
 
-### AI Assistant — Built-in Chat
+## Понимание ваших инструментов
 
-![AI Chat interface](/docs/ai-chat.webp)
+### Информационная библиотека — Оффлайн-знания (Kiwix)
 
-NOMAD includes a built-in AI chat interface powered by Ollama. It runs entirely on your server — no internet needed, no data sent anywhere.
+Информационная библиотека хранит сжатые версии веб-сайтов и справочников, которые работают без интернета.
 
-**What can it do:**
-- Answer questions on any topic
-- Explain complex concepts simply
-- Help with writing and editing
-- Reference your uploaded documents via the Knowledge Base
-- Brainstorm ideas and assist with problem-solving
+**Что включено:**
+- Полная Википедия (миллионы статей)
+- Медицинские справочники и руководства по первой помощи
+- Как-делать руководства и информация по выживанию
+- Классические книги из Project Gutenberg
 
-**How to use it:**
-1. Click **AI Chat** from the Command Center or go to [Chat](/chat)
-2. Type your question or request
-3. The AI responds in conversational style
-
-**Tip:** Be specific in your questions. Instead of "tell me about plants," try "what vegetables grow well in shade?"
-
-**Note:** The AI Assistant must be installed first. Enable it during Easy Setup or install it from the [Supply Depot](/supply-depot).
-
-**GPU Acceleration:** If your server has an NVIDIA GPU, NOMAD's installer sets up GPU support for you (it installs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) and configures Docker automatically). You only need the NVIDIA driver present on the host, which on Ubuntu you get by enabling "Install third-party drivers" during setup. With a GPU, AI responses are dramatically faster (10-20x improvement). If you add a GPU later, go to the [Supply Depot](/supply-depot) and **Force Reinstall** the AI Assistant to enable it.
+**Как использовать:**
+1. Нажмите **Информационная библиотека** на домашнем экране Command Center или в [Supply Depot](/supply-depot)
+2. Выберите коллекцию (например, Википедию)
+3. Ищите или просматривайте, как на обычном веб-сайте
 
 ---
 
-### Knowledge Base — Document-Aware AI
+### Платформа образования — Оффлайн-курсы (Kolibri)
 
-![Knowledge Base upload interface](/docs/knowledge-base.webp)
+Платформа образования предоставляет полные образовательные курсы, которые работают оффлайн.
 
-The Knowledge Base lets you upload documents so the AI can reference them when answering your questions. It uses semantic search (RAG via Qdrant) to find relevant information from your uploaded files.
+**Что включено:**
+- Видеокурсы Khan Academy
+- Математика, наука, чтение и многое другое
+- Отслеживание прогресса обучающихся
+- Работает для всех возрастов
 
-**Supported file types:**
-- PDFs, text files, and other document formats
-- NOMAD documentation is automatically loaded when the AI Assistant is installed
+**Как использовать:**
+1. Нажмите **Платформа образования** на домашнем экране Command Center или в [Supply Depot](/supply-depot)
+2. Войдите или создайте учетную запись обучающегося
+3. Просматривайте курсы и начинайте учиться
 
-**How to use it:**
-1. Go to **[Knowledge Base →](/knowledge-base)**
-2. Upload your documents (PDFs, text files, etc.)
-3. Documents are processed and indexed automatically
-4. Ask questions in AI Chat — the AI will reference your uploaded documents when relevant
-5. Remove documents you no longer need — they'll be deleted from the index and local storage
-
-**Use cases:**
-- Upload emergency plans for quick reference during a crisis
-- Load technical manuals and SOPs for offline work sites
-- Add curriculum guides for homeschooling
-- Store research papers for academic work
+**Совет:** Kolibri поддерживает несколько пользователей. Создайте учетные записи для каждого члена семьи, чтобы отслеживать индивидуальный прогресс.
 
 ---
 
-### Maps — Offline Navigation
+### AI Assistant — Встроенный чат
 
-![Offline maps viewer](/docs/maps.webp)
+![Интерфейс AI Chat](/docs/ai-chat.webp)
 
-View maps without internet. Download the regions you need before going offline.
+NOMAD включает встроенный AI-интерфейс чата на базе Ollama. Он работает полностью на вашем сервере — не нужен интернет, данные никуда не отправляются.
 
-**How to use it:**
-1. Click **Maps** from the Command Center
-2. Navigate by dragging and zooming
-3. Search for locations using the search bar
+**Что он может делать:**
+- Отвечать на вопросы на любую тему
+- Объяснять сложные концепции простым языком
+- Помогать с написанием и редактированием
+- Ссылаться на ваши загруженные документы через Базу знаний
+- Генерировать идеи и помогать в решении проблем
 
-**To add more map regions:**
-1. Go to **Settings → Maps Manager**
-2. Select the regions you need
-3. Click Download
+**Как использовать:**
+1. Нажмите **AI Chat** на Command Center или перейдите в [Чат](/chat)
+2. Введите ваш вопрос или запрос
+3. AI отвечает в разговорном стиле
 
-**Tip:** Download maps for areas you travel to frequently, plus neighboring regions just in case.
+**Совет:** Будьте конкретны в своих вопросах. Вместо «расскажи мне о растениях» попробуйте «какие овощи хорошо растут в тени?»
 
-**[Open Maps →](/maps)**
+**Примечание:** AI Assistant должен быть сначала установлен. Включите его во время Easy Setup или установите из [Supply Depot](/supply-depot).
 
----
-
-## Managing Your Server
-
-### Adding More Content
-
-As your needs change, you can add more content anytime:
-
-- **More apps:** Settings → Supply Depot
-- **More references:** Settings → Content Explorer or Content Manager
-- **More map regions:** Settings → Maps Manager
-- **More educational content:** Through Kolibri's built-in content browser
-
-### Wikipedia Selector
-
-![Content Explorer — browse and download Wikipedia packages and curated collections](/docs/content-explorer.webp)
-
-NOMAD includes a dedicated Wikipedia content management tool for browsing and downloading Wikipedia packages.
-
-**How to use it:**
-1. Go to **[Content Explorer →](/settings/zim/remote-explorer)**
-2. Browse available Wikipedia packages by language and size
-3. Select and download the packages you want
-
-**Note:** Selecting a different Wikipedia package replaces the previously downloaded version. Only one Wikipedia selection is active at a time.
-
-### System Benchmark
-
-![System Benchmark with NOMAD Score and Builder Tag](/docs/benchmark.webp)
-
-Test your hardware performance and see how your NOMAD build stacks up against the community.
-
-**How to use it:**
-1. Go to **[System Benchmark →](/settings/benchmark)**
-2. Choose a benchmark type: Full, System Only, or AI Only
-3. View your NOMAD Score (a weighted composite of CPU, memory, disk, and AI performance)
-4. Create a Builder Tag (your NOMAD-themed identity, like "Tactical-Llama-1234")
-5. Share your results with the [community leaderboard](https://benchmark.projectnomad.us)
-
-**Note:** Only Full Benchmarks with AI data can be shared to the community leaderboard.
-
-### Keeping Things Updated
-
-While you have internet, periodically check for updates:
-
-1. Go to **Settings → Check for Updates**
-2. If updates are available, click to install
-3. Wait for the update to complete (your server will restart)
-
-Content updates (Wikipedia, maps, etc.) can be managed separately from software updates.
-
-**Automatic updates:** NOMAD can also keep itself current without you having to check. Software, installed apps, and content can each be set to update automatically on an opt-in basis, with safety checks and a time window you control. See the **[Updates guide](/docs/updates)** for the full picture.
-
-**Early Access Channel:** Want the latest features before they hit stable? Enable the Early Access Channel from the Check for Updates page to receive release candidate builds. You can switch back to stable anytime.
-
-### Monitoring System Health
-
-Check on your server anytime:
-
-1. Go to **Settings → System**
-2. View CPU, memory, and storage usage
-3. Check system uptime and status
+**Ускорение на GPU:** Если на вашем сервере есть GPU NVIDIA, установщик NOMAD настраивает для вас поддержку GPU (он устанавливает [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) и автоматически настраивает Docker). Вам нужен только драйвер NVIDIA на хосте, который в Ubuntu вы получаете, включив «Установить сторонние драйверы» во время установки. С GPU ответы AI значительно быстрее (улучшение в 10-20 раз). Если вы добавите GPU позже, перейдите в [Supply Depot](/supply-depot) и **Force Reinstall** AI Assistant, чтобы включить его.
 
 ---
 
-## Tips for Best Results
+### База знаний — AI с осведомленностью о документах
 
-### Before Going Offline
+![Интерфейс загрузки Базы знаний](/docs/knowledge-base.webp)
 
-- **Update everything** — Run software and content updates
-- **Download what you need** — Maps, references, educational content
-- **Test it** — Make sure features work while you still have internet to troubleshoot
+База знаний позволяет вам загружать документы, чтобы AI мог ссылаться на них при ответах на ваши вопросы. Она использует семантический поиск (RAG через Qdrant) для поиска релевантной информации из ваших загруженных файлов.
 
-### Storage Management
+**Поддерживаемые типы файлов:**
+- PDF, текстовые файлы и другие форматы документов
+- Документация NOMAD автоматически загружается при установке AI Assistant
 
-Your server has limited storage. Prioritize:
-- Content you'll actually use
-- Critical references (medical, survival)
-- Maps for your region
-- Educational content matching your needs
+**Как использовать:**
+1. Перейдите в **[База знаний →](/knowledge-base)**
+2. Загрузите ваши документы (PDF, текстовые файлы и т.д.)
+3. Документы автоматически обрабатываются и индексируются
+4. Задавайте вопросы в AI Chat — AI будет ссылаться на ваши загруженные документы, когда это релевантно
+5. Удаляйте документы, которые вам больше не нужны — они будут удалены из индекса и локального хранилища
 
-Check storage usage in **Settings → System**.
-
-### Getting Help
-
-- **In-app docs:** You're reading them now
-- **AI assistant:** Ask a question in [AI Chat](/chat)
-- **Release notes:** See what's new in each version
+**Варианты использования:**
+- Загрузите планы экстренной помощи для быстрого доступа во время кризиса
+- Загрузите технические руководства и SOP для удаленных рабочих мест
+- Добавьте учебные программы для домашнего обучения
+- Сохраните научные статьи для академической работы
 
 ---
 
-## Next Steps
+### Карты — Оффлайн-навигация
 
-You're ready to use NOMAD Here are some things to try:
+![Просмотрщик оффлайн-карт](/docs/maps.webp)
 
-1. **Look something up** — Search for a topic in the Information Library
-2. **Learn something** — Start a Khan Academy course in the Education Platform
-3. **Ask a question** — Chat with the AI in [AI Chat](/chat)
-4. **Explore maps** — Find your neighborhood in the Maps viewer
-5. **Upload a document** — Add a PDF to the [Knowledge Base](/knowledge-base) and ask the AI about it
+Просматривайте карты без интернета. Загрузите нужные вам регионы перед тем, как выйдете оффлайн.
 
-Enjoy your offline knowledge server!
+**Как использовать:**
+1. Нажмите **Карты** на Command Center
+2. Перемещайтесь, перетаскивая и масштабируя
+3. Ищите места с помощью поисковой строки
+
+**Чтобы добавить больше регионов карт:**
+1. Перейдите в **Настройки → Менеджер карт**
+2. Выберите нужные регионы
+3. Нажмите Загрузить
+
+**Совет:** Загрузите карты для регионов, куда вы часто ездите, плюс соседние регионы на всякий случай.
+
+**[Открыть Карты →](/maps)**
+
+---
+
+## Управление вашим сервером
+
+### Добавление большего контента
+
+По мере изменения ваших потребностей вы можете добавлять больше контента в любое время:
+
+- **Больше приложений:** Настройки → Supply Depot
+- **Больше справочников:** Настройки → Обозреватель контента или Менеджер контента
+- **Больше регионов карт:** Настройки → Менеджер карт
+- **Больше образовательного контента:** Через встроенный браузер контента Kolibri
+
+### Селектор Википедии
+
+![Обозреватель контента — просмотр и загрузка пакетов Википедии и курируемых коллекций](/docs/content-explorer.webp)
+
+NOMAD включает специальный инструмент управления контентом Википедии для просмотра и загрузки пакетов Википедии.
+
+**Как использовать:**
+1. Перейдите в **[Обозреватель контента →](/settings/zim/remote-explorer)**
+2. Просматривайте доступные пакеты Википедии по языку и размеру
+3. Выберите и загрузите нужные пакеты
+
+**Примечание:** Выбор другого пакета Википедии заменяет ранее загруженную версию. Только один выбор Википедии активен одновременно.
+
+### Системный бенчмарк
+
+![Системный бенчмарк с NOMAD Score и Builder Tag](/docs/benchmark.webp)
+
+Тестируйте производительность вашего оборудования и смотрите, как ваша сборка NOMAD сравнивается с сообществом.
+
+**Как использовать:**
+1. Перейдите в **[Системный бенчмарк →](/settings/benchmark)**
+2. Выберите тип бенчмарка: Полный, Только система или Только AI
+3. Просмотрите ваш NOMAD Score (взвешенная комбинация производительности CPU, памяти, диска и AI)
+4. Создайте Builder Tag (ваш идентификатор в стиле NOMAD, например, «Tactical-Llama-1234»)
+5. Поделитесь результатами с [лидербордом сообщества](https://benchmark.projectnomad.us)
+
+**Примечание:** Только полные бенчмарки с данными AI могут быть опубликованы в лидерборде сообщества.
+
+### Обновление системы
+
+Пока у вас есть интернет, периодически проверяйте наличие обновлений:
+
+1. Перейдите в **Настройки → Проверить обновления**
+2. Если обновления доступны, нажмите для установки
+3. Дождитесь завершения обновления (ваш сервер перезапустится)
+
+Обновления контента (Википедия, карты и т.д.) можно управлять отдельно от обновлений программного обеспечения.
+
+**Автоматические обновления:** NOMAD также может обновляться самостоятельно без вашей проверки. Программное обеспечение, установленные приложения и контент могут быть настроены на автоматическое обновление на основе согласия, с проверками безопасности и временным окном, которое вы контролируете. См. **[Руководство по обновлениям](/docs/updates)** для полной картины.
+
+**Канал раннего доступа:** Хотите последние функции до стабильного релиза? Включите Канал раннего доступа на странице Проверить обновления, чтобы получать кандидаты на выпуск. Вы можете переключиться обратно на стабильную версию в любое время.
+
+### Мониторинг здоровья системы
+
+Проверяйте состояние вашего сервера в любое время:
+1. Перейдите в **Настройки → Система**
+2. Просматривайте использование CPU, памяти и хранилища
+3. Проверяйте время работы и статус системы
+
+---
+
+## Советы для лучших результатов
+
+### Перед выходом оффлайн
+
+- **Обновите все** — Запустите обновления программного обеспечения и контента
+- **Загрузите то, что вам нужно** — Карты, справочники, образовательный контент
+- **Протестируйте** — Убедитесь, что функции работают, пока у вас еще есть интернет для устранения неполадок
+
+### Управление хранилищем
+
+На вашем сервере ограниченное хранилище. В приоритете:
+- Контент, который вы действительно будете использовать
+- Критические справочники (медицинские, по выживанию)
+- Карты вашего региона
+- Образовательный контент, соответствующий вашим потребностям
+
+Проверяйте использование хранилища в **Настройки → Система**.
+
+### Получение помощи
+
+- **Документация в приложении:** Вы читаете ее сейчас
+- **AI-ассистент:** Задайте вопрос в [AI Chat](/chat)
+- **Заметки о релизе:** Смотрите, что нового в каждой версии
+
+---
+
+## Следующие шаги
+
+Вы готовы использовать NOMAD. Вот несколько вещей, которые стоит попробовать:
+
+1. **Что-то найти** — Найдите тему в Информационной библиотеке
+2. **Чему-то научиться** — Начните курс Khan Academy на Платформе образования
+3. **Задать вопрос** — Поговорите с AI в [AI Chat](/chat)
+4. **Исследовать карты** — Найдите свой район в просмотрщике Карт
+5. **Загрузить документ** — Добавьте PDF в [Базу знаний](/knowledge-base) и спросите AI о нем
+
+Наслаждайтесь вашим оффлайн-сервером знаний!

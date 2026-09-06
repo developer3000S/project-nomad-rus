@@ -1,88 +1,69 @@
-# Project NOMAD Creator Pack License
+# Лицензия на пакет создателей Project NOMAD
 
-**Version 1.0** &nbsp;·&nbsp; License ID: `nomad-creator-pack-1.0`
+**Версия 1.0** &nbsp;·&nbsp; Идентификатор лицензии: `nomad-creator-pack-1.0`
 
-> **DRAFT — pending legal review.** This document is a starting point drafted for
-> convenience, not legal advice, and has not been reviewed by an attorney. The
-> terms below describe the intended arrangement; have counsel review and finalize
-> before relying on it. Nothing here is a binding offer until finalized.
+> **ЧЕРНОВИК — ожидает юридического рассмотрения.** Этот документ является начальной точкой, составленной для удобства, а не юридического совета, и не был рассмотрен юристом. Условия ниже описывают предполагаемое соглашение; перед использованием необходимо, чтобы юристы рассмотрели и утвердили его. Ничего из этого не является обязательным предложением до окончательного утверждения.
 
 ---
 
-## 1. What this covers
+## 1. Что это охватывает
 
-This license governs **Creator Pack content** — the curated video collections
-(and their titles, descriptions, thumbnails, and packaging) distributed through
-Project NOMAD as "Creator Packs." It does **not** cover the Project NOMAD
-software itself, which is licensed separately under Apache License 2.0. Where the
-two ever appear to conflict, the Apache 2.0 license governs the software and this
-license governs the pack content.
+Эта лицензия регулирует **контент пакета создателей** — курируемые видео-коллекции
+(и их названия, описания, миниатюры и упаковку), распространяемые через
+Project NOMAD как "Пакеты создателей". Она **не** охватывает само программное обеспечение Project NOMAD,
+которое лицензируется отдельно под Apache License 2.0. В случае конфликта
+между двумя лицензиями Apache 2.0 регулирует программное обеспечение, а эта лицензия регулирует контент пакета.
 
-## 2. Ownership
+## 2. Права собственности
 
-Each Creator retains all copyright and other rights in their own videos and
-associated materials. Distribution through Project NOMAD does not transfer
-ownership. "Creator" means the individual or organization whose content a pack
-contains (for example, Crosstalk Solutions or Project NOMAD).
+Каждый создатель сохраняет все права на авторские права и другие права на свои собственные видео и
+сопутствующие материалы. Распространение через Project NOMAD не передает
+права собственности. "Создатель" означает индивидуального или организацию, чей контент содержится в пакете
+(например, Crosstalk Solutions или Project NOMAD).
 
-## 3. Grant to Project NOMAD
+## 3. Предоставление Project NOMAD
 
-Each Creator grants Project NOMAD (Crosstalk Solutions, LLC) a non-exclusive,
-revocable right to reproduce, package, host, and distribute their Creator Pack
-**through the official Project NOMAD distribution channel only**. This grant does
-not permit Project NOMAD to sublicense the content for redistribution outside
-that official channel.
+Каждый создатель предоставляет Project NOMAD (Crosstalk Solutions, LLC) неисключительное,
+отзывное право на воспроизведение, упаковку, размещение и распространение их пакета создателей
+**только через официальный канал распространения Project NOMAD**. Это право не позволяет
+Project NOMAD перелицензировать контент для распространения за пределами
+официального канала.
 
-## 4. License to end users
+## 4. Лицензия конечным пользователям
 
-Subject to these terms, an end user who installs a Creator Pack on their own
-Project NOMAD server is granted a **personal, non-commercial, non-transferable,
-non-exclusive** license to store and view that pack's content offline on their
-own device(s) for their own use and that of their household or immediate
-organization.
+В рамках этих условий конечный пользователь, который устанавливает пакет создателей на свой собственный
+сервер Project NOMAD, получает **личную, некоммерческую, непереносимую,
+неисключительную** лицензию на хранение и просмотр контента пакета в автономном режиме на своих собственных устройствах
+для собственного использования и использования членами его семьи или непосредственной организации.
 
-## 5. Restrictions
+## 5. Ограничения
 
-Except as expressly permitted above, you may **not**:
+Кроме как явно разрешено выше, вы **не можете**:
 
-1. **Redistribute or re-host** any Creator Pack or its contents — including
-   copying pack files to another server, mirror, CDN, bucket, torrent, or file
-   share, or making them available for download by others.
-2. **Bundle or ship** Creator Pack content with any fork, derivative, or
-   third-party distribution of Project NOMAD or any other product.
-3. **Serve** Creator Pack content from any distribution channel other than the
-   official Project NOMAD channel, or circumvent the entitlement controls that
-   gate access to it.
-4. **Sell, rent, sublicense, or commercially exploit** the content, or use it to
-   train machine-learning models.
-5. **Remove or alter** creator branding, attribution, or license notices.
+1. **Перераспределять или перераспространять** любой пакет создателей или его содержимое — включая
+копирование файлов пакета на другой сервер, зеркало, CDN, бакет, торрент или файловый обмен,
+или предоставление их для загрузки другими.
+2. **Собирать или поставлять** контент пакета создателей с любым форком, производным или сторонним
+распространением Project NOMAD или любого другого продукта.
+3. **Предоставлять** контент пакета создателей из любого канала распространения, кроме официального канала Project NOMAD, или обходить механизмы контроля прав доступа, которые обеспечивают доступ к нему.
+4. **Продавать, сдавать в аренду, перелицензировать или коммерчески использовать** контент, или использовать его для обучения моделей машинного обучения.
+5. **Удалять или изменять** брендинг создателя, атрибуцию или уведомления о лицензии.
 
-For clarity: the Apache 2.0 license on the Project NOMAD **software** permits
-forking the software, but it grants **no rights** to the Creator Pack **content**,
-which remains governed exclusively by this license. A fork may not distribute or
-serve Creator Packs.
+Для ясности: лицензия Apache 2.0 на **программное обеспечение** Project NOMAD разрешает форкирование программного обеспечения, но предоставляет **никаких прав** на **контент пакета создателей**, который остается регулируемым исключительно этой лицензией. Форк не может распространять или предоставлять пакеты создателей.
 
-## 6. Termination
+## 6. Прекращение
 
-This license terminates automatically if you breach it, and Project NOMAD or a
-Creator may revoke it at any time. On termination you must stop using and delete
-the affected Creator Pack content. Sections 2, 5, 7, and 8 survive termination.
+Эта лицензия автоматически прекращается, если вы нарушаете ее, и Project NOMAD или создатель могут отозвать ее в любое время. При прекращении вы должны прекратить использование и удалить затронутый контент пакета создателей. Разделы 2, 5, 7 и 8 сохраняются при прекращении.
 
-## 7. No warranty
+## 7. Отсутствие гарантии
 
-Creator Pack content is provided **"as is," without warranty of any kind**,
-express or implied, including merchantability, fitness for a particular purpose,
-and non-infringement.
+Контент пакета создателей предоставляется **"как есть", без какой-либо гарантии**, явной или подразумеваемой, включая пригодность для определенной цели, соответствие и отсутствие нарушений.
 
-## 8. Limitation of liability
+## 8. Ограничение ответственности
 
-To the maximum extent permitted by law, neither Project NOMAD, Crosstalk
-Solutions, LLC, nor any Creator is liable for any indirect, incidental, special,
-consequential, or punitive damages arising from the Creator Pack content or this
-license.
+В максимально допустимой законом степени ни Project NOMAD, Crosstalk Solutions, LLC, ни какой-либо создатель не несут ответственности за любые косвенные, случайные, специальные, следственные или штрафные убытки, возникающие от контента пакета создателей или этой лицензии.
 
 ---
 
-*Questions about this license or Creator Pack participation: contact Project NOMAD
-via https://www.projectnomad.us. Governing law and venue to be specified on legal
-review.*
+*Вопросы по этой лицензии или участию в пакете создателей: свяжитесь с Project NOMAD
+через https://www.projectnomad.us. Юрисдикция и место рассмотрения будут указаны после юридического рассмотрения.*

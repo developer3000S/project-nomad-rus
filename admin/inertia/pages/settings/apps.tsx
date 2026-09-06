@@ -64,7 +64,7 @@ export default function SettingsPage(props: { system: { services: ServiceSlim[] 
   async function handleCheckUpdates() {
     try {
       if (!isOnline) {
-        showError('You must have an internet connection to check for updates.')
+        showError('Для проверки обновлений необходимо подключение к интернету.')
         return
       }
       setCheckingUpdates(true)
