@@ -9,9 +9,11 @@
 name: project-nomad
 services:
   admin:
-    image: ghcr.io/crosstalk-solutions/project-nomad:latest
-    pull_policy: always
+    build:
+      context: ../..
+      dockerfile: Dockerfile
     container_name: nomad_admin
+    image: project-nomad:latest
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"  # Enables host.docker.internal on Linux

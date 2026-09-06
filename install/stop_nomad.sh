@@ -1,26 +1,26 @@
 #!/bin/bash
 
-echo "Finding running Docker containers for Project NOMAD.."
+echo "Поиск запущенных контейнеров Docker для Project NOMAD.."
 
 containers=$(docker ps --filter "name=^nomad_" --format "{{.Names}}")
 
 if [ -z "$containers" ]; then
-    echo "No running containers found for Project NOMAD"
+    echo "Запущенные контейнеры для Project NOMAD не найдены"
     exit 0
 fi
 
-echo "Found the following running containers:"
+echo "Обнаружены следующие запущенные контейнеры:"
 echo "$containers"
 echo ""
 
 for container in $containers; do
-    echo "Gracefully stopping container: $container"
+    echo "Корректная остановка контейнера: $container"
     if docker stop "$container"; then
-        echo "✓ Successfully stopped $container"
+        echo "✓ Контейнер $container успешно остановлен"
     else
-        echo "✗ Failed to stop $container"
+        echo "✗ Не удалось остановить контейнер $container"
     fi
     echo ""
 done
 
-echo "Finished initiating graceful shutdown of all Project NOMAD containers."
+echo "Завершение корректного завершения работы всех контейнеров Project NOMAD."

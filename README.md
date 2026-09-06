@@ -35,6 +35,21 @@ For a complete step-by-step walkthrough (including Ubuntu installation), see the
 ### Advanced Installation
 For more control over the installation process, copy and paste the [Docker Compose template](https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/management_compose.yaml) into a `docker-compose.yml` file and customize it to your liking (be sure to replace any placeholders with your actual values). Then, run `docker compose up -d` to start the Command Center and its dependencies. Note: this method is recommended for advanced users only, as it requires familiarity with Docker and manual configuration before starting.
 
+### Building from Source
+The `admin` service image is built locally from the project's `Dockerfile` — it does not pull a pre-built image from a container registry. This requires:
+
+- **Docker** with multi-stage build support
+- **libzim-dev** system package (available in Debian/Ubuntu repositories, e.g. `apt-get install libzim-dev`)
+- The image is automatically built when you run `docker compose up -d` or `docker build -t project-nomad .`
+
+If you are developing locally and need to rebuild after changing dependencies:
+
+```bash
+docker build -t project-nomad .
+```
+
+Note: `@openzim/libzim` uses the system `libzim-dev` package rather than downloading from `openzim.org`, which ensures reliable builds in network-restricted or offline environments.
+
 ## How It Works
 NOMAD is a management UI ("Command Center") and API that orchestrates a collection of containerized tools and resources via [Docker](https://www.docker.com/). It handles installation, configuration, and updates for everything — so you don't have to.
 

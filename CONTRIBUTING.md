@@ -75,6 +75,20 @@ When opening an issue:
 ### Avoid Installing a Release Version Locally
 Because NOMAD relies heavily on Docker, we actually recommend against installing a release version of the project on the same local machine where you are developing. This can lead to conflicts with ports, volumes, and other resources. Instead, you can run your development version in a separate Docker environment while keeping your local machine clean. It certainly __can__ be done, but it adds complexity to your setup and workflow. If you choose to install a release version locally, please ensure you have a clear strategy for managing potential conflicts and resource usage.
 
+### Building the Docker Image Locally
+The Command Center (`admin` service) is built locally from the project's `Dockerfile` — the `management_compose.yaml` does not pull a pre-built image. To rebuild after changing dependencies or code:
+
+```bash
+docker build -t project-nomad .
+```
+
+The build process:
+- Uses the system `libzim-dev` package (Debian/Ubuntu) for native ZIM file support — `@openzim/libzim` builds against the system library via `node-gyp`, not by downloading from `openzim.org` (which can be unreliable)
+- Requires a local Node.js 24 environment for the multi-stage build
+- Produces an image tagged `project-nomad:latest` (about 1.87 GB)
+
+If `libzim-dev` is not available in your base image, you may need to add it to the `apt-get install` line in the `FROM base` stage.
+
 ---
 
 ## Development Workflow
