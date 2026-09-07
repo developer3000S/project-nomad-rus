@@ -123,8 +123,7 @@ if (Math.abs(WEIGHT_SUM_V2 - 1) > 1e-9) {
 // with identical flags (7170.18 vs 7259.56 events/sec) — inside run-to-run
 // noise, ~0.3% on a composite. No rescoring required. Both this and the legacy
 // digest are allowlisted server-side, so the fleet can cross over gradually.
-const SYSBENCH_IMAGE =
-  'ghcr.io/crosstalk-solutions/nomad-sysbench@sha256:1f08e527f5d440135de9bd49006a2c13342cb1e483c59a53774e2db35e8e13f0'
+const SYSBENCH_IMAGE = 'project-nomad-sysbench:latest'
 const SYSBENCH_DIGEST = 'sha256:1f08e527f5d440135de9bd49006a2c13342cb1e483c59a53774e2db35e8e13f0'
 
 

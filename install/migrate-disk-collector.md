@@ -28,7 +28,7 @@ NOMAD использует информацию о дисках, хранящу�
 
 ```yml
   disk-collector:
-    image: ghcr.io/crosstalk-solutions/project-nomad-disk-collector:latest
+    image: project-nomad-disk-collector:latest
     pull_policy: always
     container_name: nomad_disk_collector
     restart: unless-stopped

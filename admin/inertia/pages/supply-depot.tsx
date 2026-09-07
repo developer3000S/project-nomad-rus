@@ -54,16 +54,16 @@ function extractTag(containerImage: string): string {
 }
 
 const CATEGORIES = [
-  { id: 'all', label: 'All' },
-  { id: 'installed', label: 'Installed' },
-  { id: 'productivity', label: 'Productivity' },
-  { id: 'media', label: 'Media' },
-  { id: 'security', label: 'Security' },
-  { id: 'networking', label: 'Networking' },
-  { id: 'utility', label: 'Utility' },
-  { id: 'ai', label: 'AI' },
-  { id: 'education', label: 'Education' },
-  { id: 'custom', label: 'Custom' },
+  { id: 'all', label: 'Все' },
+  { id: 'installed', label: 'Установлено' },
+  { id: 'productivity', label: 'Продуктивность' },
+  { id: 'media', label: 'Медиа' },
+  { id: 'security', label: 'Безопасность' },
+  { id: 'networking', label: 'Сеть' },
+  { id: 'utility', label: 'Утилиты' },
+  { id: 'ai', label: 'ИИ' },
+  { id: 'education', label: 'Образование' },
+  { id: 'custom', label: 'Пользовательские' },
 ]
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -314,7 +314,7 @@ export default function SupplyDepotPage(props: { system: { services: ServiceSlim
     }
     const appName = service.friendly_name || service.service_name
     addNotification({
-      message: `Auto-updates for ${appName} are ${enabled ? 'on' : 'off'}.`,
+      message: `Автообновление для ${appName} ${enabled ? 'включено' : 'выключено'}.`,
       type: 'success',
     })
   }
@@ -397,11 +397,10 @@ export default function SupplyDepotPage(props: { system: { services: ServiceSlim
               <IconBox className="text-white opacity-90 flex-shrink-0" size={28} />
               <div>
                 <h1 className="text-2xl font-bold text-white uppercase tracking-wide leading-tight">
-                  Supply Depot
+                  Склад снаряжения
                 </h1>
                 <p className="text-sm text-white/70 mt-1 max-w-xl">
-                  Browse and install curated apps, or add your own custom apps by providing a Docker
-                  image.
+                  Просматривайте и устанавливайте приложения или добавляйте свои собственные Docker-контейнеры.
                 </p>
               </div>
             </div>
@@ -420,7 +419,7 @@ export default function SupplyDepotPage(props: { system: { services: ServiceSlim
                 <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted h-4 w-4" />
                 <input
                   type="text"
-                  placeholder="Search apps..."
+                  placeholder="Поиск приложений..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 rounded-md bg-surface-secondary border border-desert-stone-lighter text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-desert-green placeholder:text-text-muted/50"
@@ -433,18 +432,18 @@ export default function SupplyDepotPage(props: { system: { services: ServiceSlim
                 loading={checkingUpdates}
                 disabled={checkingUpdates || !isOnline}
               >
-                Check for Updates
+                Проверить обновления
               </StyledButton>
               <StyledButton
                 icon="IconBrandDocker"
                 variant="outline"
                 onClick={() => setCustomAppOpen(true)}
               >
-                Add Custom App
+                Добавить приложение
               </StyledButton>
             </div>
 
-            {/* Category filters */}
+            {/* Фильтры категорий */}
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((cat) => (
                 <button
@@ -465,17 +464,17 @@ export default function SupplyDepotPage(props: { system: { services: ServiceSlim
           <div className="h-1 bg-desert-green" />
         </div>
 
-        {/* App cards */}
+        {/* Карточки приложений */}
         {filteredServices.length === 0 ? (
           <div className="text-center py-16">
             <IconPackage className="mx-auto mb-3 opacity-40 text-desert-stone-light" size={48} />
-            <p className="text-text-muted">No apps match your filter.</p>
+            <p className="text-text-muted">Приложений, соответствующих вашему фильтру, не найдено.</p>
           </div>
         ) : (
           <div className="space-y-10">
             {installedServices.length > 0 && (
               <section>
-                <StyledSectionHeader title={`Installed (${installedServices.length})`} />
+                <StyledSectionHeader title={`Установлено (${installedServices.length})`} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {installedServices.map((service) => (
                     <AppCard
@@ -512,7 +511,7 @@ export default function SupplyDepotPage(props: { system: { services: ServiceSlim
 
             {availableServices.length > 0 && (
               <section>
-                <StyledSectionHeader title={`Available (${availableServices.length})`} />
+                <StyledSectionHeader title={`Доступно (${availableServices.length})`} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {availableServices.map((service) => (
                     <AppCard
@@ -979,7 +978,7 @@ function AppCard({
         {service.is_user_modified && !service.is_custom ? (
           <span
             className="text-xs px-2 py-0.5 rounded-full font-medium bg-desert-tan-lighter text-desert-tan-dark border border-desert-tan-light"
-            title="You've customized this app, so it won't be overwritten by catalog updates."
+            title="Вы настроили это приложение, поэтому оно не будет перезаписано обновлениями каталога."
           >
             modified
           </span>
@@ -1093,7 +1092,7 @@ function AppCard({
                             className={`h-4 w-4 ${autoUpdateEnabled ? 'text-desert-green' : ''}`}
                           />
                         }
-                        label={`Auto-update: ${autoUpdateEnabled ? 'On' : 'Off'}`}
+                        label={`Автообновление: ${autoUpdateEnabled ? 'Вкл' : 'Выкл'}`}
                         onClick={() => onToggleAutoUpdate(!autoUpdateEnabled)}
                       />
                     ) : (

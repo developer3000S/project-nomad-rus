@@ -39,29 +39,29 @@ function buildCoreCapabilities(aiAssistantName: string): Capability[] {
   return [
     {
       id: 'information',
-      name: 'Information Library',
+      name: 'Библиотека информации',
       technicalName: 'Kiwix',
       description:
-        'Offline access to Wikipedia, medical references, how-to guides, and encyclopedias',
+        'Офлайн-доступ к Wikipedia, медицинским справочникам, руководствам и энциклопедиям',
       features: [
-        'Complete Wikipedia offline',
-        'Medical references and first aid guides',
-        'DIY repair guides and how-to content',
-        'Project Gutenberg books and literature',
+        'Полный Wikipedia офлайн',
+        'Медицинские справочники и руководства по первой помощи',
+        'Руководства по ремонту и how-to контент',
+        'Книги и литература Project Gutenberg',
       ],
       services: [SERVICE_NAMES.KIWIX],
       icon: 'IconBooks',
     },
     {
       id: 'education',
-      name: 'Education Platform',
+      name: 'Образовательная платформа',
       technicalName: 'Kolibri',
-      description: 'Interactive learning platform with video courses and exercises',
+      description: 'Интерактивная обучающая платформа с видео-курсами и упражнениями',
       features: [
-        'Khan Academy math and science courses',
-        'K-12 curriculum content',
-        'Interactive exercises and quizzes',
-        'Progress tracking for learners',
+        'Математика и науки Khan Academy',
+        'Контент по программе K-12',
+        'Интерактивные упражнения и викторины',
+        'Отслеживание прогресса для учащихся',
       ],
       services: [SERVICE_NAMES.KOLIBRI_GEN2],
       icon: 'IconSchool',
@@ -70,12 +70,12 @@ function buildCoreCapabilities(aiAssistantName: string): Capability[] {
       id: 'ai',
       name: aiAssistantName,
       technicalName: 'Ollama',
-      description: 'Local AI chat that runs entirely on your hardware - no internet required',
+      description: 'Локальный ИИ-чат, работающий полностью на вашем оборудовании — не требует интернета',
       features: [
-        'Private conversations that never leave your device',
-        'No internet connection needed after setup',
-        'Ask questions, get help with writing, brainstorm ideas',
-        'Runs on your own hardware with local AI models',
+        'Приватные разговоры, которые никогда не покидают ваше устройство',
+        'Не требуется подключение к интернету после настройки',
+        'Задавайте вопросы, получайте помощь в написании текстов, генерируйте идеи',
+        'Работает на вашем оборудовании с локальными ИИ-моделями',
       ],
       services: [SERVICE_NAMES.OLLAMA],
       icon: 'IconRobot',
@@ -94,12 +94,12 @@ function buildCoreCapabilities(aiAssistantName: string): Capability[] {
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6
 
 const STEP_LABELS: Record<WizardStep, string> = {
-  1: 'Apps',
-  2: 'Maps',
-  3: 'Content',
-  4: 'Creator Packs',
-  5: 'AI',
-  6: 'Review',
+  1: 'Приложения',
+  2: 'Карты',
+  3: 'Контент',
+  4: 'Пакеты создателей',
+  5: 'ИИ',
+  6: 'Обзор',
 }
 
 const CURATED_MAP_COLLECTIONS_KEY = 'curated-map-collections'
@@ -379,7 +379,7 @@ export default function EasySetupWizard(props: {
     if (!isOnline) {
       addNotification({
         type: 'error',
-        message: 'You must have an internet connection to complete the setup.',
+        message: 'Для завершения настройки необходимо подключение к интернету.',
       })
       return
     }
@@ -398,7 +398,7 @@ export default function EasySetupWizard(props: {
           await api.updateSetting('rag.defaultIngestPolicy', ingestPolicy)
         } catch (err) {
           // Non-fatal: the user can still set the policy from the KB modal.
-          console.warn('Could not persist ingest policy from wizard:', err)
+          console.warn('Не удалось сохранить политику ingest из мастера:', err)
         }
       }
 
@@ -406,7 +406,7 @@ export default function EasySetupWizard(props: {
       if (remoteOllamaEnabled && remoteOllamaUrl) {
         const remoteResult = await api.configureRemoteOllama(remoteOllamaUrl)
         if (!remoteResult?.success) {
-          const msg = (remoteResult as any)?.message || 'Failed to configure remote Ollama.'
+          const msg = (remoteResult as any)?.message || 'Не удалось настроить удалённый Ollama.'
           setRemoteOllamaUrlError(msg)
           setIsProcessing(false)
           setCurrentStep(1)
@@ -445,15 +445,15 @@ export default function EasySetupWizard(props: {
 
       addNotification({
         type: 'success',
-        message: 'Setup wizard completed! Your selections are being processed.',
+        message: 'Мастер настройки завершён! Ваши выбранные элементы обрабатываются.',
       })
 
       router.visit('/easy-setup/complete')
     } catch (error) {
-      console.error('Error during setup:', error)
+      console.error('Ошибка при настройке:', error)
       addNotification({
         type: 'error',
-        message: 'An error occurred during setup. Some items may not have been processed.',
+        message: 'Произошла ошибка при настройке. Некоторые элементы могут не быть обработаны.',
       })
     } finally {
       setIsProcessing(false)
@@ -487,7 +487,7 @@ export default function EasySetupWizard(props: {
         await api.updateSetting('ui.hasVisitedEasySetup', 'true')
       } catch (error) {
         // Silent fail - this is non-critical
-        console.warn('Failed to mark Easy Setup as visited:', error)
+        console.warn('Не удалось отметить быструю настройку как посещённую:', error)
       }
     }
 
@@ -610,7 +610,7 @@ export default function EasySetupWizard(props: {
         remoteOllamaEnabled
       if (hasAiSelections) {
         const confirmed = window.confirm(
-          "Turning off AI will discard your AI model picks, indexing policy, and remote Ollama configuration. Continue?"
+          "Отключение ИИ удалит ваши выбранные модели ИИ, политику индексирования и конфигурацию удалённого Ollama. Продолжить?"
         )
         if (!confirmed) return
       }
@@ -669,7 +669,7 @@ export default function EasySetupWizard(props: {
               </h3>
               {installed && (
                 <span className="text-xs bg-desert-green text-white px-2 py-0.5 rounded-full">
-                  Installed
+                  Установлено
                 </span>
               )}
             </div>
@@ -747,23 +747,23 @@ export default function EasySetupWizard(props: {
     return (
       <div className="space-y-8">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-text-primary mb-2">What do you want NOMAD to do?</h2>
+          <h2 className="text-3xl font-bold text-text-primary mb-2">Что вы хотите, чтобы делал NOMAD?</h2>
           <p className="text-text-secondary">
-            Select the capabilities you need. You can always add more later.
+            Выберите нужные вам возможности. Вы всегда можете добавить больше позже.
           </p>
         </div>
 
         {allInstalled ? (
           <div className="text-center py-12">
             <p className="text-text-secondary text-lg">
-              All available capabilities are already installed!
+              Все доступные возможности уже установлены!
             </p>
             <StyledButton
               variant="primary"
               className="mt-4"
               onClick={() => router.visit('/settings/apps')}
             >
-              Manage Apps
+              Управление приложениями
             </StyledButton>
           </div>
         ) : (
@@ -771,7 +771,7 @@ export default function EasySetupWizard(props: {
             {/* Core Capabilities */}
             {existingCoreCapabilities.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-text-primary mb-4">Core Capabilities</h3>
+                <h3 className="text-lg font-semibold text-text-primary mb-4">Основные возможности</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   {existingCoreCapabilities.map((capability) => {
                     if (capability.id === 'ai') {
@@ -794,7 +794,7 @@ export default function EasySetupWizard(props: {
                                   }}
                                   className="w-4 h-4 accent-desert-green"
                                 />
-                                <span className="text-sm font-medium text-gray-700">Use remote Ollama instance</span>
+                                <span className="text-sm font-medium text-gray-700">Использовать удалённый экземпляр Ollama</span>
                               </label>
                               {remoteOllamaEnabled && (
                                 <div className="mt-3">
@@ -831,11 +831,10 @@ export default function EasySetupWizard(props: {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-lg bg-surface-secondary p-4">
                 <div>
                   <h3 className="text-md font-medium text-text-primary mb-1">
-                    Looking for more apps?
+                    Ищете больше приложений?
                   </h3>
                   <p className="text-sm text-text-secondary">
-                    Notes, data tools, and the full catalog of add-on apps are available any time in
-                    Supply Depot.
+                    Заметки, инструменты для работы с данными и полный каталог дополнительных приложений доступны в любой момент в Supply Depot.
                   </p>
                 </div>
                 <StyledButton
@@ -843,7 +842,7 @@ export default function EasySetupWizard(props: {
                   onClick={() => router.visit('/supply-depot')}
                   className="flex-shrink-0"
                 >
-                  Open Supply Depot
+                  Открыть Supply Depot
                 </StyledButton>
               </div>
             </div>
@@ -856,22 +855,20 @@ export default function EasySetupWizard(props: {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-text-primary mb-2">Choose Map Regions</h2>
+        <h2 className="text-3xl font-bold text-text-primary mb-2">Выберите регионы карт</h2>
         <p className="text-text-secondary">
-          Select map region collections to download for offline use. You can always download more
-          regions later.
+          Выберите коллекции регионов карт для скачивания для офлайн-использования. Вы всегда можете скачать больше регионов позже.
         </p>
       </div>
       <div className="mx-auto max-w-2xl rounded-lg border border-border-subtle bg-surface-secondary p-3 text-center">
         <p className="text-sm text-text-secondary">
-          Only need a specific country, or want the whole world? Individual countries and a full
-          global map can be installed any time from the{' '}
+          Нужна только определённая страна или нужен весь мир? Отдельные страны и полная глобальная карта могут быть установлены в любое время из{' '}
           <button
             type="button"
             onClick={() => router.visit('/settings/maps')}
             className="font-medium text-desert-green underline"
           >
-            Maps Manager
+            Менеджер карт
           </button>
           .
         </p>
@@ -907,7 +904,7 @@ export default function EasySetupWizard(props: {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-text-secondary text-lg">No map collections available at this time.</p>
+          <p className="text-text-secondary text-lg">В данный момент нет доступных коллекций карт.</p>
         </div>
       )}
     </div>
@@ -924,11 +921,11 @@ export default function EasySetupWizard(props: {
     return (
       <div className="space-y-6">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-text-primary mb-2">Choose Content</h2>
+          <h2 className="text-3xl font-bold text-text-primary mb-2">Выберите контент</h2>
           <p className="text-text-secondary">
             {isInformationSelected
-              ? 'Select content categories for offline knowledge.'
-              : 'Configure content for your selected capabilities.'}
+              ? 'Выберите категории контента для офлайн-знаний.'
+              : 'Настройте контент для выбранных вами возможностей.'}
           </p>
         </div>
 
@@ -962,8 +959,8 @@ export default function EasySetupWizard(props: {
                 <IconBooks className="w-6 h-6 text-text-primary" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-text-primary">Additional Content</h3>
-                <p className="text-sm text-text-muted">Curated collections for offline reference</p>
+                <h3 className="text-xl font-semibold text-text-primary">Дополнительный контент</h3>
+                <p className="text-sm text-text-muted">Отобранные коллекции для офлайн-ссылок</p>
               </div>
             </div>
 
@@ -1006,8 +1003,7 @@ export default function EasySetupWizard(props: {
         {!isInformationSelected && (
           <div className="text-center py-12">
             <p className="text-text-secondary text-lg">
-              No content-based capabilities selected. You can skip this step or go back to select
-              capabilities that require content.
+              Не выбраны возможности, основанные на контенте. Вы можете пропустить этот шаг или вернуться, чтобы выбрать возможности, требующие контента.
             </p>
           </div>
         )}
@@ -1022,9 +1018,9 @@ export default function EasySetupWizard(props: {
     return (
       <div className="space-y-6">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold text-text-primary mb-2">Stock Creator Packs</h2>
+          <h2 className="text-3xl font-bold text-text-primary mb-2">Стандартные пакеты создателей</h2>
           <p className="text-text-secondary">
-            Branded video collections from creators, downloaded for offline viewing in Kiwix.
+            Видеоколлекции с брендингом от создателей, загруженные для офлайн-просмотра в Kiwix.
           </p>
         </div>
 
@@ -1045,7 +1041,7 @@ export default function EasySetupWizard(props: {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-text-secondary text-lg">No creator packs available right now.</p>
+            <p className="text-text-secondary text-lg">В данный момент нет доступных пакетов создателей.</p>
           </div>
         )}
       </div>
@@ -1060,7 +1056,7 @@ export default function EasySetupWizard(props: {
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-text-primary mb-2">Configure {aiAssistantName}</h2>
           <p className="text-text-secondary">
-            Choose models to download and set how {aiAssistantName} handles new content.
+            Выберите модели для загрузки и настройте, как {aiAssistantName} обрабатывает новый контент.
           </p>
         </div>
 
@@ -1070,13 +1066,13 @@ export default function EasySetupWizard(props: {
           </div>
           <div>
             <h3 className="text-xl font-semibold text-text-primary">AI Models</h3>
-            <p className="text-sm text-text-muted">Select models to download for offline AI</p>
+            <p className="text-sm text-text-muted">Выберите модели для загрузки в офлайн-режим ИИ</p>
           </div>
         </div>
         {remoteOllamaEnabled && remoteOllamaUrl ? (
           <Alert
-            title="Remote Ollama selected"
-            message="Models are managed on the remote machine. You can add models from Settings > AI Assistant after setup, note this is only supported when using Ollama, not LM Studio and other OpenAI API software."
+            title="Выбран удалённый Ollama"
+            message="Модели управляются на удалённой машине. Вы можете добавить модели из Настройки > ИИ-ассистент после настройки, обратите внимание, что это поддерживается только при использовании Ollama, а не LM Studio и другого программного обеспечения OpenAI API."
             type="info"
             variant="bordered"
           />
@@ -1125,7 +1121,7 @@ export default function EasySetupWizard(props: {
                             : 'text-text-muted'
                         )}
                       >
-                        Size: {model.tags[0].size}
+                        Размер: {model.tags[0].size}
                       </div>
                     )}
                   </div>
@@ -1147,7 +1143,7 @@ export default function EasySetupWizard(props: {
           </div>
         ) : (
           <div className="text-center py-8 bg-surface-secondary rounded-lg">
-            <p className="text-text-secondary">No recommended AI models available at this time.</p>
+            <p className="text-text-secondary">В данный момент нет рекомендуемых моделей ИИ.</p>
           </div>
         )}
 
@@ -1156,10 +1152,10 @@ export default function EasySetupWizard(props: {
             rag.defaultIngestPolicy on wizard submit. */}
         <div className="mt-8 pt-6 border-t border-border-subtle">
           <h4 className="text-lg font-semibold text-text-primary mb-1">
-            Auto-index new content for {aiAssistantName}?
+            Автоиндексация нового контента для {aiAssistantName}?
           </h4>
           <p className="text-sm text-text-muted mb-4">
-            When you add new ZIMs, documents, or curated content, should {aiAssistantName} index them automatically so it can search them while answering your questions?
+            Когда вы добавляете новые ZIM-файлы, документы или отобранный контент, должен ли {aiAssistantName} индексировать их автоматически, чтобы иметь возможность искать в них при ответе на вопросы?
           </p>
           <div className="inline-flex rounded-md border border-border-default overflow-hidden" role="group">
             <button
@@ -1172,7 +1168,7 @@ export default function EasySetupWizard(props: {
                   : 'bg-surface-primary text-text-secondary hover:bg-surface-secondary'
               )}
             >
-              Yes, always
+              Да, всегда
             </button>
             <button
               type="button"
@@ -1184,11 +1180,11 @@ export default function EasySetupWizard(props: {
                   : 'bg-surface-primary text-text-secondary hover:bg-surface-secondary'
               )}
             >
-              Ask me first
+              Сначала спросить меня
             </button>
           </div>
           <p className="text-xs text-text-muted mt-3">
-            You can change this any time from the Knowledge Base panel inside AI Chat.
+            Вы можете изменить это в любой момент в панели База знаний внутри ИИ-чата.
           </p>
         </div>
       </div>
@@ -1396,7 +1392,7 @@ export default function EasySetupWizard(props: {
       <Head title="Easy Setup Wizard" />
       {!isOnline && (
         <Alert
-          title="No Internet Connection"
+          title="Нет подключения к интернету"
           message="You'll need an internet connection to proceed. Please connect to the internet and try again."
           type="warning"
           variant="solid"
@@ -1462,7 +1458,7 @@ export default function EasySetupWizard(props: {
                   disabled={isProcessing}
                   variant="outline"
                 >
-                  Cancel & Go to Home
+                  Cancel & Перейти на главную
                 </StyledButton>
 
                 {currentStep < finalStep ? (

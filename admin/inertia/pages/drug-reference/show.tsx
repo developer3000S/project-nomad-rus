@@ -25,7 +25,7 @@ export default function DrugReferenceShow({ label, situations = [] }: PageProps)
 
   return (
     <AppLayout compact>
-      <Head title={label.brand_name ?? label.generic_name ?? 'Drug Detail'} />
+      <Head title={label.brand_name ?? label.generic_name ?? 'Детали лекарства'} />
 
       <div className="p-4 max-w-3xl mx-auto">
         {/* Back nav + comparison entry */}
@@ -35,13 +35,13 @@ export default function DrugReferenceShow({ label, situations = [] }: PageProps)
             className="inline-flex items-center gap-1 text-sm text-desert-green hover:underline"
           >
             <IconArrowLeft size={16} />
-            Drug Reference
+            Справочник лекарств
           </Link>
           <Link
             href={`/drug-reference/interactions?ids=${label.id}`}
             className="text-xs px-2.5 py-1 rounded border border-desert-green text-desert-green hover:bg-desert-green hover:text-white transition-colors"
           >
-            Add to interaction comparison
+            Добавить к сравнению взаимодействий
           </Link>
         </div>
 
@@ -49,7 +49,7 @@ export default function DrugReferenceShow({ label, situations = [] }: PageProps)
         <div className="mb-6">
           <div className="flex flex-wrap items-start gap-2 mb-1">
             <h1 className="text-2xl font-bold">
-              {label.brand_name ?? label.generic_name ?? 'Unknown Drug'}
+              {label.brand_name ?? label.generic_name ?? 'Неизвестное лекарство'}
             </h1>
             {/* OTC / Rx badge */}
             {isRx && (
@@ -104,7 +104,7 @@ export default function DrugReferenceShow({ label, situations = [] }: PageProps)
             <div className="flex items-center gap-2 mb-2">
               <IconAlertTriangle size={20} className="text-red-600 flex-shrink-0" />
               <h2 className="text-base font-bold text-red-700 uppercase tracking-wide">
-                Boxed Warning
+                Предупреждение в коробке
               </h2>
             </div>
             <LabelBlocks text={label.boxed_warning} tone="danger" />
@@ -113,7 +113,7 @@ export default function DrugReferenceShow({ label, situations = [] }: PageProps)
 
         {/* 2. Indications & Usage */}
         {label.indications && (
-          <LabelSection title="Indications & Usage" body={label.indications} />
+          <LabelSection title="Показания и применение" body={label.indications} />
         )}
 
         {/* Reverse link — curated situations this label treats. The other half of
@@ -124,7 +124,7 @@ export default function DrugReferenceShow({ label, situations = [] }: PageProps)
             <div className="mb-2 flex items-center gap-2">
               <IconFirstAidKit size={18} className="flex-shrink-0 text-desert-olive-dark" />
               <h2 className="text-sm font-bold uppercase tracking-wide text-desert-green-darker">
-                Commonly used for
+                Часто используется для
               </h2>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -143,36 +143,36 @@ export default function DrugReferenceShow({ label, situations = [] }: PageProps)
 
         {/* 3. Dosage & Administration */}
         {label.dosage && (
-          <LabelSection title="Dosage & Administration" body={label.dosage} />
+          <LabelSection title="Дозировка и применение" body={label.dosage} />
         )}
 
         {/* 4. Warnings */}
         {label.warnings && (
-          <LabelSection title="Warnings" body={label.warnings} />
+          <LabelSection title="Предупреждения" body={label.warnings} />
         )}
 
         {/* 5. Drug Interactions — single-drug label text, not a pairwise checker */}
         {label.drug_interactions && (
           <LabelSection
-            title="Drug Interactions"
+            title="Взаимодействия с лекарствами"
             body={label.drug_interactions}
-            footnote="Single-drug label information — not a cross-drug interaction checker"
+            footnote="Информация из маркировки одного лекарства — не средство проверки взаимодействий с другими"
           />
         )}
 
         {/* 6. Contraindications */}
         {label.contraindications && (
-          <LabelSection title="Contraindications" body={label.contraindications} />
+          <LabelSection title="Противопоказания" body={label.contraindications} />
         )}
 
         {/* 7. When Using (OTC) */}
         {label.when_using && (
-          <LabelSection title="When Using" body={label.when_using} />
+          <LabelSection title="При применении" body={label.when_using} />
         )}
 
         {/* 8. Stop Use (OTC) */}
         {label.stop_use && (
-          <LabelSection title="Stop Use" body={label.stop_use} />
+          <LabelSection title="Прекратить применение" body={label.stop_use} />
         )}
 
         {/* ── Footer citation ───────────────────────────────────────────────── */}

@@ -25,7 +25,7 @@ interface PageProps {
  * "data present, but nothing matched this situation".
  */
 export default function ConditionsShow({ condition, drugs, remedies, drugRowCount }: PageProps) {
-  const label = condition?.label ?? 'Condition'
+  const label = condition?.label ?? 'Состояние'
   const noData = drugRowCount === 0
 
   return (
@@ -40,7 +40,7 @@ export default function ConditionsShow({ condition, drugs, remedies, drugRowCoun
             className="inline-flex items-center gap-1 text-sm text-desert-green hover:underline"
           >
             <IconArrowLeft size={16} />
-            Drug Reference
+            Справочник лекарств
           </Link>
         </div>
 
@@ -58,23 +58,23 @@ export default function ConditionsShow({ condition, drugs, remedies, drugRowCoun
         {/* Drug list / empty states */}
         {noData ? (
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <p className="text-lg font-semibold mb-2">No drug data yet</p>
+            <p className="text-lg font-semibold mb-2">Данные о лекарствах ещё не загружены</p>
             <p className="mb-6 opacity-70">
-              Download the offline FDA drug labels from Drug Reference to see matches for this
-              situation.
+              Загрузите офлайн-метки FDA из Справочника лекарств, чтобы увидеть соответствия для этой
+              ситуации.
             </p>
             <Link href="/drug-reference">
               <span className="inline-block rounded bg-desert-green px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-desert-green-dark">
-                Go to Drug Reference
+                Перейти в Справочник лекарств
               </span>
             </Link>
           </div>
         ) : drugs.length === 0 ? (
           <div className="text-center py-8 opacity-60">
-            No over-the-counter drugs match &ldquo;{label}&rdquo; in the current label data. Try
-            searching by drug name in{' '}
+            В текущих данных маркировки FDA нет безрецептурных лекарств, соответствующих &ldquo;{label}&rdquo;. Попробуйте
+            поиск по названию в{' '}
             <Link href="/drug-reference" className="text-desert-green hover:underline">
-              Drug Reference
+              Справочнике лекарств
             </Link>
             .
           </div>
@@ -101,9 +101,9 @@ export default function ConditionsShow({ condition, drugs, remedies, drugRowCoun
               <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-desert-tan/20 text-desert-tan-dark">
                 <IconLeaf size={16} />
               </span>
-              <h2 className="text-base font-semibold text-desert-tan-dark">Natural remedies</h2>
+              <h2 className="text-base font-semibold text-desert-tan-dark">Натуральные средства</h2>
               <span className="text-xs text-desert-stone ml-auto">
-                {remedies.length} {remedies.length !== 1 ? 'remedies' : 'remedy'}
+                {remedies.length} {remedies.length !== 1 ? 'средств' : 'средство'}
               </span>
             </div>
 
@@ -130,13 +130,14 @@ export default function ConditionsShow({ condition, drugs, remedies, drugRowCoun
         {/* ── Source citation ───────────────────────────────────────────────── */}
         <footer className="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-500 space-y-1">
           <p>
-            <strong>Source:</strong> U.S. Food &amp; Drug Administration drug labeling, via{' '}
-            <strong>openFDA</strong> — public domain (CC0 1.0). NOMAD is not affiliated with or
-            endorsed by the FDA.
+            <strong>Источник:</strong> маркировка лекарств Управления по санитарному надзору за качеством пищевых
+            продуктов и медикаментов США (FDA), через{' '}
+            <strong>openFDA</strong> — общественное достояние (CC0 1.0). NOMAD не связан с FDA и не
+            поддерживается ею.
           </p>
           <p>
-            Matches are FDA label-indication text, not medical recommendations. Do not rely on this
-            data to make decisions regarding medical care.
+            Соответствия основаны на тексте маркировки FDA, а не на медицинских рекомендациях. Не полагайтесь на эти
+            данные для принятия решений о медицинском уходе.
           </p>
         </footer>
       </div>
@@ -155,7 +156,7 @@ function NaturalRemedyCard({ remedy }: { remedy: NaturalRemedy }) {
           <p className="font-semibold text-sm text-desert-tan-dark">
             {remedy.name}
             <span className="ml-2 inline-block rounded-full bg-desert-tan/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-desert-tan-dark align-middle">
-              {remedy.kind === 'self-care' ? 'Self-care' : 'Herb'}
+              {remedy.kind === 'self-care' ? 'Самопомощь' : 'Травы'}
             </span>
           </p>
           {remedy.commonNames.length > 0 && (

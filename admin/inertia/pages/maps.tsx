@@ -16,16 +16,16 @@ export default function Maps(props: {
   const [showMapCoordinates, setShowMapCoordinates] = useState(true)
 
   const alertMessage = !props.maps.baseAssetsExist
-    ? 'The base map assets have not been installed. Please download them first to enable map functionality.'
+    ? 'Базовые файлы карт не установлены. Пожалуйста, сначала загрузите их, чтобы включить функционал карт.'
     : !props.maps.worldBasemapExists
-    ? 'The world base map has not been downloaded yet, so the map may appear blank outside downloaded regions. Connect this NOMAD to the internet and download it (~15 MB) from Map Settings.'
+    ? 'Базовая карта мира ещё не загружена, поэтому за пределами загруженных регионов карта может быть пустой. Подключите этот НОМАД к интернету и загрузите её (~15 МБ) в Настройках карт.'
     : props.maps.regionFiles.length === 0
-    ? 'No map regions have been downloaded yet. Please download some regions to enable map functionality.'
+    ? 'Регионы карт ещё не загружены. Пожалуйста, загрузите несколько регионов, чтобы включить функционал карт.'
     : null
 
   return (
     <MapsLayout>
-      <Head title="Maps" />
+      <Head title="Карты" />
 
       <div className="relative w-full h-screen overflow-hidden">
         {/* Navbar */}
@@ -36,7 +36,7 @@ export default function Maps(props: {
         >
           <Link href="/home" className="flex items-center">
             <IconArrowLeft className="mr-2" size={24} />
-            <p className="text-lg text-text-secondary">Back to Home</p>
+            <p className="text-lg text-text-secondary">Назад на главную</p>
           </Link>
 
           <div className="flex items-center gap-3 mr-4">
@@ -45,12 +45,12 @@ export default function Maps(props: {
               onClick={() => setShowMapCoordinates((prev) => !prev)}
               className="rounded px-3 py-2 text-sm bg-surface-primary text-text-secondary hover:opacity-80 transition"
             >
-              {showMapCoordinates ? 'Hide Coordinates' : 'Show Coordinates'}
+              {showMapCoordinates ? 'Скрыть координаты' : 'Показать координаты'}
             </button>
 
             <Link href="/settings/maps">
               <StyledButton variant="primary" icon="IconSettings">
-                Manage Map Regions
+                Управление регионами карт
               </StyledButton>
             </Link>
           </div>
@@ -70,7 +70,7 @@ export default function Maps(props: {
               className="w-full"
               buttonProps={{
                 variant: 'secondary',
-                children: 'Go to Map Settings',
+                children: 'Перейти к настройкам карт',
                 icon: 'IconSettings',
                 onClick: () => router.visit('/settings/maps'),
               }}

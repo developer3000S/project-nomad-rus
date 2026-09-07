@@ -93,7 +93,7 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
       setPickerResults(json.results ?? [])
       setPickerSearched(true)
     } catch (err) {
-      setPickerError(err instanceof Error ? err.message : 'Search failed')
+      setPickerError(err instanceof Error ? err.message : 'Поиск не выполнен')
     } finally {
       setPickerLoading(false)
     }
@@ -122,7 +122,7 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
 
   return (
     <AppLayout compact>
-      <Head title="Compare label warnings" />
+      <Head title="Сравнение предупреждений" />
 
       <div className="p-4 max-w-7xl mx-auto">
         {/* Back nav */}
@@ -131,13 +131,13 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
           className="inline-flex items-center gap-1 text-sm text-desert-green hover:underline mb-4"
         >
           <IconArrowLeft size={16} />
-          Drug Reference
+          Справочник лекарств
         </Link>
 
         <div className="mb-5">
-          <h1 className="text-2xl font-bold mb-1">Compare label warnings</h1>
+          <h1 className="text-2xl font-bold mb-1">Сравнение предупреждений</h1>
           <p className="text-sm opacity-70">
-            View each drug's FDA-labeled interaction warnings side by side. Select up to {MAX_COMPARE} drugs.
+            Просмотрите предупреждения о взаимодействии каждого лекарства согласно маркировке FDA рядом. Выберите до {MAX_COMPARE} лекарств.
           </p>
         </div>
 
@@ -145,23 +145,23 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
         <div className="flex gap-3 items-start bg-amber-50 border border-amber-300 rounded-lg px-4 py-3 mb-6">
           <IconAlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-amber-900 leading-relaxed">
-            <strong>This shows each drug's own FDA-labeled interaction warnings, individually.</strong>{' '}
-            It is <strong>not</strong> a cross-drug interaction checker and is{' '}
-            <strong>not</strong> a substitute for professional medical review. Absence of text
-            here does not mean a drug is safe to combine.
+            <strong>Здесь показаны предупреждения о взаимодействии каждого лекарства согласно его маркировке FDA по отдельности.</strong>{' '}
+            Это <strong>не</strong> средство проверки межлекарственных взаимодействий и{' '}
+            <strong>не</strong> заменяет профессиональную медицинскую консультацию. Отсутствие текста
+            здесь не означает, что лекарство безопасно комбинировать.
           </p>
         </div>
 
         {isEmpty ? (
           // ── Empty state (no data ingested) ─────────────────────────────────
           <div className="border-2 border-dashed border-border-default rounded-lg p-8 text-center">
-            <p className="text-lg font-semibold mb-2">No FDA drug data yet</p>
+            <p className="text-lg font-semibold mb-2">Данные FDA о лекарствах ещё не загружены</p>
             <p className="mb-6 opacity-70">
-              Download the openFDA drug-label dataset to enable offline search and comparison.
+              Загрузите набор данных маркировки лекарств openFDA для офлайн-поиска и сравнения.
             </p>
             <Link href="/drug-reference">
               <StyledButton variant="primary" onClick={() => {}}>
-                Go to Drug Reference to download data
+                Перейти в Справочник лекарств для загрузки данных
               </StyledButton>
             </Link>
             {ingestStatus && (
@@ -175,10 +175,10 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
             {/* ── Drug picker ───────────────────────────────────────────────── */}
             <div className="mb-6 border border-border-subtle rounded-lg p-4 bg-surface-secondary">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-text-primary">Select drugs to compare</h2>
+                <h2 className="text-sm font-semibold text-text-primary">Выберите лекарства для сравнения</h2>
                 {atMax && (
                   <span className="text-xs text-amber-700 bg-amber-100 border border-amber-200 rounded px-2 py-0.5">
-                    Maximum {MAX_COMPARE} drugs reached
+                    Достигнуто максимум {MAX_COMPARE} лекарств
                   </span>
                 )}
               </div>
@@ -236,13 +236,13 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
 
               {/* Picker results */}
               {pickerLoading && (
-                <div className="mt-2 text-xs text-text-secondary">Searching…</div>
+                <div className="mt-2 text-xs text-text-secondary">Поиск…</div>
               )}
               {pickerError && (
                 <div className="mt-2 text-xs text-red-600">{pickerError}</div>
               )}
               {pickerSearched && pickerResults.length === 0 && !pickerLoading && (
-                <div className="mt-2 text-xs text-text-secondary">No results for "{query}"</div>
+                <div className="mt-2 text-xs text-text-secondary">Ничего не найдено по запросу "{query}"</div>
               )}
               {pickerResults.length > 0 && !atMax && (
                 <div className="mt-2 border border-border-subtle rounded-lg overflow-hidden divide-y divide-border-subtle max-h-64 overflow-y-auto bg-surface-primary">
@@ -261,11 +261,11 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
             {/* ── Comparison columns ────────────────────────────────────────── */}
             {selectedIds.length === 0 ? (
               <div className="text-center py-12 text-text-muted border-2 border-dashed border-border-subtle rounded-lg">
-                <p className="text-sm">Select drugs above to compare their labeled interaction warnings.</p>
+                <p className="text-sm">Выберите лекарства выше, чтобы сравнить их предупреждения о взаимодействии.</p>
               </div>
             ) : loadingEntries ? (
               <div className="text-center py-12 text-text-muted">
-                <p className="text-sm">Loading…</p>
+                <p className="text-sm">Загрузка…</p>
               </div>
             ) : (
               // Stacked single-column on phones. From sm: up the columns share
@@ -288,10 +288,11 @@ export default function DrugReferenceInteractions({ ingestStatus, rowCount }: Pa
 
         {/* ── Source citation (CC0, no-endorsement) ───────────────────────── */}
         <footer className="mt-8 pt-4 border-t border-border-subtle text-xs text-text-secondary">
-          <strong>Source:</strong> U.S. Food &amp; Drug Administration drug labeling, via{' '}
-          <strong>openFDA</strong> — public domain (CC0 1.0). NOMAD is not affiliated with or
-          endorsed by the FDA. Label data is provided as-is; do not rely on it for medical
-          decisions.
+          <strong>Источник:</strong> маркировка лекарств Управления по санитарному надзору за качеством пищевых
+          продуктов и медикаментов США (FDA), через{' '}
+          <strong>openFDA</strong> — общественное достояние (CC0 1.0). NOMAD не связан с FDA и не
+          поддерживается ею. Данные маркировки предоставляются как есть; не полагайтесь на них при принятии
+          медицинских решений.
         </footer>
       </div>
     </AppLayout>
@@ -314,21 +315,21 @@ function PickerRow({ result, selected, onAdd }: PickerRowProps) {
       {/* Reuse the same visual pattern as DrugResultRow but without a Link */}
       <div className="min-w-0 flex-1 mr-3">
         <span className="text-sm font-medium text-text-primary block truncate">
-          {result.brand_name ?? result.generic_name ?? 'Unknown'}
+          {result.brand_name ?? result.generic_name ?? 'Неизвестно'}
         </span>
         {result.brand_name && result.generic_name && (
           <span className="text-xs text-text-secondary italic">{result.generic_name}</span>
         )}
       </div>
       {selected ? (
-        <span className="text-xs text-desert-green font-semibold flex-shrink-0">Added</span>
+        <span className="text-xs text-desert-green font-semibold flex-shrink-0">Добавлено</span>
       ) : (
         <button
           type="button"
           onClick={onAdd}
           className="text-xs px-2.5 py-1 rounded border border-desert-green text-desert-green hover:bg-desert-green hover:text-white transition-colors flex-shrink-0"
         >
-          Add
+          Добавить
         </button>
       )}
     </div>

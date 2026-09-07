@@ -58,23 +58,33 @@ const ROUTE_OPTIONS = [
 
 /** Friendly "form" label for a route value (how you take it), plainer than the raw route. */
 const ROUTE_FRIENDLY: Record<string, string> = {
-  ORAL: 'Oral (pill, liquid)',
-  TOPICAL: 'Topical (cream, gel)',
-  OPHTHALMIC: 'Eye drops',
-  OTIC: 'Ear drops',
-  NASAL: 'Nasal spray',
-  INHALATION: 'Inhaler',
-  SUBLINGUAL: 'Under the tongue',
-  RECTAL: 'Rectal',
-  VAGINAL: 'Vaginal',
-  TRANSDERMAL: 'Skin patch',
-  DENTAL: 'Dental',
+  ORAL: 'Перорально (таблетка, жидкость)',
+  TOPICAL: 'Наружно (крем, гель)',
+  OPHTHALMIC: 'Глазные капли',
+  OTIC: 'Ушные капли',
+  NASAL: 'Назальный спрей',
+  INHALATION: 'Ингалятор',
+  SUBLINGUAL: 'Под язык',
+  RECTAL: 'Ректально',
+  VAGINAL: 'Вагинально',
+  TRANSDERMAL: 'Трансдермальный пластырь',
+  DENTAL: 'Для полости рта',
 }
 
 const DEBOUNCE_MS = 350
 const LIMIT = 50
 /** Max drugs shown per situation card (ranked, so the useful ones are on top). */
 const PER_SITUATION_DISPLAY = 25
+
+/** Russian plural helper: singular / few / many */
+function plural(n: number, zero = '', one = '', few = '', many = ''): string {
+  const mod10 = n % 10
+  const mod100 = n % 100
+  if (n === 0) return zero
+  if (mod10 === 1 && mod100 !== 11) return one
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few
+  return many
+}
 
 /** Shared elevated-card surface for the result and detail panels. */
 const CARD_SURFACE =
@@ -94,7 +104,7 @@ function drugKey(d: DrugSearchResult): string {
 
 /** Normalised active-ingredient group key (order/case-insensitive so combos group cleanly). */
 function ingredientKey(d: DrugSearchResult): string {
-  return (d.generic_name ?? 'Other')
+  return (d.generic_name ?? 'Другое')
     .split(',')
     .map((s) => s.trim().toUpperCase())
     .filter(Boolean)
@@ -139,7 +149,7 @@ function groupByIngredient(results: DrugSearchResult[]): IngredientGrouping[] {
       const label = parts
         .map((p) => (p ? p.charAt(0) + p.slice(1).toLowerCase() : p))
         .join(' + ')
-      g = { key, label: label || 'Other', single: parts.length <= 1, products: [] }
+      g = { key, label: label || 'Другое', single: parts.length <= 1, products: [] }
       map.set(key, g)
     }
     g.products.push(d)
@@ -245,7 +255,7 @@ export default function DrugReferenceIndex({
         setDrugResults(append ? (prev) => [...prev, ...next] : next)
         setHasMore(next.length === LIMIT)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Search failed')
+        setError(err instanceof Error ? err.message : 'Поиск не выполнен')
       } finally {
         setDrugLoading(false)
       }
@@ -322,7 +332,7 @@ export default function DrugReferenceIndex({
           },
         }))
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Search failed')
+        setError(err instanceof Error ? err.message : 'Поиск не выполнен')
         setSitResults((prev) => ({ ...prev, [c.slug]: { label: c.label, drugs: [], remedies: [], loading: false } }))
       }
     },
@@ -418,8 +428,8 @@ export default function DrugReferenceIndex({
     if (resetting) return
     if (
       !window.confirm(
-        'Restart the ingest? This clears the current (possibly stuck) ingest job and ' +
-          're-runs it from the already-downloaded files.'
+        'Перезапустить индексацию? Это очистит текущее задание индексации (возможно, зависшее) и ' +
+          'запустит его заново из уже скачанных файлов.'
       )
     ) {
       return
@@ -461,29 +471,29 @@ export default function DrugReferenceIndex({
           <PageHeader rowCount={rowCount} />
           <DrugDisclaimerModal open={showDisclaimer} onAcknowledge={() => setShowDisclaimer(false)} />
           <div className="border-2 border-dashed border-desert-stone-lighter rounded-2xl p-8 text-center bg-desert-white">
-            <p className="text-lg font-semibold mb-2 text-desert-green-darker">No FDA drug data yet</p>
+            <p className="text-lg font-semibold mb-2 text-desert-green-darker">Нет данных FDA</p>
             <p className="mb-6 opacity-70">
-              Download the openFDA drug-label dataset to enable offline search. Requires ~1.7 GB
-              compressed download (~8–10 GB after ingestion).
+              Загрузите набор данных маркировки лекарств openFDA для офлайн-поиска. Требуется ~1,7 ГБ
+              сжатого архива (~8–10 ГБ после индексации).
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <StyledButton variant="primary" onClick={handleTriggerDownload} disabled={triggering || busy}>
                 {phase === 'downloading'
-                  ? 'Downloading…'
+                  ? 'Загрузка…'
                   : phase === 'ingesting'
-                    ? 'Indexing…'
+                    ? 'Индексация…'
                     : triggering
-                      ? 'Starting…'
-                      : 'Download FDA drug data'}
+                      ? 'Запуск…'
+                      : 'Скачать данные FDA'}
               </StyledButton>
               {canIngestFromDisk && (
                 <StyledButton variant="secondary" onClick={handleIngestFromDisk} disabled={ingesting || busy}>
-                  {ingesting ? 'Starting…' : 'Ingest into search'}
+                  {ingesting ? 'Запуск…' : 'Проиндексировать для поиска'}
                 </StyledButton>
               )}
               {phase === 'ingesting' && (
                 <StyledButton variant="outline" onClick={handleResetIngest} disabled={resetting}>
-                  {resetting ? 'Restarting…' : 'Restart ingest'}
+                  {resetting ? 'Перезапуск…' : 'Перезапустить индексацию'}
                 </StyledButton>
               )}
             </div>
@@ -516,13 +526,13 @@ export default function DrugReferenceIndex({
         <TabGroup selectedIndex={tabIndex} onChange={setTabIndex}>
           <TabList className="mb-5 flex gap-1 border-b border-desert-stone-lighter/50">
             <Tab className={tabClass}>
-              <IconSearch size={16} /> Search by drug
+              <IconSearch size={16} /> Поиск лекарства
             </Tab>
             <Tab className={tabClass}>
-              <IconFirstAidKit size={16} /> By situation
+              <IconFirstAidKit size={16} /> По ситуации
             </Tab>
             <Tab className={tabClass}>
-              <IconDatabase size={16} /> FDA data
+              <IconDatabase size={16} /> Данные FDA
             </Tab>
           </TabList>
 
@@ -546,7 +556,7 @@ export default function DrugReferenceIndex({
                   value={query}
                   onChange={handleQueryChange}
                   autoFocus
-                  placeholder="Search a medicine by name — ibuprofen, Benadryl, loratadine…"
+                  placeholder="Поиск лекарства по названию — ибупрофен, Бензедрин, лоратадин…"
                   className="w-full rounded-lg border border-desert-stone-lighter bg-surface-primary py-2.5 pl-10 pr-4 text-sm text-desert-green-darker transition focus:border-desert-green focus:outline-none focus:ring-2 focus:ring-desert-green/20"
                 />
               </div>
@@ -555,21 +565,21 @@ export default function DrugReferenceIndex({
               <div className="mb-6">
                 <div className="flex items-center gap-2">
                   <FilterPill active={productType === null} onClick={() => handleFilterChange(null)}>
-                    All
+                    Все
                   </FilterPill>
                   <FilterPill
                     active={productType === PRODUCT_TYPES.OTC}
                     tone="olive"
                     onClick={() => handleFilterChange(PRODUCT_TYPES.OTC)}
                   >
-                    Over-the-counter
+                    Без рецепта
                   </FilterPill>
                   <FilterPill
                     active={productType === PRODUCT_TYPES.RX}
                     tone="orange"
                     onClick={() => handleFilterChange(PRODUCT_TYPES.RX)}
                   >
-                    Prescription
+                    По рецепту
                   </FilterPill>
                   <button
                     type="button"
@@ -577,20 +587,20 @@ export default function DrugReferenceIndex({
                     className="ml-auto flex items-center gap-1 rounded-full border border-desert-stone-lighter bg-surface-primary px-3 py-1 text-xs text-desert-green-darker hover:border-desert-green"
                   >
                     <IconAdjustmentsHorizontal size={14} />
-                    {route ? ROUTE_FRIENDLY[route] : 'Form'} · {sort === 'name' ? 'A–Z' : 'Best match'}
+                    {route ? ROUTE_FRIENDLY[route] : 'Форма'} · {sort === 'name' ? 'А–Я' : 'Лучшее совпадение'}
                     <IconChevronDown size={14} className={filtersOpen ? 'rotate-180 transition' : 'transition'} />
                   </button>
                 </div>
                 {filtersOpen && (
                   <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg border border-desert-stone-lighter/60 bg-desert-sand/20 p-3">
                     <label className="flex items-center gap-2 text-xs text-desert-green-darker">
-                      Form (how you take it)
+                      Форма (как принимается)
                       <select
                         value={route ?? ''}
                         onChange={(e) => handleRouteChange(e.target.value || null)}
                         className="rounded-lg border border-desert-stone-lighter bg-surface-primary px-2 py-1 text-xs text-desert-green-darker focus:border-desert-green focus:outline-none"
                       >
-                        <option value="">Any form</option>
+                        <option value="">Любая форма</option>
                         {ROUTE_OPTIONS.map((r) => (
                           <option key={r} value={r}>
                             {ROUTE_FRIENDLY[r]}
@@ -599,14 +609,14 @@ export default function DrugReferenceIndex({
                       </select>
                     </label>
                     <label className="flex items-center gap-2 text-xs text-desert-green-darker">
-                      Sort
+                      Сортировка
                       <select
                         value={sort}
                         onChange={(e) => handleSortChange(e.target.value as 'relevance' | 'name')}
                         className="rounded-lg border border-desert-stone-lighter bg-surface-primary px-2 py-1 text-xs text-desert-green-darker focus:border-desert-green focus:outline-none"
                       >
-                        <option value="relevance">Best match</option>
-                        <option value="name">A–Z</option>
+                        <option value="relevance">Лучшее совпадение</option>
+                        <option value="name">А–Я</option>
                       </select>
                     </label>
                   </div>
@@ -614,18 +624,18 @@ export default function DrugReferenceIndex({
               </div>
 
               {drugLoading && drugResults.length === 0 && (
-                <div className="text-center py-8 opacity-60">Searching…</div>
+                <div className="text-center py-8 opacity-60">Поиск…</div>
               )}
 
               {!drugSearched && (
                 <div className="rounded-2xl border border-dashed border-desert-stone-lighter/70 p-8 text-center text-sm text-desert-stone">
-                  Type a medicine name above to search {rowCount.toLocaleString()} FDA drug labels.
+                  Введите название лекарства выше, чтобы искать среди {rowCount.toLocaleString()} меток FDA.
                   <br />
-                  Looking for something to treat a symptom instead? Try the{' '}
+                  Ищете средство для лечения симптома? Попробуйте вкладку{' '}
                   <button className="font-semibold text-desert-green underline" onClick={() => setTabIndex(1)}>
-                    By situation
-                  </button>{' '}
-                  tab.
+                    По ситуации
+                  </button>
+                  .
                 </div>
               )}
 
@@ -636,10 +646,10 @@ export default function DrugReferenceIndex({
                       <IconPill size={18} />
                     </span>
                     <h2 className="text-sm font-bold text-desert-green-darker">
-                      {ingredientGroups.length} ingredient{ingredientGroups.length !== 1 ? 's' : ''}
+                      {ingredientGroups.length} активн. веществ{plural(ingredientGroups.length, '', '', 'а', 'ов')}
                     </h2>
                     <span className="ml-auto text-xs text-desert-stone">
-                      {drugResults.length} product{drugResults.length !== 1 ? 's' : ''}
+                      {drugResults.length} продукт{plural(drugResults.length, '', 'а', 'а', 'ов')}
                     </span>
                   </div>
                   <div className="divide-y divide-desert-stone-lighter/40">
@@ -650,7 +660,7 @@ export default function DrugReferenceIndex({
                   {hasMore && (
                     <div className="flex justify-center border-t border-desert-stone-lighter/40 p-3">
                       <StyledButton variant="secondary" onClick={handleLoadMore} disabled={drugLoading}>
-                        {drugLoading ? 'Loading…' : 'Load more products'}
+                        {drugLoading ? 'Загрузка…' : 'Загрузить больше продуктов'}
                       </StyledButton>
                     </div>
                   )}
@@ -659,7 +669,7 @@ export default function DrugReferenceIndex({
 
               {drugNothing && (
                 <div className="text-center py-8 opacity-60">
-                  No medicines match &ldquo;{query}&rdquo;.
+                  Лекарств по запросу &ldquo;{query}&rdquo; не найдено.
                 </div>
               )}
             </TabPanel>
@@ -672,7 +682,7 @@ export default function DrugReferenceIndex({
               <div className="my-4">
                 {anySituationSelected && (
                   <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-semibold text-desert-stone">Selected:</span>
+                    <span className="text-xs font-semibold text-desert-stone">Выбрано:</span>
                     {selectedSlugs.map((slug) => {
                       const c = conditions.find((x) => x.slug === slug)
                       if (!c) return null
@@ -696,7 +706,7 @@ export default function DrugReferenceIndex({
                       }}
                       className="text-xs text-desert-stone underline hover:text-desert-green-darker"
                     >
-                      Clear
+                      Очистить
                     </button>
                   </div>
                 )}
@@ -707,7 +717,7 @@ export default function DrugReferenceIndex({
                   className="flex items-center gap-1 rounded-full border border-desert-stone-lighter bg-surface-primary px-3 py-1 text-xs text-desert-green-darker hover:border-desert-olive"
                 >
                   <IconFirstAidKit size={14} />
-                  {anySituationSelected ? 'Add another situation' : 'Pick one or more situations'}
+                  {anySituationSelected ? 'Добавить ещё ситуацию' : 'Выберите одну или несколько ситуаций'}
                   <IconChevronDown size={14} className={browseOpen ? 'rotate-180 transition' : 'transition'} />
                 </button>
 
@@ -745,12 +755,12 @@ export default function DrugReferenceIndex({
 
               {!anySituationSelected && (
                 <div className="rounded-2xl border border-dashed border-desert-stone-lighter/70 p-8 text-center text-sm text-desert-stone">
-                  Pick a situation (or a few) above to see the over-the-counter drugs whose FDA labels list it.
+                  Выберите ситуацию (или несколько) выше, чтобы увидеть безрецептурные лекарства, чьи метки FDA содержат эту информацию.
                 </div>
               )}
 
               {situationLoading && (
-                <div className="text-center py-6 opacity-60">Finding options…</div>
+                <div className="text-center py-6 opacity-60">Поиск вариантов…</div>
               )}
 
               {/* Intersection — treats ALL selected situations */}
@@ -761,7 +771,7 @@ export default function DrugReferenceIndex({
                       <IconFirstAidKit size={18} />
                     </span>
                     <h2 className="text-sm font-bold text-desert-olive-dark">
-                      Treats all {selectedSlugs.length} selected
+                      Лечит все {selectedSlugs.length} выбранных
                     </h2>
                     <span className="ml-auto text-xs text-desert-stone">{intersection.length} OTC</span>
                   </div>
@@ -777,8 +787,8 @@ export default function DrugReferenceIndex({
                   ALL selected (intersection empty), or for a single situation. */}
               {!situationLoading && intersection.length === 0 && selectedSlugs.length >= 2 && (
                 <p className="mb-3 text-sm text-desert-stone">
-                  No single option treats all {selectedSlugs.length} of these — here are options for each
-                  situation.
+                  Нет одного средства на все {selectedSlugs.length} ситуаций — ниже варианты для каждой из
+                  них.
                 </p>
               )}
               {!situationLoading &&
@@ -792,7 +802,7 @@ export default function DrugReferenceIndex({
                 if (allDrugs.length === 0 && remediesShown.length === 0) {
                   return (
                     <p key={slug} className="mb-4 text-sm text-desert-stone">
-                      No additional OTC options found for <strong>{r.label}</strong>.
+                      Дополнительные безрецептурные варианты для <strong>{r.label}</strong> не найдены.
                     </p>
                   )
                 }
@@ -803,11 +813,11 @@ export default function DrugReferenceIndex({
                         <IconFirstAidKit size={18} />
                       </span>
                       <h2 className="text-sm font-bold text-desert-green-darker">
-                        For <span className="text-desert-olive-dark">&ldquo;{r.label}&rdquo;</span>
+                        Для <span className="text-desert-olive-dark">&ldquo;{r.label}&rdquo;</span>
                       </h2>
                       <span className="ml-auto text-xs text-desert-stone">
                         {allDrugs.length} OTC
-                        {allDrugs.length > PER_SITUATION_DISPLAY ? ` · top ${PER_SITUATION_DISPLAY}` : ''}
+                        {allDrugs.length > PER_SITUATION_DISPLAY ? ` · первые ${PER_SITUATION_DISPLAY}` : ''}
                       </span>
                     </div>
                     {drugs.length > 0 && (
@@ -822,7 +832,7 @@ export default function DrugReferenceIndex({
                         <div className="flex items-center gap-2 px-4 py-2 border-b border-desert-tan-lighter/30">
                           <IconLeaf size={14} className="text-desert-tan-dark" />
                           <span className="text-xs font-semibold uppercase tracking-wide text-desert-tan-dark">
-                            Natural remedies
+                            Натуральные средства
                           </span>
                         </div>
                         <div className="border-b border-desert-tan-lighter/20 p-3">
@@ -844,25 +854,25 @@ export default function DrugReferenceIndex({
             <TabPanel>
               <div className={`${CARD_SURFACE} p-5`}>
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-sm font-bold text-desert-green-darker">FDA drug data</h2>
+                  <h2 className="text-sm font-bold text-desert-green-darker">Данные FDA о лекарствах</h2>
                   <div className="flex flex-wrap items-center gap-2">
                     {canIngestFromDisk && (
                       <StyledButton variant="outline" size="sm" onClick={handleIngestFromDisk} disabled={ingesting || busy}>
-                        {ingesting ? 'Starting…' : 'Ingest into search'}
+                        {ingesting ? 'Запуск…' : 'Проиндексировать для поиска'}
                       </StyledButton>
                     )}
                     <StyledButton variant="secondary" size="sm" onClick={handleTriggerDownload} disabled={triggering || busy}>
                       {phase === 'downloading'
-                        ? 'Downloading…'
+                        ? 'Загрузка…'
                         : phase === 'ingesting'
-                          ? 'Indexing…'
-                          : 'Update FDA data'}
+                          ? 'Индексация…'
+                          : 'Обновить данные FDA'}
                     </StyledButton>
                   </div>
                 </div>
                 <p className="mb-4 text-xs text-desert-stone">
-                  {rowCount.toLocaleString()} drug labels installed. Updating re-checks openFDA for a newer
-                  dataset and refreshes the offline copy.
+                  Установлено меток лекарств: {rowCount.toLocaleString()}. При обновлении выполняется повторная
+                  проверка openFDA на наличие нового набора данных и обновляется офлайн-копия.
                 </p>
                 {status && <IngestStatus status={status} onRefresh={handleStatusRefresh} />}
               </div>
@@ -882,18 +892,18 @@ function PageHeader({ rowCount }: { rowCount: number }) {
   return (
     <div className="mb-4">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-1">
-        <h1 className="text-2xl font-bold text-desert-green-darker">Drug Reference</h1>
+        <h1 className="text-2xl font-bold text-desert-green-darker">Справочник лекарств</h1>
         {rowCount > 0 && (
           <Link href="/drug-reference/interactions">
             <StyledButton variant="outline" size="sm" onClick={() => {}}>
-              Compare label warnings
+              Сравнить предупреждения на этикетках
             </StyledButton>
           </Link>
         )}
       </div>
       <p className="text-sm opacity-70">
-        Look up a medicine by name, or start from a symptom to find over-the-counter options — all from
-        offline FDA drug labels.
+        Найдите лекарство по названию или начните с симптома, чтобы подобрать безрецептурные варианты — всё
+        из офлайн-меток FDA.
       </p>
     </div>
   )
@@ -904,9 +914,11 @@ function PageHeader({ rowCount }: { rowCount: number }) {
 function SourceFooter() {
   return (
     <footer className="mt-8 pt-4 border-t border-desert-stone-lighter/40 text-xs text-desert-stone">
-      <strong>Source:</strong> U.S. Food &amp; Drug Administration drug labeling, via{' '}
-      <strong>openFDA</strong> — public domain (CC0 1.0). NOMAD is not affiliated with or endorsed by the
-      FDA. Label data and situation matches are label-text only; do not rely on them for medical decisions.
+      <strong>Источник:</strong> маркировка лекарств Управления по санитарному надзору за качеством пищевых
+      продуктов и медикаментов США (FDA), через{' '}
+      <strong>openFDA</strong> — общественное достояние (CC0 1.0). NOMAD не связан с FDA и не
+      поддерживается ею. Данные маркировки и соответствия ситуациям являются только текстом маркировки;
+      не полагайтесь на них при принятии медицинских решений.
     </footer>
   )
 }
@@ -921,7 +933,7 @@ function SituationRemedyRow({ remedy }: { remedy: NaturalRemedy }) {
           <p className="text-sm font-semibold text-desert-tan-dark">
             {remedy.name}
             <span className="ml-2 inline-block rounded-full bg-desert-tan/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-desert-tan-dark align-middle">
-              {remedy.kind === 'self-care' ? 'Self-care' : 'Herb'}
+              {remedy.kind === 'self-care' ? 'Самопомощь' : 'Травы'}
             </span>
           </p>
           {remedy.commonNames.length > 0 && (
@@ -929,18 +941,18 @@ function SituationRemedyRow({ remedy }: { remedy: NaturalRemedy }) {
           )}
         </div>
         <span className="flex-shrink-0 text-xs text-desert-stone mt-0.5">
-          Source: {remedySourceName(remedy)}
+          Источник: {remedySourceName(remedy)}
         </span>
       </div>
       <p className="mt-1.5 text-xs text-desert-green-darker">{remedy.uses}</p>
       {remedy.how && (
         <p className="mt-1 text-xs text-desert-green-darker">
-          <strong>How:</strong> {remedy.how}
+          <strong>Как:</strong> {remedy.how}
         </p>
       )}
       {remedy.cautions && (
         <p className="mt-1 text-xs text-desert-red-dark">
-          <strong>Cautions:</strong> {remedy.cautions}
+          <strong>Предостережения:</strong> {remedy.cautions}
         </p>
       )}
     </div>
