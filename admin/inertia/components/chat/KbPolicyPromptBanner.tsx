@@ -48,7 +48,7 @@ export default function KbPolicyPromptBanner() {
     onSuccess: () => {
       addNotification({
         type: 'success',
-        message: `${aiAssistantName} will index your existing content. You can track progress in the Knowledge Base panel.`,
+        message: `${aiAssistantName} проиндексирует ваш существующий контент. Вы можете отслеживать прогресс на панели «База знаний».`,
       })
       queryClient.invalidateQueries({ queryKey: ['kbPolicyPromptState'] })
       queryClient.invalidateQueries({ queryKey: ['ingestPolicy'] })
@@ -58,7 +58,7 @@ export default function KbPolicyPromptBanner() {
     onError: (error: any) => {
       addNotification({
         type: 'error',
-        message: error?.message || 'Could not start indexing. Try again from the Knowledge Base panel.',
+        message: error?.message || 'Не удалось запустить индексацию. Попробуйте снова на панели «База знаний».',
       })
     },
   })
@@ -68,7 +68,7 @@ export default function KbPolicyPromptBanner() {
     onSuccess: () => {
       addNotification({
         type: 'success',
-        message: 'Your content stays unindexed for now. You can opt in any time from the Knowledge Base panel.',
+        message: 'Ваш контент пока остаётся непроиндексированным. Вы можете включить индексацию в любой момент на панели «База знаний».',
       })
       queryClient.invalidateQueries({ queryKey: ['kbPolicyPromptState'] })
       queryClient.invalidateQueries({ queryKey: ['ingestPolicy'] })
@@ -76,7 +76,7 @@ export default function KbPolicyPromptBanner() {
     onError: (error: any) => {
       addNotification({
         type: 'error',
-        message: error?.message || 'Could not save your choice. Try again.',
+        message: error?.message || 'Не удалось сохранить ваш выбор. Попробуйте ещё раз.',
       })
     },
   })
@@ -94,10 +94,10 @@ export default function KbPolicyPromptBanner() {
           <p className="text-sm text-text-primary">
             <strong>
               {fileCount === 1
-                ? `Index your existing file for ${aiAssistantName}?`
-                : `Index your ${fileCount.toLocaleString()} existing files for ${aiAssistantName}?`}
+                ? `Проиндексировать существующий файл для ${aiAssistantName}?`
+                : `Проиндексировать ${fileCount.toLocaleString()} существующих файлов для ${aiAssistantName}?`}
             </strong>
-            {' '}When indexed, {aiAssistantName} can reference them while answering your questions.
+            {' '}После индексации {aiAssistantName} сможет ссылаться на них при ответах на ваши вопросы.
           </p>
         </div>
         <div className="flex gap-2 flex-shrink-0">
@@ -108,7 +108,7 @@ export default function KbPolicyPromptBanner() {
             disabled={isBusy}
             loading={indexNowMutation.isPending}
           >
-            Index existing content
+            Индексировать существующий контент
           </StyledButton>
           <StyledButton
             onClick={() => maybeLaterMutation.mutate()}
@@ -117,7 +117,7 @@ export default function KbPolicyPromptBanner() {
             disabled={isBusy}
             loading={maybeLaterMutation.isPending}
           >
-            Maybe later
+            Возможно, позже
           </StyledButton>
         </div>
       </div>

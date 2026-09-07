@@ -306,7 +306,7 @@ export function remedySourceName(remedy: { kind?: 'herb' | 'self-care'; sourceUr
   if (url.includes('fda.gov')) return 'FDA'
   if (url.includes('medlineplus.gov')) return 'MedlinePlus (NLM)'
   if (url.includes('nih.gov')) return 'NIH'
-  return 'US government source'
+  return 'Государственный источник США'
 }
 
 /**

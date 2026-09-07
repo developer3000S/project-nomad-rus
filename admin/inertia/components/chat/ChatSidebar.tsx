@@ -52,7 +52,7 @@ export default function ChatSidebar({
         'fixed inset-y-0 left-0 z-50 md:static md:z-auto md:flex',
         isMobileOpen ? 'flex' : 'hidden'
       )}
-      aria-label="Chat conversations"
+      aria-label="Беседы чата"
     >
       <div className="p-4 border-b border-border-subtle h-[75px] flex items-center justify-center">
         <StyledButton
@@ -64,13 +64,13 @@ export default function ChatSidebar({
           variant="primary"
           fullWidth
         >
-          New Chat
+          Новый чат
         </StyledButton>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {sessions.length === 0 ? (
-          <div className="p-4 text-center text-text-muted text-sm">No previous chats</div>
+          <div className="p-4 text-center text-text-muted text-sm">Нет предыдущих чатов</div>
         ) : (
           <div className="p-2 space-y-1">
             {sessions.map((session) => (
@@ -114,7 +114,7 @@ export default function ChatSidebar({
         )}
       </div>
       <div className="p-4 flex flex-col items-center justify-center gap-y-2">
-        <img src="/project_nomad_logo.webp" alt="Project NOMAD Logo" className="h-28 w-28 mb-6" />
+        <img src="/project_nomad_logo.webp" alt="Логотип Project NOMAD" className="h-28 w-28 mb-6" />
         <StyledButton
           onClick={() => {
             // /chat is served by the admin app itself, so navigate in place rather than
@@ -127,7 +127,7 @@ export default function ChatSidebar({
           size="sm"
           fullWidth
         >
-          {isInModal ? 'Open Full Chat' : 'Back to Home'}
+          {isInModal ? 'Открыть полный чат' : 'На главную'}
         </StyledButton>
         <StyledButton
           onClick={() => {
@@ -138,7 +138,7 @@ export default function ChatSidebar({
           size="sm"
           fullWidth
         >
-          Models & Settings
+          Модели и настройки
         </StyledButton>
         <StyledButton
           onClick={() => {
@@ -149,7 +149,7 @@ export default function ChatSidebar({
           size="sm"
           fullWidth
         >
-          Knowledge Base
+          База знаний
         </StyledButton>
         <StyledButton
           onClick={() => {
@@ -170,7 +170,7 @@ export default function ChatSidebar({
             size="sm"
             fullWidth
           >
-            Clear History
+            Очистить историю
           </StyledButton>
         )}
       </div>

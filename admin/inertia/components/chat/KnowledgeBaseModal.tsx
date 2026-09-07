@@ -88,26 +88,26 @@ function renderStatePill(record: KbFileGroup): React.ReactNode {
     case 'indexed':
       return (
         <span className={`${base} text-green-700 bg-green-50 border-green-200 dark:text-green-300 dark:bg-green-950/40 dark:border-green-800`}>
-          Indexed
+          Проиндексировано
         </span>
       )
     case 'pending_decision':
     case 'browse_only':
       return (
         <span className={`${base} text-text-secondary bg-surface-secondary border-border-subtle`}>
-          Not Indexed
+          Не проиндексировано
         </span>
       )
     case 'failed':
       return (
         <span className={`${base} text-red-700 bg-red-50 border-red-200 dark:text-red-300 dark:bg-red-950/40 dark:border-red-800`}>
-          Failed
+          Ошибка
         </span>
       )
     case 'stalled':
       return (
         <span className={`${base} text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-300 dark:bg-amber-950/40 dark:border-amber-800`}>
-          Stalled
+          Зависло
         </span>
       )
   }
@@ -130,15 +130,15 @@ function pickRowAction(record: KbFileGroup, hasWarnings: boolean): RowAction | n
   switch (effective) {
     case 'indexed':
       return hasWarnings
-        ? { kind: 'reembed', label: 'Re-embed', force: true, variant: 'secondary', icon: 'IconRefreshAlert' }
+        ? { kind: 'reembed', label: 'Переиндексировать', force: true, variant: 'secondary', icon: 'IconRefreshAlert' }
         : null
     case 'pending_decision':
-      return { kind: 'index', label: 'Index', force: false, variant: 'primary', icon: 'IconDownload' }
+      return { kind: 'index', label: 'Индексировать', force: false, variant: 'primary', icon: 'IconDownload' }
     case 'browse_only':
-      return { kind: 'index', label: 'Index', force: true, variant: 'primary', icon: 'IconDownload' }
+      return { kind: 'index', label: 'Индексировать', force: true, variant: 'primary', icon: 'IconDownload' }
     case 'failed':
     case 'stalled':
-      return { kind: 'index', label: 'Retry', force: true, variant: 'primary', icon: 'IconRefresh' }
+      return { kind: 'index', label: 'Повторить', force: true, variant: 'primary', icon: 'IconRefresh' }
   }
 }
 
@@ -219,14 +219,14 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
         type: 'success',
         message:
           policy === 'Always'
-            ? 'New content will be auto-indexed for AI.'
-            : 'New content will wait for you to opt in.',
+            ? 'Новый контент будет автоматически индексироваться для ИИ.'
+            : 'Новый контент будет ждать вашего согласия на индексирование.',
       })
     },
     onError: (error: any) => {
       addNotification({
         type: 'error',
-        message: error?.message || 'Failed to update indexing policy.',
+        message: error?.message || 'Не удалось обновить политику индексирования.',
       })
     },
   })
@@ -239,24 +239,24 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
     mutationFn: ({ source, collection }: { source: string; collection: string }) =>
       api.updateFileCollection(source, collection || null),
     onSuccess: (data) => {
-      addNotification({ type: 'success', message: data?.message || 'Collection updated.' })
+      addNotification({ type: 'success', message: data?.message || 'Коллекция обновлена.' })
       queryClient.invalidateQueries({ queryKey: ['storedFiles'] })
       queryClient.invalidateQueries({ queryKey: ['kbCollections'] })
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to update collection.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось обновить коллекцию.' })
     },
   })
 
   const deleteMutation = useMutation({
     mutationFn: (source: string) => api.deleteRAGFile(source),
     onSuccess: () => {
-      addNotification({ type: 'success', message: 'File removed from knowledge base.' })
+      addNotification({ type: 'success', message: 'Файл удалён из базы знаний.' })
       setConfirmDeleteSource(null)
       queryClient.invalidateQueries({ queryKey: ['storedFiles'] })
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to delete file.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось удалить файл.' })
       setConfirmDeleteSource(null)
     },
   })
@@ -267,7 +267,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
     onSuccess: (data) => {
       addNotification({
         type: 'success',
-        message: data?.message || 'File queued for embedding.',
+        message: data?.message || 'Файл поставлен в очередь на индексацию.',
       })
       setConfirmReembed(null)
       queryClient.invalidateQueries({ queryKey: ['storedFiles'] })
@@ -275,7 +275,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
       queryClient.invalidateQueries({ queryKey: ['kbFileWarnings'] })
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to queue file.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось поставить файл в очередь.' })
       setConfirmReembed(null)
     },
   })
@@ -283,25 +283,25 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
   const cleanupFailedMutation = useMutation({
     mutationFn: () => api.cleanupFailedEmbedJobs(),
     onSuccess: (data) => {
-      addNotification({ type: 'success', message: data?.message || 'Failed jobs cleaned up.' })
+      addNotification({ type: 'success', message: data?.message || 'Неудачные задания очищены.' })
       queryClient.invalidateQueries({ queryKey: ['failedEmbedJobs'] })
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to clean up jobs.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось очистить задания.' })
     },
   })
 
   const cancelAllMutation = useMutation({
     mutationFn: () => api.cancelAllEmbedJobs(),
     onSuccess: (data) => {
-      addNotification({ type: 'success', message: data?.message || 'All embedding jobs cancelled.' })
+      addNotification({ type: 'success', message: data?.message || 'Все задания индексации отменены.' })
       queryClient.invalidateQueries({ queryKey: ['embed-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['failedEmbedJobs'] })
       queryClient.invalidateQueries({ queryKey: ['storedFiles'] })
       queryClient.invalidateQueries({ queryKey: ['kbFileWarnings'] })
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to cancel jobs.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось отменить задания.' })
     },
   })
 
@@ -312,7 +312,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
       queryClient.invalidateQueries({ queryKey: ['qdrantHealth'] })
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to start Qdrant.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось запустить Qdrant.' })
     },
   })
 
@@ -321,13 +321,13 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
     onSuccess: (data) => {
       addNotification({
         type: 'success',
-        message: data?.message || 'Storage synced successfully. If new files were found, they have been queued for processing.',
+        message: data?.message || 'Хранилище синхронизировано. Если найдены новые файлы, они поставлены в очередь на обработку.',
       })
     },
     onError: (error: any) => {
       addNotification({
         type: 'error',
-        message: error?.message || 'Failed to sync storage',
+        message: error?.message || 'Не удалось синхронизировать хранилище',
       })
     },
   })
@@ -337,7 +337,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
     onSuccess: (data) => {
       addNotification({
         type: data?.success ? 'success' : 'error',
-        message: data?.message || 'Re-embed completed.',
+        message: data?.message || 'Переиндексация завершена.',
       })
       queryClient.invalidateQueries({ queryKey: ['storedFiles'] })
       queryClient.invalidateQueries({ queryKey: ['embed-jobs'] })
@@ -345,7 +345,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
       setResetTyped('')
     },
     onError: () => {
-      addNotification({ type: 'error', message: 'Failed to re-embed knowledge base.' })
+      addNotification({ type: 'error', message: 'Не удалось переиндексировать базу знаний.' })
       setBulkMode(null)
     },
   })
@@ -355,7 +355,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
     onSuccess: (data) => {
       addNotification({
         type: data?.success ? 'success' : 'error',
-        message: data?.message || 'Reset complete.',
+        message: data?.message || 'Сброс завершён.',
       })
       queryClient.invalidateQueries({ queryKey: ['storedFiles'] })
       queryClient.invalidateQueries({ queryKey: ['embed-jobs'] })
@@ -363,7 +363,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
       setResetTyped('')
     },
     onError: () => {
-      addNotification({ type: 'error', message: 'Failed to reset knowledge base.' })
+      addNotification({ type: 'error', message: 'Не удалось сбросить базу знаний.' })
       setBulkMode(null)
     },
   })
@@ -393,33 +393,34 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
     if (successCount > 0) {
       addNotification({
         type: 'success',
-        message: `${successCount} file${successCount > 1 ? 's' : ''} queued for processing.`,
+        message: `${successCount} файл(ов) поставлено в очередь на обработку.`,
       })
     }
     for (const name of failedNames) {
-      addNotification({ type: 'error', message: `Failed to upload: ${name}` })
+      addNotification({ type: 'error', message: `Не удалось загрузить: ${name}` })
     }
   }
 
   const handleConfirmCancelAll = () => {
     openModal(
       <StyledModal
-        title='Cancel All Embedding Jobs?'
+        title='Отменить все задания индексации?'
         onConfirm={() => {
           cancelAllMutation.mutate()
           closeModal('confirm-cancel-all-modal')
         }}
         onCancel={() => closeModal('confirm-cancel-all-modal')}
         open={true}
-        confirmText='Cancel All Jobs'
-        cancelText='Keep Jobs'
+        confirmText='Отменить все задания'
+        cancelText='Оставить задания'
         confirmVariant='danger'
       >
         <p className='text-text-primary'>
-          This stops <strong>every</strong> embedding job — including ones still in progress or
-          stuck — and clears the processing queue. The uploaded source files for those jobs are
-          deleted, so you'll need to re-upload anything you still want indexed. Stored files that
-          already finished embedding are not affected. Are you sure you want to proceed?
+          Это остановит <strong>все</strong> задания индексации — включая выполняющиеся и
+          зависшие — и очистит очередь обработки. Исходные файлы для этих заданий будут удалены,
+          поэтому вам нужно будет повторно загрузить всё, что ещё хотите проиндексировать.
+          Сохранённые файлы, индексация которых уже завершена, не пострадают. Вы уверены, что
+          хотите продолжить?
         </p>
       </StyledModal>,
       'confirm-cancel-all-modal'
@@ -429,7 +430,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
   const handleConfirmSync = () => {
     openModal(
       <StyledModal
-        title='Confirm Sync?'
+        title='Подтвердить синхронизацию?'
         onConfirm={() => {
           syncMutation.mutate()
           closeModal(
@@ -438,13 +439,15 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
         }}
         onCancel={() => closeModal("confirm-sync-modal")}
         open={true}
-        confirmText='Confirm Sync'
-        cancelText='Cancel'
+        confirmText='Подтвердить синхронизацию'
+        cancelText='Отмена'
         confirmVariant='primary'
       >
         <p className='text-text-primary'>
-          This will scan the NOMAD's storage directories for any new files and queue them for processing. This is useful if you've manually added files to the storage or want to ensure everything is up to date.
-          This may cause a temporary increase in resource usage if new files are found and being processed. Are you sure you want to proceed?
+          Будет выполнено сканирование каталогов хранения NOMAD на наличие новых файлов, и они
+          будут поставлены в очередь на обработку. Это полезно, если вы вручную добавили файлы в
+          хранилище или хотите убедиться, что всё актуально. При наличии новых файлов может
+          временно возрасти потребление ресурсов. Вы уверены, что хотите продолжить?
         </p>
       </StyledModal>,
       "confirm-sync-modal"
@@ -455,7 +458,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm transition-opacity">
       <div className="bg-surface-primary rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-border-subtle shrink-0">
-          <h2 className="text-2xl font-semibold text-text-primary">Knowledge Base</h2>
+          <h2 className="text-2xl font-semibold text-text-primary">База знаний</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-surface-secondary rounded-lg transition-colors"
@@ -467,7 +470,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
           {qdrantOffline && (
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm dark:bg-red-950 dark:border-red-800 dark:text-red-300 flex items-center justify-between gap-4">
               <span>
-                <strong>Knowledge Base unavailable:</strong> The Qdrant vector database is offline.
+                <strong>База знаний недоступна:</strong> Векторная база данных Qdrant не в сети.
               </span>
               <StyledButton
                 variant="danger"
@@ -476,7 +479,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                 loading={startQdrantMutation.isPending || isStartingQdrant}
                 disabled={startQdrantMutation.isPending || isStartingQdrant}
               >
-                {isStartingQdrant ? 'Starting…' : 'Start Qdrant'}
+                {isStartingQdrant ? 'Запуск…' : 'Запустить Qdrant'}
               </StyledButton>
             </div>
           )}
@@ -492,7 +495,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
               />
               <div className="flex justify-center items-center gap-4 my-6">
                 <label className="flex items-center gap-2 text-sm text-text-secondary">
-                  Collection:
+                  Коллекция:
                   <CollectionCombobox
                     value={uploadCollection}
                     onChange={setUploadCollection}
@@ -508,13 +511,13 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   disabled={files.length === 0 || isUploading || qdrantOffline}
                   loading={isUploading}
                 >
-                  Upload
+                  Загрузить
                 </StyledButton>
               </div>
             </div>
             <div className="border-t bg-surface-primary p-6">
               <h3 className="text-lg font-semibold text-desert-green mb-4">
-                Why upload documents to your Knowledge Base?
+                Зачем загружать документы в базу знаний?
               </h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
@@ -523,14 +526,14 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   </div>
                   <div>
                     <p className="font-medium text-desert-stone-dark">
-                      {aiAssistantName} Knowledge Base Integration
+                      Интеграция базы знаний с {aiAssistantName}
                     </p>
                     <p className="text-sm text-desert-stone">
-                      When you upload documents to your Knowledge Base, NOMAD processes and embeds
-                      the content, making it directly accessible to {aiAssistantName}. This allows{' '}
-                      {aiAssistantName} to reference your specific documents during conversations,
-                      providing more accurate and personalized responses based on your uploaded
-                      data.
+                      Когда вы загружаете документы в базу знаний, NOMAD обрабатывает и индексирует
+                      их содержимое, делая его напрямую доступным для {aiAssistantName}. Это
+                      позволяет {aiAssistantName} ссылаться на ваши конкретные документы во время
+                      бесед, обеспечивая более точные и персонализированные ответы на основе
+                      загруженных данных.
                     </p>
                   </div>
                 </div>
@@ -540,13 +543,14 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   </div>
                   <div>
                     <p className="font-medium text-desert-stone-dark">
-                      Enhanced Document Processing with OCR
+                      Улучшенная обработка документов с OCR
                     </p>
                     <p className="text-sm text-desert-stone">
-                      NOMAD includes built-in Optical Character Recognition (OCR) capabilities,
-                      allowing it to extract text from image-based documents such as scanned PDFs or
-                      photos. This means that even if your documents are not in a standard text
-                      format, NOMAD can still process and embed their content for AI access.
+                      NOMAD включает встроенные возможности оптического распознавания символов
+                      (OCR), позволяющие извлекать текст из документов в виде изображений, таких как
+                      отсканированные PDF-файлы или фотографии. Это означает, что даже если ваши
+                      документы не в стандартном текстовом формате, NOMAD всё равно сможет
+                      обработать и проиндексировать их содержимое для доступа ИИ.
                     </p>
                   </div>
                 </div>
@@ -556,11 +560,13 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   </div>
                   <div>
                     <p className="font-medium text-desert-stone-dark">
-                      Information Library Integration
+                      Интеграция с информационной библиотекой
                     </p>
                     <p className="text-sm text-desert-stone">
-                      NOMAD will automatically discover and extract any content you save to your
-                      Information Library (if installed), making it instantly available to {aiAssistantName} without any extra steps.
+                      NOMAD автоматически обнаружит и извлечёт любой контент, который вы
+                      сохраняете в своей информационной библиотеке (если она установлена), делая
+                      его мгновенно доступным для {aiAssistantName} без каких-либо дополнительных
+                      действий.
                     </p>
                   </div>
                 </div>
@@ -571,11 +577,11 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex-1 min-w-[14rem]">
                 <p className="text-sm font-medium text-text-primary">
-                  Auto-index new content for AI?
+                  Автоиндексация нового контента для ИИ?
                 </p>
                 <p className="text-xs text-text-muted mt-1">
-                  Indexed content typically uses 5–10× the original file size on disk.
-                  Changes apply to new content added after this setting changes.
+                  Проиндексированный контент обычно занимает в 5–10 раз больше места на диске.
+                  Изменения применяются к новому контенту, добавленному после изменения этой настройки.
                 </p>
               </div>
               <div
@@ -611,7 +617,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
 
           <div className="my-8">
             <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-              <StyledSectionHeader title="Processing Queue" className="!mb-0" />
+              <StyledSectionHeader title="Очередь обработки" className="!mb-0" />
               <div className="flex items-center gap-2 flex-wrap">
                 <StyledButton
                   variant="danger"
@@ -621,7 +627,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   loading={cleanupFailedMutation.isPending}
                   disabled={cleanupFailedMutation.isPending || qdrantOffline}
                 >
-                  Clean Up Failed
+                  Очистить неудавшиеся
                 </StyledButton>
                 <StyledButton
                   variant="danger"
@@ -630,9 +636,9 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   onClick={handleConfirmCancelAll}
                   loading={cancelAllMutation.isPending}
                   disabled={cancelAllMutation.isPending}
-                  title="Stop and clear every embedding job regardless of state, including stuck or in-progress ones. Deletes the uploaded source files for those jobs."
+                  title="Остановить и очистить все задания индексации независимо от состояния, включая зависшие или выполняющиеся. Удаляет загруженные исходные файлы для этих заданий."
                 >
-                  Cancel All Jobs
+                  Отменить все задания
                 </StyledButton>
               </div>
             </div>
@@ -641,16 +647,16 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
 
           <div className="my-12">
             <div className='flex items-center justify-between mb-6 gap-2 flex-wrap'>
-              <StyledSectionHeader title="Stored Knowledge Base Files" className='!mb-0' />
+              <StyledSectionHeader title="Сохранённые файлы базы знаний" className='!mb-0' />
               <div className="flex items-center gap-2 flex-wrap">
                 <label className="flex items-center gap-2 text-sm text-text-secondary">
-                  Search in:
+                  Искать в:
                   <select
                     value={collectionFilter}
                     onChange={(e) => setCollectionFilter(e.target.value)}
                     className="rounded border border-border-subtle bg-surface-primary px-3 py-2 text-text-primary"
                   >
-                    <option value="All">All</option>
+                    <option value="All">Все</option>
                     {knownCollections.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
@@ -662,7 +668,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   icon="IconSettings"
                   onClick={() => setManageCollectionsOpen(true)}
                 >
-                  Manage Collections
+                  Управление коллекциями
                 </StyledButton>
                 <StyledButton
                   variant="danger"
@@ -671,9 +677,9 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   onClick={() => { setResetTyped(''); setBulkMode('reset') }}
                   disabled={isUploading || qdrantOffline || bulkBusy}
                   loading={resetMutation.isPending}
-                  title="Drop the entire embeddings collection and re-embed everything from scratch. Permanently removes vectors for files no longer on disk. Destructive: requires typing RESET to confirm."
+                  title="Удалить всю коллекцию эмбеддингов и пересоздать с нуля. Безвозвратно удаляет векторы для файлов, которых больше нет на диске. Деструктивно: требуется ввести RESET для подтверждения."
                 >
-                  Reset & Rebuild
+                  Сброс и перестройка
                 </StyledButton>
                 <StyledButton
                   variant="secondary"
@@ -682,9 +688,9 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   onClick={() => setBulkMode('reembed')}
                   disabled={isUploading || qdrantOffline || bulkBusy || storedFiles.length === 0}
                   loading={reembedMutation.isPending}
-                  title="Re-embed every file on disk, replacing existing vectors file-by-file. Vectors for files no longer on disk are preserved. Use this if the chunker or embedding model has changed."
+                  title="Переиндексировать каждый файл на диске, заменяя существующие векторы. Векторы для файлов, которых больше нет на диске, сохраняются. Используйте, если изменился чанкер или модель эмбеддинга."
                 >
-                  Re-embed All
+                  Переиндексировать всё
                 </StyledButton>
                 <StyledButton
                   variant="secondary"
@@ -693,9 +699,9 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                   onClick={handleConfirmSync}
                   disabled={syncMutation.isPending || isUploading || qdrantOffline || bulkBusy}
                   loading={syncMutation.isPending || isUploading}
-                  title="Scan storage for new files and queue any that haven't been embedded yet. Safe to run anytime; won't touch already-embedded content."
+                  title="Сканировать хранилище на наличие новых файлов и ставить в очередь те, которые ещё не были проиндексированы. Безопасно запускать в любой момент; не затрагивает уже проиндексированный контент."
                 >
-                  Sync Storage
+                  Синхронизировать хранилище
                 </StyledButton>
 
               </div>
@@ -704,7 +710,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
               <div className="mb-4 inline-flex items-center gap-2 text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded px-3 py-2">
                 <span aria-hidden="true">⚠</span>
                 <span>
-                  File warnings unavailable — couldn't read storage state. Retrying…
+                  Предупреждения о файлах недоступны — не удалось прочитать состояние хранилища. Повтор…
                 </span>
               </div>
             )}
@@ -714,7 +720,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
               columns={[
                 {
                   accessor: 'source',
-                  title: renderSortHeader('File Name', 'name', sort, setSort),
+                  title: renderSortHeader('Имя файла', 'name', sort, setSort),
                   render(record) {
                     const warnings = fileWarnings[record.source] ?? []
                     const pill = renderStatePill(record)
@@ -734,15 +740,15 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                                 <span aria-hidden="true">⚠</span>
                                 {w.kind === 'zero_chunks' && (
                                   <span>
-                                    Embedded 0 chunks — this file has no text content.
-                                    AI Assistant cannot reference it.
+                                    Проиндексировано 0 фрагментов — этот файл не содержит текста.
+                                    ИИ-ассистент не может на него ссылаться.
                                   </span>
                                 )}
                                 {w.kind === 'partial_stall' && (
                                   <span>
-                                    Only {w.chunksEmbedded.toLocaleString()} of est.{' '}
-                                    {w.chunksExpected.toLocaleString()} chunks embedded —
-                                    ingestion may have stalled.
+                                    Проиндексировано только {w.chunksEmbedded.toLocaleString()} из{' '}
+                                    {w.chunksExpected.toLocaleString()} ожидаемых фрагментов —
+                                    возможно, обработка зависла.
                                   </span>
                                 )}
                               </span>
@@ -755,7 +761,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                 },
                 {
                   accessor: 'size',
-                  title: renderSortHeader('Size', 'size', sort, setSort),
+                  title: renderSortHeader('Размер', 'size', sort, setSort),
                   className: 'whitespace-nowrap',
                   render(record) {
                     if (record.bucket === 'admin_docs' || record.size === null) {
@@ -766,7 +772,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                 },
                 {
                   accessor: 'uploadedAt',
-                  title: renderSortHeader('Uploaded', 'uploadedAt', sort, setSort),
+                  title: renderSortHeader('Загружено', 'uploadedAt', sort, setSort),
                   className: 'whitespace-nowrap',
                   render(record) {
                     if (record.bucket === 'admin_docs' || !record.uploadedAt) {
@@ -782,7 +788,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                 },
                 {
                   accessor: 'collection',
-                  title: 'Collection',
+                  title: 'Коллекция',
                   className: 'whitespace-nowrap',
                   render(record) {
                     if (record.bucket === 'admin_docs') {
@@ -810,7 +816,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                       return (
                         <div className="flex justify-end">
                           <span className="text-sm text-text-muted italic">
-                            Managed by NOMAD
+                            Управляется NOMAD
                           </span>
                         </div>
                       )
@@ -821,14 +827,14 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                     if (isConfirming) {
                       return (
                         <div className="flex items-center gap-2 justify-end">
-                          <span className="text-sm text-text-secondary">Remove from knowledge base?</span>
+                          <span className="text-sm text-text-secondary">Удалить из базы знаний?</span>
                           <StyledButton
                             variant='danger'
                             size='sm'
                             onClick={() => deleteMutation.mutate(record.source)}
                             disabled={isDeleting}
                           >
-                            {isDeleting ? 'Deleting…' : 'Confirm'}
+                            {isDeleting ? 'Удаление…' : 'Подтвердить'}
                           </StyledButton>
                           <StyledButton
                             variant='ghost'
@@ -836,7 +842,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                             onClick={() => setConfirmDeleteSource(null)}
                             disabled={isDeleting}
                           >
-                            Cancel
+                            Отмена
                           </StyledButton>
                         </div>
                       )
@@ -876,7 +882,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                             size="sm"
                             icon="IconEye"
                             onClick={() => setViewerSource(record.source)}
-                          >View</StyledButton>
+                          >Просмотр</StyledButton>
                         )}
                         {canDownload && (
                           <StyledButton
@@ -886,7 +892,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                             onClick={() => {
                               window.location.href = `/api/rag/files/download?source=${encodeURIComponent(record.source)}`
                             }}
-                          >Download</StyledButton>
+                          >Скачать</StyledButton>
                         )}
                         <StyledButton
                           variant="danger"
@@ -895,7 +901,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                           onClick={() => setConfirmDeleteSource(record.source)}
                           disabled={deleteMutation.isPending || embedMutation.isPending}
                           loading={deleteMutation.isPending && confirmDeleteSource === record.source}
-                        >Delete</StyledButton>
+                        >Удалить</StyledButton>
                       </div>
                     )
                   },
@@ -915,10 +921,10 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
 
       {bulkMode === 'reembed' && (
         <StyledModal
-          title='Re-embed All Documents?'
+          title='Переиндексировать все документы?'
           open={true}
-          confirmText={reembedMutation.isPending ? 'Re-embedding…' : 'Re-embed All'}
-          cancelText='Cancel'
+          confirmText={reembedMutation.isPending ? 'Переиндексация…' : 'Переиндексировать всё'}
+          cancelText='Отмена'
           confirmVariant='primary'
           confirmLoading={reembedMutation.isPending}
           onConfirm={() => reembedMutation.mutate()}
@@ -926,27 +932,27 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
         >
           <div className='text-text-primary text-sm space-y-3 text-left'>
             <p>
-              This will re-process every document currently in your knowledge base — about
-              <strong> {storedFiles.length} file{storedFiles.length === 1 ? '' : 's'}</strong>.
-              For each file, NOMAD will delete the existing embeddings from Qdrant and queue a fresh
-              embedding job using the current chunking and embedding model.
+              Будет повторно обработан каждый документ в вашей базе знаний — около
+              <strong> {storedFiles.length} файл(ов)</strong>.
+              Для каждого файла NOMAD удалит существующие эмбеддинги из Qdrant и поставит в
+              очередь новую задачу индексации с использованием текущей модели.
             </p>
             <div className='rounded border border-border-subtle bg-surface-secondary p-3'>
-              <p className='font-semibold mb-1'>What this is for</p>
+              <p className='font-semibold mb-1'>Для чего это нужно</p>
               <p className='text-text-secondary'>
-                Use this when the embedding model or chunking logic has changed, or when you suspect
-                stored vectors are stale. Files on disk are <em>not</em> deleted, and any orphan
-                points whose source file is no longer present will be preserved untouched (see
-                <em> Reset &amp; Rebuild </em>if you want a fully clean slate).
+                Используйте, когда модель эмбеддинга или логика разбиения изменилась, или когда вы
+                подозреваете, что сохранённые векторы устарели. Файлы на диске <em>не</em> удаляются,
+                а любые осиротевшие точки, чей исходный файл больше не существует, останутся
+                нетронутыми (см. <em>Сброс и перестройка</em>, если нужен полностью чистый старт).
               </p>
             </div>
             <div className='rounded border border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 p-3 text-amber-900 dark:text-amber-200'>
-              <p className='font-semibold mb-1'>Heads up</p>
+              <p className='font-semibold mb-1'>Обратите внимание</p>
               <ul className='list-disc pl-5 space-y-1'>
-                <li>Embedding {storedFiles.length} file{storedFiles.length === 1 ? '' : 's'} may take a long time, especially for large PDFs or ZIM archives.</li>
-                <li>On systems without GPU acceleration, expect sustained high CPU usage for the duration.</li>
-                <li>Knowledge Base search results may be incomplete until every file finishes re-embedding.</li>
-                <li>If embed jobs are already in progress, this action will be refused — wait for the queue to drain first.</li>
+                <li>Индексация {storedFiles.length} файла(ов) может занять много времени, особенно для больших PDF или ZIM-архивов.</li>
+                <li>На системах без GPU-ускорения ожидайте высокую нагрузку на CPU на протяжении всего процесса.</li>
+                <li>Результаты поиска в базе знаний могут быть неполными, пока все файлы не завершат переиндексацию.</li>
+                <li>Если задачи индексации уже выполняются, это действие будет отклонено — дождитесь завершения очереди.</li>
               </ul>
             </div>
           </div>
@@ -955,10 +961,10 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
 
       {bulkMode === 'reset' && (
         <StyledModal
-          title='Reset & Rebuild Knowledge Base?'
+          title='Сбросить и перестроить базу знаний?'
           open={true}
-          confirmText={resetMutation.isPending ? 'Resetting…' : 'Wipe & Rebuild'}
-          cancelText='Cancel'
+          confirmText={resetMutation.isPending ? 'Сброс…' : 'Очистить и перестроить'}
+          cancelText='Отмена'
           confirmVariant='danger'
           confirmLoading={resetMutation.isPending}
           onConfirm={() => {
@@ -968,29 +974,30 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
         >
           <div className='text-text-primary text-sm space-y-3 text-left'>
             <p>
-              This will <strong>permanently delete every point</strong> in the
-              <code> nomad_knowledge_base </code>Qdrant collection and rebuild from the
-              <strong> {storedFiles.length} file{storedFiles.length === 1 ? '' : 's'}</strong> currently
-              on disk. The collection is dropped, recreated, and every file is re-queued for embedding.
+              <strong>Безвозвратно удалит каждую точку</strong> в коллекции
+              <code> nomad_knowledge_base </code>Qdrant и пересоберёт из
+              <strong> {storedFiles.length} файл(ов)</strong>, сейчас находящихся на диске.
+              Коллекция будет удалена, пересоздана, и каждый файл заново поставлен в очередь на
+              индексацию.
             </p>
             <div className='rounded border border-border-subtle bg-surface-secondary p-3'>
-              <p className='font-semibold mb-1'>How this differs from Re-embed All</p>
+              <p className='font-semibold mb-1'>Чем это отличается от «Переиндексировать всё»</p>
               <ul className='list-disc pl-5 space-y-1 text-text-secondary'>
-                <li><strong>Re-embed All</strong> replaces vectors file-by-file. Any orphan points (vectors whose source file was deleted from disk at some point) are preserved.</li>
-                <li><strong>Reset &amp; Rebuild</strong> drops the entire collection. Orphan points are <strong>gone forever</strong>. Only files currently on disk will exist in Qdrant afterwards.</li>
+                <li><strong>Переиндексировать всё</strong> заменяет векторы пофайлово. Осиротевшие точки (векторы, чей исходный файл был когда-то удалён) сохраняются.</li>
+                <li><strong>Сброс и перестройка</strong> полностью удаляет коллекцию. Осиротевшие точки <strong>исчезают навсегда</strong>. В Qdrant останутся только файлы, которые сейчас есть на диске.</li>
               </ul>
             </div>
             <div className='rounded border border-red-300 bg-red-50 dark:bg-red-950 dark:border-red-800 p-3 text-red-900 dark:text-red-200'>
-              <p className='font-semibold mb-1'>This action is destructive and cannot be undone</p>
+              <p className='font-semibold mb-1'>Это действие разрушительно и не может быть отменено</p>
               <ul className='list-disc pl-5 space-y-1'>
-                <li>Knowledge Base search will be empty until embedding finishes (potentially hours on CPU-only systems).</li>
-                <li>For a few seconds during the reset, the Qdrant collection does not exist — any chat-with-RAG queries in that window may return a "collection not found" error. Avoid using chat until the rebuild has begun.</li>
-                <li>If embed jobs are already in progress, this action will be refused — wait for the queue to drain first.</li>
+                <li>Поиск в базе знаний будет пуст, пока индексация не завершится (потенциально несколько часов на системах без GPU).</li>
+                <li>На несколько секунд во время сброса коллекция Qdrant не существует — любые запросы чата с RAG в этом окне могут вернуть ошибку «коллекция не найдена». Избегайте использования чата до начала перестройки.</li>
+                <li>Если задачи индексации уже выполняются, это действие будет отклонено — дождитесь завершения очереди.</li>
               </ul>
             </div>
             <div>
               <label className='block text-sm font-semibold mb-1'>
-                Type <code>RESET</code> to confirm:
+                Введите <code>RESET</code> для подтверждения:
               </label>
               <input
                 type='text'
@@ -1001,7 +1008,7 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
                 className='w-full rounded border border-border-subtle bg-surface-primary px-3 py-2 text-text-primary focus:outline-none focus:ring-2 focus:ring-red-500'
               />
               {resetTyped.length > 0 && resetTyped !== 'RESET' && (
-                <p className='text-xs text-red-600 mt-1'>Type RESET exactly (uppercase, no spaces) to enable the confirm button.</p>
+                <p className='text-xs text-red-600 mt-1'>Введите RESET точно (заглавными, без пробелов), чтобы активировать кнопку подтверждения.</p>
               )}
             </div>
           </div>
@@ -1010,10 +1017,10 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
 
       {confirmReembed && (
         <StyledModal
-          title='Re-embed this file?'
+          title='Переиндексировать этот файл?'
           open={true}
-          confirmText={embedMutation.isPending ? 'Queuing…' : 'Re-embed'}
-          cancelText='Cancel'
+          confirmText={embedMutation.isPending ? 'Постановка в очередь…' : 'Переиндексировать'}
+          cancelText='Отмена'
           confirmVariant='primary'
           confirmLoading={embedMutation.isPending}
           onConfirm={() =>
@@ -1023,16 +1030,16 @@ export default function KnowledgeBaseModal({ aiAssistantName = "AI Assistant", o
         >
           <div className='text-text-primary text-sm space-y-3 text-left'>
             <p>
-              This will delete the existing embeddings for{' '}
-              <strong>{confirmReembed.displayName}</strong> and queue
-              a fresh embedding job. The file on disk is not touched.
+              Существующие эмбеддинги для{' '}
+              <strong>{confirmReembed.displayName}</strong> будут удалены и поставлено новое
+              задание индексации. Файл на диске не затрагивается.
             </p>
             <div className='rounded border border-amber-300 bg-amber-50 dark:bg-amber-950 dark:border-amber-800 p-3 text-amber-900 dark:text-amber-200'>
-              <p className='font-semibold mb-1'>Heads up</p>
+              <p className='font-semibold mb-1'>Обратите внимание</p>
               <ul className='list-disc pl-5 space-y-1'>
-                <li>For large ZIM archives this can take a long time, especially on CPU-only systems.</li>
-                <li>Search results that referenced this file will be incomplete until the new embedding finishes.</li>
-                <li>If a job for this file is already running, the re-embed will be refused — wait for it to finish first.</li>
+                <li>Для больших ZIM-архивов это может занять много времени, особенно на системах без GPU.</li>
+                <li>Результаты поиска, ссылающиеся на этот файл, будут неполными, пока новая индексация не завершится.</li>
+                <li>Если для этого файла уже выполняется задание, переиндексация будет отклонена — дождитесь её завершения.</li>
               </ul>
             </div>
           </div>
@@ -1075,16 +1082,16 @@ function FileViewerModal({ source, onClose }: { source: string; onClose: () => v
       open={true}
       onClose={onClose}
       onCancel={onClose}
-      cancelText="Close"
+      cancelText="Закрыть"
       large
     >
       <div className="text-left text-sm">
         {isLoading && (
-          <div className="text-text-secondary">Loading…</div>
+          <div className="text-text-secondary">Загрузка…</div>
         )}
         {showError && (
           <div className="text-amber-700 dark:text-amber-300">
-            Couldn't load file. It may have been moved or its type isn't viewable.
+            Не удалось загрузить файл. Возможно, он был перемещён или его тип не поддерживается для просмотра.
           </div>
         )}
         {data && (

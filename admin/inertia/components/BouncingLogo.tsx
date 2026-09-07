@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 // Fading Image Component
-const FadingImage = ({  alt = "Fading image", className = "" }) => {
+const FadingImage = ({  alt = "Изображение с затуханием", className = "" }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [shouldShow, setShouldShow] = useState(true);
 

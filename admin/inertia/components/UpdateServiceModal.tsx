@@ -50,23 +50,23 @@ export default function UpdateServiceModal({
 
     return (
         <StyledModal
-            title="Update Service"
+            title="Обновить службу"
             onConfirm={() => onUpdate(selectedVersion)}
             onCancel={onCancel}
             open={true}
-            confirmText="Update"
-            cancelText="Cancel"
+            confirmText="Обновить"
+            cancelText="Отмена"
             confirmVariant="primary"
             icon={<IconArrowUp className="h-12 w-12 text-desert-green" />}
         >
             <div className="space-y-4">
                 <p className="text-text-primary">
-                    Update <strong>{record.friendly_name || record.service_name}</strong> from{' '}
-                    <code className="bg-surface-secondary px-1.5 py-0.5 rounded text-sm">{currentTag}</code> to{' '}
+                    Обновить <strong>{record.friendly_name || record.service_name}</strong> с{' '}
+                    <code className="bg-surface-secondary px-1.5 py-0.5 rounded text-sm">{currentTag}</code> на{' '}
                     <code className="bg-surface-secondary px-1.5 py-0.5 rounded text-sm">{selectedVersion}</code>?
                 </p>
                 <p className="text-sm text-text-muted">
-                    Your data and configuration will be preserved during the update.
+                    Ваши данные и конфигурация будут сохранены во время обновления.
                     {versions.find((v) => v.tag === selectedVersion)?.releaseUrl && (
                         <>
                             {' '}
@@ -76,7 +76,7 @@ export default function UpdateServiceModal({
                                 rel="noopener noreferrer"
                                 className="text-desert-green hover:underline"
                             >
-                                View release notes
+                                Просмотреть примечания к выпуску
                             </a>
                         </>
                     )}
@@ -88,16 +88,16 @@ export default function UpdateServiceModal({
                         onClick={handleToggleAdvanced}
                         className="text-sm text-desert-green hover:underline font-medium"
                     >
-                        {showAdvanced ? 'Hide' : 'Show'} available versions
+                        {showAdvanced ? 'Скрыть' : 'Показать'} доступные версии
                     </button>
 
                     {showAdvanced && (
                         <>
                             <div className="mt-3 max-h-48 overflow-y-auto border rounded-lg divide-y">
                                 {loadingVersions ? (
-                                    <div className="p-4 text-center text-text-muted text-sm">Loading versions...</div>
+                                    <div className="p-4 text-center text-text-muted text-sm">Загрузка версий…</div>
                                 ) : versions.length === 0 ? (
-                                    <div className="p-4 text-center text-text-muted text-sm">No other versions available</div>
+                                    <div className="p-4 text-center text-text-muted text-sm">Нет других доступных версий</div>
                                 ) : (
                                     versions.map((v) => (
                                         <label
@@ -134,7 +134,9 @@ export default function UpdateServiceModal({
                                 )}
                             </div>
                             <p className="mt-2 text-sm text-text-muted">
-                                It's not recommended to upgrade to a new major version (e.g. 1.8.2 &rarr; 2.0.0) unless you have verified compatibility with your current configuration. Always review the release notes and test in a staging environment if possible.
+                                Не рекомендуется обновлять до новой основной версии (например, 1.8.2 → 2.0.0),
+                                если вы не подтвердили совместимость с текущей конфигурацией. Всегда изучите
+                                примечания к выпуску и протестируйте в staging-окружении, если возможно.
                             </p>
                         </>
                     )}

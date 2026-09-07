@@ -2,7 +2,7 @@ const ProgressBar = ({ progress, speed }: { progress: number; speed?: string }) 
   if (progress >= 100) {
     return (
       <div className="flex items-center justify-between">
-        <span className="text-sm text-desert-green">Download complete</span>
+        <span className="text-sm text-desert-green">Загрузка завершена</span>
       </div>
     )
   }
@@ -17,7 +17,7 @@ const ProgressBar = ({ progress, speed }: { progress: number; speed?: string }) 
       </div>
       {speed && (
         <div className="mt-1 text-sm text-text-muted">
-          Est. Speed: {speed}
+          Примерная скорость: {speed}
         </div>
       )}
     </div>

@@ -201,7 +201,7 @@ export default function Alert({
               type === 'success' ? 'focus:ring-desert-olive' : '',
               type === 'info' ? 'focus:ring-desert-stone' : ''
             )}
-            aria-label="Dismiss alert"
+            aria-label="Закрыть уведомление"
           >
             <DynamicIcon icon="IconX" className="size-4" />
           </button>

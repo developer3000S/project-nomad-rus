@@ -30,8 +30,8 @@ const WikipediaSelector: React.FC<WikipediaSelectorProps> = ({
   const highlightedOptionId = selectedOptionId ?? currentSelection?.optionId ?? null
 
   // Check if current selection is downloading or failed
-  const isDownloading = currentSelection?.status === 'downloading'
-  const isFailed = currentSelection?.status === 'failed'
+  const isЗагрузка = currentSelection?.status === 'downloading'
+  const isОшибка = currentSelection?.status === 'failed'
 
   return (
     <div className="w-full">
@@ -42,7 +42,7 @@ const WikipediaSelector: React.FC<WikipediaSelectorProps> = ({
         </div>
         <div>
           <h3 className="text-xl font-semibold text-text-primary">Wikipedia</h3>
-          <p className="text-sm text-text-muted">Select your preferred Wikipedia package</p>
+          <p className="text-sm text-text-muted">Выберите нужный пакет Wikipedia</p>
         </div>
       </div>
 
@@ -51,7 +51,7 @@ const WikipediaSelector: React.FC<WikipediaSelectorProps> = ({
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2">
           <LoadingSpinner fullscreen={false} iconOnly className="size-4" />
           <span className="text-sm text-blue-700">
-            Downloading Wikipedia... This may take a while for larger packages.
+            Wikipedia загружается... Это может занять некоторое время для больших пакетов.
           </span>
         </div>
       )}
@@ -62,7 +62,7 @@ const WikipediaSelector: React.FC<WikipediaSelectorProps> = ({
           <div className="flex items-center gap-2">
             <IconAlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
             <span className="text-sm text-red-700">
-              Wikipedia download failed. Select a package and try again.
+              Загрузка Wikipedia не удалась. Выберите пакет и попробуйте снова.
             </span>
           </div>
         </div>
@@ -71,8 +71,8 @@ const WikipediaSelector: React.FC<WikipediaSelectorProps> = ({
       {/* Options grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {options.map((option) => {
-          const isSelected = highlightedOptionId === option.id
-          const isInstalled =
+          const isВыбрано = highlightedOptionId === option.id
+          const isУстановлено =
             currentSelection?.optionId === option.id && currentSelection?.status === 'installed'
           const isCurrentDownloading =
             currentSelection?.optionId === option.id && currentSelection?.status === 'downloading'
@@ -147,7 +147,7 @@ const WikipediaSelector: React.FC<WikipediaSelectorProps> = ({
                       option.size_mb === 0 ? 'bg-surface-secondary text-text-muted' : 'bg-surface-secondary text-text-secondary'
                     )}
                   >
-                    {option.size_mb === 0 ? 'No download' : formatBytes(option.size_mb * 1024 * 1024, 1)}
+                    {option.size_mb === 0 ? 'Без загрузки' : formatBytes(option.size_mb * 1024 * 1024, 1)}
                   </span>
                 </div>
               </div>
@@ -166,7 +166,7 @@ const WikipediaSelector: React.FC<WikipediaSelectorProps> = ({
             loading={isSubmitting}
             icon="IconDownload"
           >
-            {selectedOptionId === 'none' ? 'Remove Wikipedia' : 'Download Selected'}
+            {selectedOptionId === 'none' ? 'Удалить Wikipedia' : 'Скачать выбранное'}
           </StyledButton>
         </div>
       )}

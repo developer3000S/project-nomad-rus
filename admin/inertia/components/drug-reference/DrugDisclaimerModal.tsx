@@ -45,44 +45,44 @@ export default function DrugDisclaimerModal({ open, onAcknowledge }: { open: boo
                 <IconAlertTriangle size={26} />
               </span>
               <DialogTitle as="h3" className="mt-4 text-lg font-bold text-text-primary">
-                Before you use the Drug Reference
+                Перед использованием Справочника лекарств
               </DialogTitle>
             </div>
 
             <div className="mt-4 space-y-3 text-sm text-text-secondary">
               <p>
-                This tool shows general health information from official <strong>FDA drug labels</strong> and
-                matches symptoms to over-the-counter options. It is provided for <strong>information only</strong>.
+                Этот инструмент показывает общую медицинскую информацию из официальных <strong>описаний лекарств FDA</strong> и
+                подбирает безрецептурные средства по симптомам. Он предоставлен <strong>только для ознакомления</strong>.
               </p>
               <ul className="list-disc space-y-1.5 pl-5">
                 <li>
-                  It is <strong>not medical advice</strong> and not a substitute for a doctor, pharmacist, or nurse.
+                  Это <strong>не медицинский совет</strong> и не замена врачу, фармацевту или медсестре.
                 </li>
                 <li>
-                  It is <strong>not a drug-interaction checker</strong>. Always read each product&rsquo;s full label
-                  and check with a professional before combining medicines.
+                  Это <strong>не проверка лекарственных взаимодействий</strong>. Всегда читайте полное описание каждого препарата
+                  и консультируйтесь со специалистом, прежде чем комбинировать лекарства.
                 </li>
                 <li>
-                  Situation matches come from label text, not clinical recommendations — they can be incomplete or
-                  include products you wouldn&rsquo;t expect.
+                  Подбор по ситуации основан на тексте описания, а не на клинических рекомендациях — он может быть неполным
+                  или включать неожиданные препараты.
                 </li>
                 <li>
-                  Always follow the directions on the <strong>actual product you have</strong>; dosages and warnings
-                  differ between products.
+                  Всегда следуйте инструкциям на <strong>том препарате, который у вас есть</strong>; дозировки и предупреждения
+                  различаются для разных продуктов.
                 </li>
                 <li>
-                  In an emergency, or if symptoms are severe, worsening, or you&rsquo;re unsure,{' '}
-                  <strong>contact a medical professional or call emergency services</strong>.
+                  В экстренной ситуации, а также при тяжёлых, ухудшающихся или неясных симптомах{' '}
+                  <strong>обратитесь к врачу или вызовите скорую помощь</strong>.
                 </li>
               </ul>
               <p className="text-xs text-text-muted">
-                Data is from openFDA (U.S. FDA, public domain). NOMAD is not affiliated with or endorsed by the FDA.
+                Данные взяты из openFDA (Управление по санитарному надзору США, общественное достояние). NOMAD не связан с FDA и не поддерживается ею.
               </p>
             </div>
 
             <div className="mt-6">
               <StyledButton variant="action" fullWidth onClick={acknowledge}>
-                I understand — continue
+                Понимаю — продолжить
               </StyledButton>
             </div>
           </DialogPanel>

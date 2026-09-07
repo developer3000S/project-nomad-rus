@@ -22,7 +22,7 @@ export default function ServiceLogsModal({
   async function load() {
     setLoading(true)
     const res = await api.getServiceLogs(serviceName, 500)
-    setLogs(res?.success ? res.logs || '' : 'Unable to load logs for this container.')
+    setLogs(res?.success ? res.logs || '' : 'Не удалось загрузить логи для этого контейнера.')
     setLoading(false)
   }
 
@@ -33,19 +33,19 @@ export default function ServiceLogsModal({
 
   return (
     <StyledModal
-      title={`Logs — ${friendlyName}`}
+      title={`Логи — ${friendlyName}`}
       open={open}
       onCancel={onClose}
-      cancelText="Close"
+      cancelText="Закрыть"
       onConfirm={load}
-      confirmText="Refresh"
+      confirmText="Обновить"
       confirmIcon="IconRefresh"
       confirmVariant="outline"
       confirmLoading={loading}
       large
     >
       <pre className="text-xs font-mono whitespace-pre-wrap break-all max-h-[60vh] overflow-auto bg-surface-secondary rounded-md p-3 text-text-primary text-left">
-        {logs || (loading ? 'Loading…' : 'No log output.')}
+        {logs || (loading ? 'Загрузка…' : 'Нет данных в логе.')}
       </pre>
     </StyledModal>
   )

@@ -65,7 +65,7 @@ export default function InfoCard({ title, icon, data, variant = 'default' }: Inf
                 {item.label}
               </dt>
               <dd className={classNames('text-sm font-semibold text-right text-desert-green-dark')}>
-                {item.value || 'N/A'}
+                {item.value || 'Н/Д'}
               </dd>
             </div>
           ))}

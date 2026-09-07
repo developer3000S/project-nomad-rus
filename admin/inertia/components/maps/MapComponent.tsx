@@ -317,7 +317,7 @@ export default function MapComponent({
                 <input
                   autoFocus
                   type="text"
-                  placeholder="Name this location"
+                  placeholder="Назовите это место"
                   value={markerName}
                   onChange={(e) => setMarkerName(e.target.value)}
                   onKeyDown={(e) => {
@@ -328,7 +328,7 @@ export default function MapComponent({
                 />
 
                 <textarea
-                  placeholder="Notes (optional)"
+                  placeholder="Заметки (необязательно)"
                   value={markerNotes}
                   onChange={(e) => setMarkerNotes(e.target.value)}
                   onKeyDown={(e) => {
@@ -363,7 +363,7 @@ export default function MapComponent({
                     onClick={() => setPlacingMarker(null)}
                     className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded transition-colors"
                   >
-                    Cancel
+                    Отмена
                   </button>
 
                   <button
@@ -372,7 +372,7 @@ export default function MapComponent({
                     disabled={!markerName.trim()}
                     className="text-xs bg-[#424420] text-white rounded px-2.5 py-1 hover:bg-[#525530] disabled:opacity-40 transition-colors"
                   >
-                    Save
+                    Сохранить
                   </button>
                 </div>
               </div>

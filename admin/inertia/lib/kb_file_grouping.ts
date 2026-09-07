@@ -131,7 +131,7 @@ export function groupAndSortKbFiles(
       groups.push({
         bucket,
         source: '__admin_docs_group__',
-        displayName: `Project NOMAD documentation · ${members.length} file${members.length === 1 ? '' : 's'}`,
+        displayName: `Документация Project NOMAD · ${members.length} файл${members.length === 1 ? '' : members.length < 5 ? 'а' : 'ов'}`,
         count: members.length,
         members: members.map((m) => m.source),
         state: null,

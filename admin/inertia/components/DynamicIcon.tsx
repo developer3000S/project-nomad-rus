@@ -16,7 +16,7 @@ const DynamicIcon: React.FC<DynamicIconProps> = ({ icon, className, stroke, onCl
   const Icon = icons[icon]
 
   if (!Icon) {
-    console.warn(`Icon "${icon}" not found in icon map.`)
+    console.warn(`Иконка "${icon}" не найдена в карте иконок.`)
     return null
   }
 

@@ -31,46 +31,46 @@ export default function CollectionsManager({ onClose }: CollectionsManagerProps)
     mutationFn: ({ oldName, newName }: { oldName: string; newName: string }) =>
       api.renameCollection(oldName, newName),
     onSuccess: (data) => {
-      addNotification({ type: 'success', message: data?.message || 'Collection renamed.' })
+      addNotification({ type: 'success', message: data?.message || 'Коллекция переименована.' })
       setEditingName(null)
       invalidateAll()
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to rename collection.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось переименовать коллекцию.' })
     },
   })
 
   const deleteMutation = useMutation({
     mutationFn: (name: string) => api.deleteCollection(name),
     onSuccess: (data) => {
-      addNotification({ type: 'success', message: data?.message || 'Collection removed.' })
+      addNotification({ type: 'success', message: data?.message || 'Коллекция удалена.' })
       setConfirmDelete(null)
       invalidateAll()
     },
     onError: (error: any) => {
-      addNotification({ type: 'error', message: error?.message || 'Failed to remove collection.' })
+      addNotification({ type: 'error', message: error?.message || 'Не удалось удалить коллекцию.' })
     },
   })
 
   return (
     <StyledModal
       open={true}
-      title="Manage Collections"
+      title="Управление коллекциями"
       onClose={onClose}
-      cancelText="Close"
+      cancelText="Закрыть"
       onCancel={onClose}
       large
     >
       <div className="text-left">
         <p className="text-sm text-text-secondary mb-4">
-          Rename or remove collections. Removing a collection doesn't delete any files —
-          they're simply moved back to Uncategorized so you can re-sort them.
+          Переименуйте или удалите коллекции. Удаление коллекции не удаляет файлы — они просто
+          перемещаются обратно в «Без категории», чтобы вы могли отсортировать их заново.
         </p>
 
-        {isLoading && <p className="text-sm text-text-muted">Loading…</p>}
+        {isLoading && <p className="text-sm text-text-muted">Загрузка…</p>}
         {!isLoading && collections.length === 0 && (
           <p className="text-sm text-text-muted">
-            No collections yet. Assign a file to a collection from the Knowledge Base table to create one.
+            Коллекций пока нет. Назначьте файл коллекции в таблице «База знаний», чтобы создать её.
           </p>
         )}
 
@@ -94,16 +94,16 @@ export default function CollectionsManager({ onClose }: CollectionsManagerProps)
                       renameMutation.mutate({ oldName: name, newName: editValue.trim() })
                     }
                   >
-                    Save
+                    Сохранить
                   </StyledButton>
                   <StyledButton variant="outline" onClick={() => setEditingName(null)}>
-                    Cancel
+                    Отмена
                   </StyledButton>
                 </>
               ) : confirmDelete === name ? (
                 <>
                   <span className="flex-1 text-sm text-text-primary">
-                    Remove "{name}"? Files move to Uncategorized.
+                    Удалить «{name}»? Файлы перейдут в «Без категории».
                   </span>
                   <StyledButton
                     variant="danger"
@@ -111,10 +111,10 @@ export default function CollectionsManager({ onClose }: CollectionsManagerProps)
                     loading={deleteMutation.isPending}
                     onClick={() => deleteMutation.mutate(name)}
                   >
-                    Confirm
+                    Подтвердить
                   </StyledButton>
                   <StyledButton variant="outline" onClick={() => setConfirmDelete(null)}>
-                    Cancel
+                    Отмена
                   </StyledButton>
                 </>
               ) : (
@@ -128,14 +128,14 @@ export default function CollectionsManager({ onClose }: CollectionsManagerProps)
                       setEditValue(name)
                     }}
                   >
-                    Rename
+                    Переименовать
                   </StyledButton>
                   <StyledButton
                     variant="danger"
                     icon="IconTrash"
                     onClick={() => setConfirmDelete(name)}
                   >
-                    Remove
+                    Удалить
                   </StyledButton>
                 </>
               )}

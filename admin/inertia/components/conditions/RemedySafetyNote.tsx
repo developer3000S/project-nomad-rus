@@ -23,15 +23,15 @@ export default function RemedySafetyNote() {
         aria-hidden="true"
       />
       <div className="space-y-1">
-        <p className="font-bold">Informational only — not medical advice.</p>
+        <p className="font-bold">Только справочная информация — не медицинский совет.</p>
         <p className="text-amber-800">
-          These remedies have limited or mixed evidence, are not FDA-evaluated, and are not a
-          substitute for professional care. Check with a clinician before using any of them, and
-          before combining one with a medication you already take.
+          Эти средства имеют ограниченные или неоднозначные доказательства, не оценены FDA и не заменяют
+          профессиональную медицинскую помощь. Проконсультируйтесь с врачом перед использованием любого
+          из них, а также перед сочетанием с уже принимаемыми лекарствами.
         </p>
         <p className="text-amber-800">
-          In an emergency, or if symptoms are severe or worsening,{' '}
-          <strong>seek real medical care — call emergency services</strong>.
+          В экстренной ситуации, а также при тяжёлых или ухудшающихся симптомах{' '}
+          <strong>обратитесь за медицинской помощью — вызовите скорую</strong>.
         </p>
       </div>
     </div>

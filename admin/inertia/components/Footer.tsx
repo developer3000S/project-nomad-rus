@@ -21,7 +21,7 @@ export default function Footer() {
           className="text-sm/6 text-gray-500 hover:text-desert-green flex items-center gap-1 cursor-pointer"
         >
           <IconBug className="size-3.5" />
-          Debug Info
+          Отладочная информация
         </button>
         <ThemeToggle />
       </div>

@@ -13,7 +13,7 @@ export default function BackToHomeHeader({ className, children }: BackToHomeHead
       <div className="justify-self-start">
         <Link href="/home" className="flex items-center">
           <IconArrowLeft className="mr-2" size={24} />
-          <p className="text-lg text-text-secondary">Back to Home</p>
+          <p className="text-lg text-text-secondary">На главную</p>
         </Link>
       </div>
       <div className="flex-grow flex flex-col justify-center">{children}</div>

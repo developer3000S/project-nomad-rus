@@ -31,7 +31,7 @@ export function getAllDiskDisplayItems(
   const storageMountItem: DiskDisplayItem[] = storageMount
     ? [
         {
-          label: 'NAS Storage',
+          label: 'Хранилище NAS',
           value: storageMount.use || 0,
           total: formatBytes(storageMount.size),
           used: formatBytes(storageMount.used),
@@ -46,7 +46,7 @@ export function getAllDiskDisplayItems(
     return [
       ...storageMountItem,
       ...validDisks.map((disk) => ({
-        label: disk.name || 'Unknown',
+        label: disk.name || 'Неизвестно',
         value: disk.percentUsed || 0,
         total: formatBytes(disk.totalSize),
         used: formatBytes(disk.totalUsed),
@@ -70,7 +70,7 @@ export function getAllDiskDisplayItems(
     return [
       ...storageMountItem,
       ...displayFs.map((fs) => ({
-        label: fs.fs || 'Unknown',
+        label: fs.fs || 'Неизвестно',
         value: fs.use || 0,
         total: formatBytes(fs.size),
         used: formatBytes(fs.used),

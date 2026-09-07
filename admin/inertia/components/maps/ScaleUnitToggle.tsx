@@ -26,7 +26,7 @@ export default function ScaleUnitToggle({
             color: scaleUnit === 'metric' ? 'white' : '#666',
           }}
         >
-          Metric
+          Метрическая
         </button>
 
         <button
@@ -38,7 +38,7 @@ export default function ScaleUnitToggle({
             color: scaleUnit === 'imperial' ? 'white' : '#666',
           }}
         >
-          Imperial
+          Имперская
         </button>
       </div>
     </div>

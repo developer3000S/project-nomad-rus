@@ -16,13 +16,13 @@ import Alert from '~/components/Alert'
  */
 const WHATS_NEW = {
   version: '1.34',
-  title: "What's new in v1.34",
+  title: "Что нового в v1.34",
   highlights: [
-    'Creator Packs - install curated video packs from your favorite creators and watch them fully offline.',
-    'Medication Reference - offline FDA drug-label lookup for quick, reliable medication information.',
-    'Benchmark Score v2 - a rebuilt scoring model, with live telemetry while the test runs and your score revealed at the end.',
-    'NOMAD.md - give your AI assistant standing instructions it follows in every conversation.',
-    'Knowledge Base collections - group what the assistant searches by subject, so answers stay on topic.',
+    'Creator Packs — устанавливайте подборки видео от любимых авторов и смотрите их полностью офлайн.',
+    'Справочник лекарств — офлайн-поиск по данным FDA для быстрого получения информации о препаратах.',
+    'Benchmark Score v2 — переработанная модель оценки с живой телеметрией во время теста и раскрытием результата в конце.',
+    'NOMAD.md — дайте вашему ИИ-ассистенту постоянные инструкции, которые он соблюдает в каждом разговоре.',
+    'Коллекции базы знаний — группируйте то, что ищет ассистент, по темам, чтобы ответы оставались релевантными.',
   ],
 }
 
@@ -72,7 +72,7 @@ export default function WhatsNewBanner() {
         onDismiss={handleDismiss}
         buttonProps={{
           variant: 'primary',
-          children: 'See release notes',
+          children: 'См. заметки о выпуске',
           icon: 'IconBook',
           onClick: () => router.visit('/docs/release-notes'),
         }}

@@ -38,21 +38,21 @@ const CreatorPackCard: React.FC<CreatorPackCardProps> = ({ pack, selected, onCli
   const statusBadge = selected ? (
     <span className="flex items-center text-lime-600 dark:text-lime-400 text-sm font-medium">
       <IconCircleCheck className="w-5 h-5 mr-1" />
-      Selected
+      Выбрано
     </span>
   ) : isDownloading ? (
     <span className="flex items-center text-lime-600 dark:text-lime-400 text-sm font-medium">
       <IconLoader2 className="w-5 h-5 mr-1 animate-spin" />
-      Downloading
+      Загрузка
     </span>
   ) : isInstalled ? (
     <span className="flex items-center text-lime-600 dark:text-lime-400 text-sm font-medium">
       <IconCircleCheck className="w-5 h-5 mr-1" />
-      Installed
+      Установлено
     </span>
   ) : (
     <span className="flex items-center text-text-muted text-sm font-medium">
-      Install
+      Установить
       <IconChevronRight className="w-5 h-5 ml-1" />
     </span>
   )
@@ -86,11 +86,11 @@ const CreatorPackCard: React.FC<CreatorPackCardProps> = ({ pack, selected, onCli
       <div className="flex items-center justify-between gap-3 px-5 py-3">
         <div className="min-w-0">
           <p className="text-sm text-text-secondary truncate">
-            {pack.video_count} videos &middot; {formatBytes(sizeBytes, 0)}
+            {pack.video_count} видео · {formatBytes(sizeBytes, 0)}
           </p>
           {hasUpdate && (
             <span className="inline-block mt-1 text-xs px-2 py-0.5 rounded bg-lime-500/20 text-lime-700 dark:text-lime-300">
-              Update available
+              Доступно обновление
             </span>
           )}
         </div>
@@ -99,8 +99,8 @@ const CreatorPackCard: React.FC<CreatorPackCardProps> = ({ pack, selected, onCli
           {onUninstall && isInstalled && (
             <button
               type="button"
-              title="Uninstall pack"
-              aria-label="Uninstall pack"
+              title="Удалить подборку"
+              aria-label="Удалить подборку"
               className="p-1 rounded text-text-muted hover:text-red-500 hover:bg-red-500/10 transition-colors"
               onClick={(e) => {
                 e.stopPropagation()

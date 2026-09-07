@@ -2,12 +2,12 @@ import { useState, useCallback, useEffect } from 'react'
 import api from '~/lib/api'
 
 export const PIN_COLORS = [
-  { id: 'orange', label: 'Orange', hex: '#a84a12' },
-  { id: 'red', label: 'Red', hex: '#994444' },
-  { id: 'green', label: 'Green', hex: '#424420' },
-  { id: 'blue', label: 'Blue', hex: '#2563eb' },
-  { id: 'purple', label: 'Purple', hex: '#7c3aed' },
-  { id: 'yellow', label: 'Yellow', hex: '#ca8a04' },
+  { id: 'orange', label: 'Оранжевый', hex: '#a84a12' },
+  { id: 'red', label: 'Красный', hex: '#994444' },
+  { id: 'green', label: 'Зелёный', hex: '#424420' },
+  { id: 'blue', label: 'Синий', hex: '#2563eb' },
+  { id: 'purple', label: 'Фиолетовый', hex: '#7c3aed' },
+  { id: 'yellow', label: 'Жёлтый', hex: '#ca8a04' },
 ] as const
 
 export type PinColorId = typeof PIN_COLORS[number]['id']

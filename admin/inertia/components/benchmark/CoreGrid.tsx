@@ -51,8 +51,8 @@ export default function CoreGrid({ loads }: CoreGridProps) {
         ))}
       </div>
       <div className="text-xs text-desert-stone-dark font-mono">
-        {loads.length} thread{loads.length === 1 ? '' : 's'}
-        {grouped > 1 ? ` (${grouped}/cell)` : ''}
+        {loads.length} поток{loads.length === 1 ? '' : 'ов'}
+        {grouped > 1 ? ` (${grouped}/ячейка)` : ''}
       </div>
     </div>
   )

@@ -12,10 +12,10 @@ export default function useServiceInstallationActivity() {
       setInstallActivity((prev) => [
         ...prev,
         {
-          service_name: data.service_name ?? 'unknown',
-          type: data.status ?? 'unknown',
+          service_name: data.service_name ?? 'неизвестно',
+          type: data.status ?? 'неизвестно',
           timestamp: new Date().toISOString(),
-          message: data.message ?? 'No message provided',
+          message: data.message ?? 'Сообщение отсутствует',
         },
       ])
     })

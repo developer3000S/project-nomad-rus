@@ -44,13 +44,13 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
     setInstalling(true)
     try {
       await api.installCreatorPack(packToInstall.id)
-      addNotification({ message: `Started installing "${packToInstall.name}"`, type: 'success' })
+      addNotification({ message: `Начата установка "${packToInstall.name}"`, type: 'success' })
       invalidateCreatorPacks()
       invalidateDownloads()
       setPackToInstall(null)
     } catch (error) {
       console.error('Error installing creator pack:', error)
-      addNotification({ message: 'An error occurred while starting the install.', type: 'error' })
+      addNotification({ message: 'Произошла ошибка при запуске установки.', type: 'error' })
     } finally {
       setInstalling(false)
     }
@@ -61,13 +61,13 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
     setUninstalling(true)
     try {
       await api.uninstallCreatorPack(packToUninstall.id)
-      addNotification({ message: `Uninstalled "${packToUninstall.name}"`, type: 'success' })
+      addNotification({ message: `"${packToUninstall.name}" удалён`, type: 'success' })
       invalidateCreatorPacks()
       invalidateDownloads()
       setPackToUninstall(null)
     } catch (error) {
       console.error('Error uninstalling creator pack:', error)
-      addNotification({ message: 'An error occurred while uninstalling.', type: 'error' })
+      addNotification({ message: 'Произошла ошибка при удалении.', type: 'error' })
     } finally {
       setUninstalling(false)
     }
@@ -82,7 +82,7 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
         <div>
           <h3 className="text-xl font-semibold text-text-primary">Creator Packs</h3>
           <p className="text-sm text-text-muted">
-            Branded video collections from creators, for offline viewing
+            Брендированные видеоподборки от авторов для просмотра офлайн
           </p>
         </div>
       </div>
@@ -99,16 +99,16 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
           ))}
         </div>
       ) : (
-        <p className="text-text-muted mt-4">No creator packs available.</p>
+        <p className="text-text-muted mt-4">Нет доступных подборок авторов.</p>
       )}
 
       <StyledModal
         open={!!packToInstall}
-        title={packToInstall ? `Install ${packToInstall.name}?` : 'Install Creator Pack'}
+        title={packToInstall ? `Установить ${packToInstall.name}?` : 'Установить Creator Pack'}
         onClose={() => !installing && setPackToInstall(null)}
         onCancel={() => setPackToInstall(null)}
         onConfirm={handleConfirmInstall}
-        confirmText={packToInstall?.available_update_version ? 'Update pack' : 'Install pack'}
+        confirmText={packToInstall?.available_update_version ? 'Обновить подборку' : 'Установить подборку'}
         confirmIcon="IconDownload"
         confirmLoading={installing}
         icon={<IconMovie className="w-6 h-6" />}
@@ -116,12 +116,12 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
         {packToInstall && (
           <div className="space-y-3 text-text-secondary">
             <p>
-              {packToInstall.video_count} videos from {packToInstall.creator}, about{' '}
-              {formatBytes(packToInstall.size_mb * 1024 * 1024, 0)}. It will download in the
-              background and appear in Kiwix when ready.
+              {packToInstall.video_count} видео от {packToInstall.creator}, около{' '}
+              {formatBytes(packToInstall.size_mb * 1024 * 1024, 0)}. Загрузка будет идти в
+              фоне, и видео появятся в Kiwix, когда будут готовы.
             </p>
             <p className="text-sm text-text-muted">
-              Licensed content — personal use, not for redistribution.{' '}
+              Лицензионный контент — для личного использования, не для распространения.{' '}
               <a
                 href={LICENSE_URL}
                 target="_blank"
@@ -129,7 +129,7 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
                 className="text-desert-green underline hover:no-underline"
                 onClick={(e) => e.stopPropagation()}
               >
-                View license
+                Посмотреть лицензию
               </a>
             </p>
           </div>
@@ -138,11 +138,11 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
 
       <StyledModal
         open={!!packToUninstall}
-        title={packToUninstall ? `Uninstall ${packToUninstall.name}?` : 'Uninstall Creator Pack'}
+        title={packToUninstall ? `Удалить ${packToUninstall.name}?` : 'Удалить Creator Pack'}
         onClose={() => !uninstalling && setPackToUninstall(null)}
         onCancel={() => setPackToUninstall(null)}
         onConfirm={handleConfirmUninstall}
-        confirmText="Uninstall pack"
+        confirmText="Удалить подборку"
         confirmIcon="IconTrash"
         confirmVariant="danger"
         confirmLoading={uninstalling}
@@ -150,9 +150,9 @@ const CreatorPacksSection: React.FC<CreatorPacksSectionProps> = ({ allowUninstal
       >
         {packToUninstall && (
           <p className="text-text-secondary">
-            This removes the downloaded videos (
-            {formatBytes(packToUninstall.size_mb * 1024 * 1024, 0)}) from this NOMAD. You can
-            reinstall the pack anytime.
+            Это удалит загруженные видео (
+            {formatBytes(packToUninstall.size_mb * 1024 * 1024, 0)}) с этого NOMAD. Подборку
+            можно переустановить в любое время.
           </p>
         )}
       </StyledModal>

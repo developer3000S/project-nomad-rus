@@ -331,7 +331,7 @@ class API {
     })
 
     if (!response.ok || !response.body) {
-      throw new Error(`HTTP error: ${response.status}`)
+      throw new Error(`Ошибка HTTP: ${response.status}`)
     }
 
     const reader = response.body.getReader()
@@ -354,7 +354,7 @@ class API {
             data = JSON.parse(line.slice(6))
           } catch { continue /* skip malformed chunks */ }
 
-          if (data.error) throw new Error('The model encountered an error. Please try again.')
+          if (data.error) throw new Error('Модель столкнулась с ошибкой. Попробуйте ещё раз.')
 
           onChunk(
             data.message?.content ?? '',
@@ -919,12 +919,12 @@ class API {
     } catch (error: any) {
       // For 409 Conflict errors, throw a specific error that the UI can handle
       if (error.response?.status === 409) {
-        const err = new Error(error.response?.data?.error || 'This benchmark has already been submitted to the repository')
+        const err = new Error(error.response?.data?.error || 'Этот тест производительности уже был отправлен в репозиторий')
           ; (err as any).status = 409
         throw err
       }
       // For other errors, extract the message and throw
-      const errorMessage = error.response?.data?.error || error.message || 'Failed to submit benchmark'
+      const errorMessage = error.response?.data?.error || error.message || 'Не удалось отправить результаты теста производительности'
       throw new Error(errorMessage)
     }
   }

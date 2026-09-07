@@ -68,7 +68,7 @@ export default function DrugResultRow({ result, brandFirst = false }: Props) {
 
           {result.labelCount > 1 && (
             <span className="px-1.5 py-0.5 rounded text-xs bg-surface-secondary text-text-secondary flex-shrink-0">
-              {result.labelCount} labels
+              {result.labelCount} описаний
             </span>
           )}
         </div>

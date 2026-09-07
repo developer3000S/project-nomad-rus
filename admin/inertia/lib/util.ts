@@ -13,10 +13,10 @@ export function capitalizeFirstLetter(str?: string | null): string {
 }
 
 export function formatBytes(bytes: number, decimals = 2): string {
-  if (bytes === 0) return '0 Bytes'
+  if (bytes === 0) return '0 Байт'
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  const sizes = ['Байт', 'КБ', 'МБ', 'ГБ', 'ТБ']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
@@ -78,7 +78,7 @@ export function catchInternal<Fn extends (...args: any[]) => any>(fn: Fn): (...a
       console.error('Internal error caught:', error)
 
       if (globalNotificationCallback) {
-        const errorMessage = 'An internal error occurred. Please try again or check the console for details. ' + (error instanceof Error ? String(error.message).slice(0, 50) : '')
+        const errorMessage = 'Произошла внутренняя ошибка. Попробуйте ещё раз или проверьте консоль для получения подробностей. ' + (error instanceof Error ? String(error.message).slice(0, 50) : '')
         globalNotificationCallback({
           message: errorMessage,
           type: 'error',

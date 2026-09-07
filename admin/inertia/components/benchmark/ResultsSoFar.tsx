@@ -11,7 +11,7 @@ export default function ResultsSoFar({ partials }: { partials: BenchmarkPartialR
   return (
     <div className="bg-desert-white rounded-lg p-4 border border-desert-stone-light">
       <div className="text-xs font-semibold text-desert-stone-dark uppercase tracking-wide mb-3">
-        Results so far
+        Промежуточные результаты
       </div>
       <div className="flex flex-wrap gap-2">
         {partials.map((p) => (

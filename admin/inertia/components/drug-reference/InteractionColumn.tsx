@@ -47,7 +47,7 @@ export default function InteractionColumn({ entry, onRemove }: Props) {
           <button
             type="button"
             onClick={() => onRemove(entry.id)}
-            aria-label={`Remove ${displayName} from comparison`}
+            aria-label={`Убрать ${displayName} из сравнения`}
             className="flex-shrink-0 text-desert-stone-light hover:text-desert-stone-dark transition-colors text-lg leading-none ml-1 mt-0.5"
           >
             ×
@@ -61,7 +61,7 @@ export default function InteractionColumn({ entry, onRemove }: Props) {
           <LabelBlocks text={entry.drug_interactions} />
         ) : (
           <p className="text-sm text-desert-stone-light italic">
-            No labeled interaction text on this label.
+            В этом описании нет данных о взаимодействиях.
           </p>
         )}
       </div>

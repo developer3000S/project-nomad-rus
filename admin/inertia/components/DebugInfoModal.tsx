@@ -58,14 +58,14 @@ export default function DebugInfoModal({ open, onClose }: DebugInfoModalProps) {
       onCancel={onClose}
     >
       <p className="text-sm text-gray-500 mb-3 text-left">
-        This is non-sensitive system info you can share when reporting issues.
-        No passwords, IPs, or API keys are included.
+        Это неконфиденциальная системная информация, которую можно предоставить при сообщении об
+        ошибках. Пароли, IP-адреса и API-ключи не включены.
       </p>
 
       <textarea
         id="debug-info-text"
         readOnly
-        value={loading ? 'Loading...' : debugText}
+        value={loading ? 'Загрузка…' : debugText}
         rows={18}
         className="w-full font-mono text-xs text-black bg-gray-50 border border-gray-200 rounded-md p-3 resize-none focus:outline-none text-left"
       />
@@ -79,12 +79,12 @@ export default function DebugInfoModal({ open, onClose }: DebugInfoModalProps) {
           {copied ? (
             <>
               <IconCheck className="size-4" />
-              Copied!
+              Скопировано!
             </>
           ) : (
             <>
               <IconCopy className="size-4" />
-              Copy to Clipboard
+              Копировать в буфер обмена
             </>
           )}
         </button>
@@ -95,7 +95,7 @@ export default function DebugInfoModal({ open, onClose }: DebugInfoModalProps) {
           rel="noopener noreferrer"
           className="text-sm text-desert-green hover:underline"
         >
-          Open a GitHub Issue
+          Открыть issue на GitHub
         </a>
       </div>
     </StyledModal>

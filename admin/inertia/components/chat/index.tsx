@@ -139,6 +139,7 @@ export default function Chat({
     refetchOnMount: false,
   })
 
+
   const rewriteModelAvailable = useMemo(() => {
     return installedModels.some((model) => model.name === DEFAULT_QUERY_REWRITE_MODEL)
   }, [installedModels])
@@ -163,14 +164,14 @@ export default function Chat({
     }) => api.sendChatMessage({ ...request, stream: false }),
     onSuccess: async (data) => {
       if (!data || !activeSessionId) {
-        throw new Error('No response from Ollama')
+        throw new Error('Нет ответа от Ollama')
       }
 
       // Add assistant message
       const assistantMessage: ChatMessage = {
         id: `msg-${Date.now()}-assistant`,
         role: 'assistant',
-        content: data.message?.content || 'Sorry, I could not generate a response.',
+        content: data.message?.content || 'К сожалению, не удалось сгенерировать ответ.',
         timestamp: new Date(),
       }
 
@@ -185,7 +186,7 @@ export default function Chat({
       const errorMessage: ChatMessage = {
         id: `msg-${Date.now()}-error`,
         role: 'assistant',
-        content: 'Sorry, there was an error processing your request. Please try again.',
+        content: 'Произошла ошибка при обработке вашего запроса. Попробуйте ещё раз.',
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
@@ -276,17 +277,17 @@ export default function Chat({
   const handleClearHistory = useCallback(() => {
     openModal(
       <StyledModal
-        title="Clear All Chat History?"
+        title="Удалить всю историю чата?"
         onConfirm={() => deleteAllSessionsMutation.mutate()}
         onCancel={closeAllModals}
         open={true}
-        confirmText="Clear All"
-        cancelText="Cancel"
+        confirmText="Удалить всё"
+        cancelText="Отмена"
         confirmVariant="danger"
       >
         <p className="text-text-primary">
-          Are you sure you want to delete all chat sessions? This action cannot be undone and all
-          conversations will be permanently deleted.
+          Вы уверены, что хотите удалить все сеансы чата? Это действие нельзя отменить, и все
+          беседы будут удалены безвозвратно.
         </p>
       </StyledModal>,
       'confirm-clear-history-modal'
@@ -339,7 +340,7 @@ export default function Chat({
 
       // Create a new session if none exists
       if (!sessionId) {
-        const newSession = await api.createChatSession('New Chat', selectedModel)
+        const newSession = await api.createChatSession('Новый чат', selectedModel)
         if (newSession) {
           sessionId = newSession.id
           setActiveSessionId(sessionId)
@@ -450,7 +451,7 @@ export default function Chat({
                 {
                   id: assistantMsgId,
                   role: 'assistant',
-                  content: 'Sorry, there was an error processing your request. Please try again.',
+                  content: 'Произошла ошибка при обработке вашего запроса. Попробуйте ещё раз.',
                   timestamp: new Date(),
                 },
               ]
@@ -489,17 +490,17 @@ export default function Chat({
     <>
       {pendingModelSwitch && (
         <StyledModal
-          title={`Switch to ${pendingModelSwitch}?`}
+          title={`Переключиться на ${pendingModelSwitch}?`}
           onConfirm={handleConfirmModelSwitch}
           onCancel={handleCancelModelSwitch}
           open={true}
-          confirmText="Switch & New Chat"
-          cancelText="Cancel"
+          confirmText="Переключить и начать новый чат"
+          cancelText="Отмена"
           confirmVariant="primary"
         >
           <p className="text-text-primary">
-            Switching to <strong>{pendingModelSwitch}</strong> will start a new chat. Your current
-            conversation stays available in the sidebar.
+            Переключение на <strong>{pendingModelSwitch}</strong> начнёт новый чат. Текущая беседа
+            останется доступной в боковой панели.
           </p>
         </StyledModal>
       )}
@@ -522,7 +523,7 @@ export default function Chat({
         {isMobileSidebarOpen && (
           <button
             type="button"
-            aria-label="Close conversation sidebar"
+            aria-label="Закрыть боковую панель беседы"
             className="fixed inset-0 z-40 bg-black/40 md:hidden"
             onClick={() => setIsMobileSidebarOpen(false)}
           />
@@ -534,7 +535,7 @@ export default function Chat({
               <button
                 type="button"
                 className="rounded-lg p-1.5 hover:bg-surface-primary focus:outline-none focus:ring-2 focus:ring-desert-green md:hidden"
-                aria-label="Open conversation sidebar"
+                aria-label="Открыть боковую панель беседы"
                 aria-controls="chat-sidebar"
                 aria-expanded={isMobileSidebarOpen}
                 onClick={() => setIsMobileSidebarOpen(true)}
@@ -542,7 +543,7 @@ export default function Chat({
                 <IconMenu2 className="h-6 w-6 text-text-muted" aria-hidden="true" />
               </button>
               <h2 className="text-lg font-semibold text-text-primary truncate">
-                {activeSession?.title || 'New Chat'}
+                {activeSession?.title || 'Новый чат'}
               </h2>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 min-w-0">
@@ -555,12 +556,12 @@ export default function Chat({
                       : 'text-green-700 bg-green-50 border border-green-200'
                   )}
                 >
-                  {remoteStatus?.connected === false ? 'Remote Disconnected' : 'Remote Connected'}
+                  {remoteStatus?.connected === false ? 'Удалённый отключен' : 'Удалённый подключен'}
                 </span>
               )}
               <div className="flex items-center gap-2">
               <label htmlFor="collection-select" className="text-sm text-text-secondary">
-                Search in:
+                Искать в:
               </label>
               <select
                 id="collection-select"
@@ -568,7 +569,7 @@ export default function Chat({
                 onChange={(e) => setCollectionFilter(e.target.value)}
                 className="px-3 py-1.5 border border-border-default rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-desert-green focus:border-transparent bg-surface-primary"
               >
-                <option value="">All</option>
+                <option value="">Все</option>
                 {knownCollections.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
@@ -576,12 +577,12 @@ export default function Chat({
             </div>
             <div className="flex items-center gap-2 min-w-0">
                 <label htmlFor="model-select" className="text-sm text-text-secondary">
-                  Model:
+                  Модель:
                 </label>
                 {isLoadingModels ? (
-                  <div className="text-sm text-text-muted">Loading models...</div>
+                  <div className="text-sm text-text-muted">Загрузка моделей...</div>
                 ) : installedModels.length === 0 ? (
-                  <div className="text-sm text-red-600">No models installed</div>
+                  <div className="text-sm text-red-600">Нет установленных моделей</div>
                 ) : (
                   <select
                     id="model-select"
@@ -600,11 +601,11 @@ export default function Chat({
               </div>
               {selectedModelSupportsThinking && (
               <div className="flex items-center">
-                <span className="text-sm text-text-secondary select-none">Thinking:</span>
+                <span className="text-sm text-text-secondary select-none">Рассуждение:</span>
                 <InfoTooltip
                   position="bottom"
                   align="right"
-                  text="When on, this model works through its reasoning before answering. Slower, but often better on tricky questions. Your choice is remembered for this model; the default for other models is set in AI Assistant settings."
+                  text="Когда включено, модель сначала обдумывает свой ответ. Медленнее, но часто лучше для сложных вопросов. Ваш выбор запоминается для этой модели; настройка по умолчанию для других моделей доступна в настройках AI-ассистента."
                 />
                 <Switch
                   id="chat-thinking-toggle"
@@ -616,7 +617,7 @@ export default function Chat({
             {isInModal && (
                 <button
                   type="button"
-                  aria-label="Close chat"
+                  aria-label="Закрыть чат"
                   onClick={() => {
                     if (onClose) {
                       onClose()
