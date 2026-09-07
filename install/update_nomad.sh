@@ -117,12 +117,12 @@ ensure_docker_compose_file_exists() {
 }
 
 force_recreate() {
-  echo -e "${YELLOW}#${RESET} Pulling the latest Docker images..."
-  if ! docker compose -p project-nomad -f /opt/project-nomad/compose.yml pull; then
-    echo -e "${RED}#${RESET} Failed to pull the latest Docker images. Please check your network connection and the Docker registry status, then try again."
+  echo -e "${YELLOW}#${RESET} Building Docker images locally from source..."
+  if ! docker compose -p project-nomad -f /opt/project-nomad/compose.yml build; then
+    echo -e "${RED}#${RESET} Failed to build Docker images. Please check your source tree and try again."
     exit 1
   fi
-  
+
   echo -e "${YELLOW}#${RESET} Forcing recreation of containers..."
   if ! docker compose -p project-nomad -f /opt/project-nomad/compose.yml up -d --force-recreate; then
     echo -e "${RED}#${RESET} Failed to recreate containers. Please check the Docker logs for more details."

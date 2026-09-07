@@ -41,9 +41,9 @@ perform_update() {
     log "System update initiated"
     sleep 1
 
-    # Apply target image tag to compose.yml before pulling
+    # Apply target image tag to compose.yml before building
     log "Applying image tag '${target_tag}' to compose.yml..."
-    if sed -i "s|\(image: ghcr\.io/crosstalk-solutions/project-nomad\):.*|\1:${target_tag}|" "$COMPOSE_FILE" 2>> "$LOG_FILE"; then
+    if sed -i "s|\(image: project-nomad\):.*|\1:${target_tag}|" "$COMPOSE_FILE" 2>> "$LOG_FILE"; then
         log "Successfully updated compose.yml admin image tag to '${target_tag}'"
     else
         log "ERROR: Failed to update compose.yml image tag"
@@ -51,25 +51,24 @@ perform_update() {
         return 1
     fi
 
-    # Stage 2: Pulling images
-    write_status "pulling" 20 "Pulling latest Docker images..."
-    log "Pulling latest Docker images..."
+    # Stage 2: Building images
+    write_status "building" 20 "Building Docker images locally..."
+    log "Building Docker images locally..."
 
-    # Snapshot the images backing our managed repos before the pull supersedes
+    # Snapshot the images backing our managed repos before the build supersedes
     # them, so the post-update cleanup can drop only NOMAD's own dangling layers.
     PRE_UPDATE_IMAGE_IDS=$(snapshot_managed_image_ids)
 
-    if docker compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" pull >> "$LOG_FILE" 2>&1; then
-        log "Successfully pulled latest images"
-        write_status "pulled" 60 "Images pulled successfully"
+    if docker compose -p "$COMPOSE_PROJECT_NAME" -f "$COMPOSE_FILE" build >> "$LOG_FILE" 2>&1; then
+        log "Successfully built images"
+        write_status "built" 60 "Images built successfully"
     else
-        log "ERROR: Failed to pull images"
-        write_status "error" 0 "Failed to pull Docker images - check logs"
+        log "ERROR: Failed to build images"
+        write_status "error" 0 "Failed to build Docker images - check logs"
         return 1
     fi
-    
+
     sleep 2
-    
     # Stage 3: Recreating containers individually (excluding updater)
     write_status "recreating" 65 "Recreating containers individually..."
     log "Recreating containers individually (excluding updater)..."

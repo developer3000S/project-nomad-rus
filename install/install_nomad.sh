@@ -30,10 +30,7 @@ GREEN='\033[1;32m' # Светло-зелёный.
 
 WHIPTAIL_TITLE="Установка Project NOMAD"
 NOMAD_DIR="/opt/project-nomad"
-MANAGEMENT_COMPOSE_FILE_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/management_compose.yaml"
-START_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/start_nomad.sh"
-STOP_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/stop_nomad.sh"
-UPDATE_SCRIPT_URL="https://raw.githubusercontent.com/Crosstalk-Solutions/project-nomad/refs/heads/main/install/update_nomad.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 script_option_debug='true'
 accepted_terms='false'
 local_ip_address=''
@@ -407,15 +404,35 @@ create_nomad_directory(){
   sudo touch "${NOMAD_DIR}/storage/logs/admin.log"
 }
 
-download_management_compose_file() {
+copy_management_compose_file() {
   local compose_file_path="${NOMAD_DIR}/compose.yml"
+  local repo_root
+  repo_root="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-  echo -e "${YELLOW}#${RESET} Загрузка docker-compose файла для управления...\\n"
-  if ! curl -fsSL "$MANAGEMENT_COMPOSE_FILE_URL" -o "$compose_file_path"; then
-    echo -e "${RED}#${RESET} Не удалось загрузить файл docker compose. Проверьте URL и попробуйте снова."
+  echo -e "${YELLOW}#${RESET} Копирование docker-compose файла для управления из репозитория...\\n"
+  if ! cp "${SCRIPT_DIR}/management_compose.yaml" "$compose_file_path"; then
+    echo -e "${RED}#${RESET} Не удалось скопировать файл docker compose. Проверьте наличие ${SCRIPT_DIR}/management_compose.yaml и попробуйте снова."
     exit 1
   fi
-  echo -e "${GREEN}#${RESET} Файл docker compose успешно загружен в $compose_file_path.\\n"
+  echo -e "${GREEN}#${RESET} Файл docker compose успешно скопирован в $compose_file_path.\\n"
+
+  # Контексты сборки в исходном файле относительные; развёрнутый compose живёт в ${NOMAD_DIR},
+  # поэтому прописываем абсолютный путь к корню репозитория, иначе docker будет искать
+  # Dockerfile вне дерева исходников.
+  echo -e "${YELLOW}#${RESET} Привязка контекстов сборки к ${repo_root}...\\n"
+  if ! sed -i "s|context: \.\./\.\.|context: ${repo_root}|g" "$compose_file_path"; then
+    echo -e "${RED}#${RESET} Не удалось настроить контексты сборки в файле docker compose."
+    exit 1
+  fi
+
+  # Контейнер updater пересобирает образы через docker.sock, и compose CLI внутри
+  # него читает build-контекст с файловой системы контейнера. Пробрасываем дерево
+  # исходников в updater по тому же абсолютному пути (только для чтения).
+  echo -e "${YELLOW}#${RESET} Монтирование исходников в контейнер updater...\\n"
+  if ! sed -i "\|      - /opt/project-nomad:/opt/project-nomad # Writable access|a\\      - ${repo_root}:${repo_root}:ro # Дерево исходников для локальной пересборки образов" "$compose_file_path"; then
+    echo -e "${RED}#${RESET} Не удалось добавить монтирование исходников в файл docker compose."
+    exit 1
+  fi
 
   local app_key=$(generateRandomPass)
   local db_root_password=$(generateRandomPass)
@@ -442,26 +459,26 @@ download_management_compose_file() {
   echo -e "${GREEN}#${RESET} Файл docker compose успешно настроен.\\n"
 }
 
-download_helper_scripts() {
+copy_helper_scripts() {
   local start_script_path="${NOMAD_DIR}/start_nomad.sh"
   local stop_script_path="${NOMAD_DIR}/stop_nomad.sh"
   local update_script_path="${NOMAD_DIR}/update_nomad.sh"
 
-  echo -e "${YELLOW}#${RESET} Загрузка вспомогательных скриптов...\\n"
-  if ! curl -fsSL --retry 5 --retry-delay 3 "$START_SCRIPT_URL" -o "$start_script_path"; then
-    echo -e "${RED}#${RESET} Не удалось загрузить скрипт запуска. Проверьте URL и попробуйте снова."
+  echo -e "${YELLOW}#${RESET} Копирование вспомогательных скриптов из репозитория...\\n"
+  if ! cp "${SCRIPT_DIR}/start_nomad.sh" "$start_script_path"; then
+    echo -e "${RED}#${RESET} Не удалось скопировать скрипт запуска. Проверьте наличие ${SCRIPT_DIR}/start_nomad.sh и попробуйте снова."
     exit 1
   fi
   chmod +x "$start_script_path"
 
-  if ! curl -fsSL --retry 5 --retry-delay 3 "$STOP_SCRIPT_URL" -o "$stop_script_path"; then
-    echo -e "${RED}#${RESET} Не удалось загрузить скрипт остановки. Проверьте URL и попробуйте снова."
+  if ! cp "${SCRIPT_DIR}/stop_nomad.sh" "$stop_script_path"; then
+    echo -e "${RED}#${RESET} Не удалось скопировать скрипт остановки. Проверьте наличие ${SCRIPT_DIR}/stop_nomad.sh и попробуйте снова."
     exit 1
   fi
   chmod +x "$stop_script_path"
 
-  if ! curl -fsSL --retry 5 --retry-delay 3 "$UPDATE_SCRIPT_URL" -o "$update_script_path"; then
-    echo -e "${RED}#${RESET} Не удалось загрузить скрипт обновления. Проверьте URL и попробуйте снова."
+  if ! cp "${SCRIPT_DIR}/update_nomad.sh" "$update_script_path"; then
+    echo -e "${RED}#${RESET} Не удалось скопировать скрипт обновления. Проверьте наличие ${SCRIPT_DIR}/update_nomad.sh и попробуйте снова."
     exit 1
   fi
   chmod +x "$update_script_path"
@@ -630,8 +647,8 @@ check_docker_compose
 setup_nvidia_container_toolkit
 get_local_ip
 create_nomad_directory
-download_helper_scripts
-download_management_compose_file
+copy_helper_scripts
+copy_management_compose_file
 start_management_containers
 verify_gpu_setup
 success_message
